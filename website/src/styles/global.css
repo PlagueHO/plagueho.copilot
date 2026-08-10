@@ -1210,7 +1210,7 @@ html.theme-light .theme-toggle__icon--dark {
   margin-bottom: 0.75rem;
 }
 
-.install-card code {
+.install-card > code {
   display: block;
   overflow-wrap: anywhere;
   color: var(--color-text);
@@ -1257,6 +1257,61 @@ html.theme-light .theme-toggle__icon--dark {
 
 .how-to-install p + p {
   margin-top: 0.5rem;
+}
+
+.how-to-install__paths {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.how-to-install__paths section {
+  border-top: 1px solid var(--color-glass-border);
+  padding-top: 1rem;
+}
+
+.how-to-install h3,
+.install-card h3 {
+  color: var(--color-text-emphasis);
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.install-card h3 {
+  margin-top: 1.25rem;
+}
+
+.install-card h2 + h3 {
+  margin-top: 0;
+}
+
+.how-to-install__paths .install__buttons {
+  margin: 0.75rem 0;
+}
+
+.install-card__vscode {
+  margin-bottom: 1.25rem;
+}
+
+.install-card__vscode summary {
+  color: var(--color-link);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.install-card__vscode code {
+  display: block;
+  overflow-x: auto;
+  color: var(--color-text);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  white-space: pre;
 }
 
 .install-card .install-card__note {

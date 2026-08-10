@@ -14,9 +14,16 @@ interface Extension {
   platform: string;
   previewUrl: string;
   readmeHtml: string;
-  installUrl: string;
+  directInstallUrl: string;
   sourceUrl: string;
   pluginName: string;
+  marketplaceSource: string;
+  marketplaceName: string;
+  marketplaceAddUrl: string;
+  copilotAppInstallUrl: string;
+  vscodeInstallUrl: string;
+  vscodeInsidersInstallUrl: string;
+  marketplaceAddCommand: string;
   installCommand: string;
 }
 
@@ -36,7 +43,11 @@ export function getStaticPaths() {
 
 const { extension } = Astro.props as { extension: Extension };
 const base = import.meta.env.BASE_URL;
-const copilotInstallUrl = `ghapp://plugins/install?source=${encodeURIComponent(`${extension.pluginName}@plagueho-copilot`)}`;
+const vscodeMarketplaceSetting = JSON.stringify(
+  { "chat.plugins.marketplaces": [extension.marketplaceSource] },
+  null,
+  2,
+);
 ---
 <Layout
   title={`${extension.name} — DSR Copilot Catalog`}
@@ -71,35 +82,59 @@ const copilotInstallUrl = `ghapp://plugins/install?source=${encodeURIComponent(`
       <aside class="extension-detail__sidebar">
         <section class="install-card">
           <h2>Install</h2>
-          <p>Install this canvas extension in the GitHub Copilot app:</p>
+          <h3>1. Add the marketplace once</h3>
+          <p>
+            Register <code>{extension.marketplaceSource}</code> before using marketplace installation.
+          </p>
           <div class="install__buttons">
             <a
               class="install__button install__button--primary"
-              href={copilotInstallUrl}
-              title="Install in the GitHub Copilot app"
+              href={extension.marketplaceAddUrl}
+              title="Register the marketplace in the GitHub Copilot app"
             >
-              Install in Copilot app
+              Add marketplace in Copilot app
             </a>
             <button
               class="install__button install__button--secondary"
-              id="copy-extension-url"
+              id="copy-marketplace-command"
               type="button"
-              data-url={extension.installUrl}
-              title="Copy extension URL"
+              data-command={extension.marketplaceAddCommand}
+              title="Copy the GitHub Copilot CLI marketplace command"
             >
-              Copy URL
+              Copy CLI command
             </button>
+          </div>
+          <details class="install-card__vscode">
+            <summary>VS Code and VS Code Insiders setup</summary>
+            <p>Add this to the user <code>settings.json</code> in either editor:</p>
+            <code>{vscodeMarketplaceSetting}</code>
+          </details>
+
+          <h3>2. Install this extension</h3>
+          <div class="install__buttons">
+            <a
+              class="install__button install__button--primary"
+              href={extension.copilotAppInstallUrl}
+              title="Install in the GitHub Copilot app"
+            >
+              Copilot app
+            </a>
             <a
               class="install__button install__button--secondary"
-              href={extension.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="View source"
+              href={extension.vscodeInstallUrl}
+              title="Install in VS Code"
             >
-              Source
+              VS Code
+            </a>
+            <a
+              class="install__button install__button--secondary"
+              href={extension.vscodeInsidersInstallUrl}
+              title="Install in VS Code Insiders"
+            >
+              VS Code Insiders
             </a>
           </div>
-          <p>Or run this plugin install command:</p>
+          <p>Or run this command in GitHub Copilot CLI:</p>
           <code>{extension.installCommand}</code>
           <button
             class="install__button install__button--primary"
@@ -109,6 +144,29 @@ const copilotInstallUrl = `ghapp://plugins/install?source=${encodeURIComponent(`
           >
             Copy install command
           </button>
+
+          <h3>Direct GitHub installation in the Copilot app</h3>
+          <p>
+            Choose <strong>Install Plugin from Source</strong> in the GitHub Copilot app, then paste this plugin-folder URL.
+          </p>
+          <button
+            class="install__button install__button--secondary"
+            id="copy-extension-url"
+            type="button"
+            data-url={extension.directInstallUrl}
+            title="Copy the GitHub plugin-folder URL"
+          >
+            Copy GitHub folder URL
+          </button>
+          <a
+            class="install__button install__button--secondary"
+            href={extension.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="View source"
+          >
+            Source
+          </a>
           <p class="install-card__note">
             Canvas extensions are supported in the GitHub Copilot app only.
           </p>
@@ -131,14 +189,22 @@ const copilotInstallUrl = `ghapp://plugins/install?source=${encodeURIComponent(`
 
 <script>
   const button = document.getElementById('copy-install') as HTMLButtonElement | null;
+  const marketplaceButton = document.getElementById('copy-marketplace-command') as HTMLButtonElement | null;
   const urlButton = document.getElementById('copy-extension-url') as HTMLButtonElement | null;
+
+  marketplaceButton?.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(marketplaceButton.dataset.command ?? '');
+    marketplaceButton.textContent = 'Copied!';
+    window.setTimeout(() => {
+      marketplaceButton.textContent = 'Copy CLI command';
+    }, 2000);
+  });
 
   urlButton?.addEventListener('click', async () => {
     await navigator.clipboard.writeText(urlButton.dataset.url ?? '');
-    const originalText = urlButton.textContent ?? 'Copy URL';
     urlButton.textContent = 'Copied!';
     window.setTimeout(() => {
-      urlButton.textContent = originalText;
+      urlButton.textContent = 'Copy GitHub folder URL';
     }, 2000);
   });
 

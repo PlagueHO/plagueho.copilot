@@ -12,9 +12,17 @@ interface Extension {
   keywords: string[];
   platform: string;
   previewUrl: string;
-  installUrl: string;
+  directInstallUrl: string;
   sourceUrl: string;
   pluginName: string;
+  marketplaceSource: string;
+  marketplaceName: string;
+  marketplaceAddUrl: string;
+  copilotAppInstallUrl: string;
+  vscodeInstallUrl: string;
+  vscodeInsidersInstallUrl: string;
+  marketplaceAddCommand: string;
+  installCommand: string;
 }
 
 interface SiteData {
@@ -50,12 +58,50 @@ const base = import.meta.env.BASE_URL;
     <div class="container">
       <div class="listing-toolbar">
         <div class="how-to-install">
-          <h2>How to install canvas extensions</h2>
+          <h2>Install canvas extensions</h2>
           <p>
-            Open the GitHub Copilot app and select <strong>Install in Copilot app</strong> on an extension.
-            You can also select <strong>Copy URL</strong> to copy the extension URL for installation.
+            Canvas extensions are delivered with their plugin. Choose one of these installation paths.
           </p>
-          <p>To install from the CLI, open an extension to see its plugin install command.</p>
+          <div class="how-to-install__paths">
+            <section>
+              <h3>1. Register the marketplace, then install</h3>
+              <p>
+                Register <code>{siteData.extensions[0]?.marketplaceSource ?? 'PlagueHO/plagueho.copilot'}</code> once before using the Copilot app, CLI, VS Code, or VS Code Insiders install links.
+              </p>
+              {siteData.extensions[0] && (
+                <div class="install__buttons">
+                  <a
+                    class="install__button install__button--primary"
+                    href={siteData.extensions[0].marketplaceAddUrl}
+                    title="Register the marketplace in the GitHub Copilot app"
+                  >
+                    Add marketplace in Copilot app
+                  </a>
+                  <button
+                    class="install__button install__button--secondary copy-install-value"
+                    type="button"
+                    data-value={siteData.extensions[0].marketplaceAddCommand}
+                    data-label="Copy CLI command"
+                    title="Copy the GitHub Copilot CLI marketplace command"
+                  >
+                    Copy CLI command
+                  </button>
+                </div>
+              )}
+              <p>
+                In VS Code or VS Code Insiders, add <code>PlagueHO/plagueho.copilot</code> to the <code>chat.plugins.marketplaces</code> setting.
+              </p>
+              <p>
+                Use the card’s Copilot app button, or open an extension for VS Code, VS Code Insiders, and CLI installation options.
+              </p>
+            </section>
+            <section>
+              <h3>2. Or install directly from GitHub in the Copilot app</h3>
+              <p>
+                Open <strong>Install Plugin from Source</strong> in the GitHub Copilot app, then paste the GitHub plugin-folder URL copied from an extension card.
+              </p>
+            </section>
+          </div>
         </div>
         <div class="listing-toolbar__row">
           <div class="search-bar">
@@ -105,7 +151,7 @@ const base = import.meta.env.BASE_URL;
             <div class="extension-card__actions">
               <a
                 class="install__button install__button--primary"
-                href={`ghapp://plugins/install?source=${encodeURIComponent(`${extension.pluginName}@plagueho-copilot`)}`}
+                href={extension.copilotAppInstallUrl}
                 title="Install in the GitHub Copilot app"
               >
                 Install in Copilot app
@@ -113,8 +159,8 @@ const base = import.meta.env.BASE_URL;
               <button
                 class="install__button install__button--secondary copy-extension-url"
                 type="button"
-                data-url={extension.installUrl}
-                title="Copy extension URL"
+                data-url={extension.directInstallUrl}
+                title="Copy the GitHub plugin-folder URL for direct installation"
               >
                 Copy URL
               </button>
@@ -159,13 +205,23 @@ const base = import.meta.env.BASE_URL;
     emptyState.classList.toggle('is-visible', visible === 0);
   });
 
-  document.querySelectorAll<HTMLButtonElement>('.copy-extension-url').forEach((button) => {
+  document.querySelectorAll<HTMLButtonElement>('.copy-install-value').forEach((button) => {
     button.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(button.dataset.url ?? '');
-      const originalText = button.textContent ?? 'Copy URL';
+      await navigator.clipboard.writeText(button.dataset.value ?? '');
+      const originalText = button.dataset.label ?? 'Copy value';
       button.textContent = 'Copied!';
       window.setTimeout(() => {
         button.textContent = originalText;
+      }, 2000);
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.copy-extension-url').forEach((button) => {
+    button.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(button.dataset.url ?? '');
+      button.textContent = 'Copied!';
+      window.setTimeout(() => {
+        button.textContent = 'Copy URL';
       }, 2000);
     });
   });
