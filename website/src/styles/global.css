@@ -1149,6 +1149,10 @@ html.theme-light .theme-toggle__icon--dark {
   align-items: start;
 }
 
+.extension-detail__layout > * {
+  min-width: 0;
+}
+
 .extension-detail__main {
   display: grid;
   gap: 2rem;
@@ -1165,6 +1169,11 @@ html.theme-light .theme-toggle__icon--dark {
   padding: 1.5rem;
 }
 
+.extension-detail__preview {
+  min-width: 0;
+  overflow: hidden;
+}
+
 .extension-detail__preview h2,
 .extension-detail__readme > h2,
 .install-card h2 {
@@ -1175,6 +1184,8 @@ html.theme-light .theme-toggle__icon--dark {
 
 .extension-detail__preview img {
   display: block;
+  max-width: 100%;
+  height: auto;
   width: 100%;
   border: 1px solid var(--color-glass-border);
   border-radius: var(--border-radius);
@@ -1183,8 +1194,7 @@ html.theme-light .theme-toggle__icon--dark {
 .extension-detail__sidebar {
   display: grid;
   gap: 1rem;
-  position: sticky;
-  top: 5rem;
+  min-width: 0;
 }
 
 .install-card p {
