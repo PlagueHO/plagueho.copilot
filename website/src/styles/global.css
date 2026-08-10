@@ -1079,6 +1079,11 @@ html.theme-light .theme-toggle__icon--dark {
   text-decoration: none;
 }
 
+.extension-card__link:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
 .extension-card:hover {
   color: var(--color-text);
   border-color: rgba(16, 185, 129, 0.55);
