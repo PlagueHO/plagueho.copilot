@@ -189,6 +189,7 @@ function parseExtension(reference, plugin) {
     platform: "Windows",
     previewUrl: `extension-previews/${previewName}`,
     readmeHtml: marked.parse(readme),
+    installUrl: `${githubBase}/tree/main/extensions/${id}`,
     sourceUrl: `${githubBase}/tree/main/extensions/${id}`,
     pluginName: plugin.name,
     installCommand: `copilot plugin install ${plugin.name}@plagueho-copilot`,
