@@ -18,6 +18,13 @@ const dataDir = join(websiteDir, "public", "data");
 const previewDir = join(websiteDir, "public", "extension-previews");
 const compositionNamespace = "com.github.plagueho";
 const githubBase = "https://github.com/PlagueHO/plagueho.copilot";
+const marketplaceSource = "PlagueHO/plagueho.copilot";
+const marketplaceName = "plagueho-copilot";
+const marketplaceBranch = "marketplace";
+
+function createCopilotAppLauncher(appLink) {
+  return `https://github.com/copilot/app/launch?open=${encodeURIComponent(appLink)}`;
+}
 
 mkdirSync(dataDir, { recursive: true });
 mkdirSync(previewDir, { recursive: true });
@@ -172,6 +179,8 @@ function parseExtension(reference, plugin) {
   const readme = readFileSync(join(extensionDir, "README.md"), "utf8");
   const canvas = extractCanvasMetadata(source);
   const previewName = `${id}.png`;
+  const pluginSource = `${plugin.name}@${marketplaceName}`;
+  const directInstallUrl = `${githubBase}/tree/${marketplaceBranch}/plugins/${plugin.name}`;
   cpSync(
     join(extensionDir, "assets", "preview.png"),
     join(previewDir, previewName),
@@ -189,10 +198,21 @@ function parseExtension(reference, plugin) {
     platform: "Windows",
     previewUrl: `extension-previews/${previewName}`,
     readmeHtml: marked.parse(readme),
-    installUrl: `${githubBase}/tree/main/extensions/${id}`,
+    directInstallUrl,
     sourceUrl: `${githubBase}/tree/main/extensions/${id}`,
     pluginName: plugin.name,
-    installCommand: `copilot plugin install ${plugin.name}@plagueho-copilot`,
+    marketplaceSource,
+    marketplaceName,
+    marketplaceAddUrl: createCopilotAppLauncher(
+      `ghapp://plugins/marketplace/add?source=${encodeURIComponent(marketplaceSource)}`,
+    ),
+    copilotAppInstallUrl: createCopilotAppLauncher(
+      `ghapp://plugins/install?source=${encodeURIComponent(pluginSource)}`,
+    ),
+    vscodeInstallUrl: `vscode://chat-plugin/install?source=${encodeURIComponent(marketplaceSource)}&plugin=${encodeURIComponent(plugin.name)}`,
+    vscodeInsidersInstallUrl: `vscode-insiders://chat-plugin/install?source=${encodeURIComponent(marketplaceSource)}&plugin=${encodeURIComponent(plugin.name)}`,
+    marketplaceAddCommand: `copilot plugin marketplace add ${marketplaceSource}`,
+    installCommand: `copilot plugin install ${pluginSource}`,
   };
 }
 
