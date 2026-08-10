@@ -1143,8 +1143,7 @@ html.theme-light .theme-toggle__icon--dark {
 }
 
 .extension-detail__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+  display: flex;
   gap: 2rem;
   align-items: start;
 }
@@ -1156,6 +1155,7 @@ html.theme-light .theme-toggle__icon--dark {
 .extension-detail__main {
   display: grid;
   gap: 2rem;
+  flex: 1 1 0;
   min-width: 0;
 }
 
@@ -1193,6 +1193,7 @@ html.theme-light .theme-toggle__icon--dark {
 
 .extension-detail__sidebar {
   display: grid;
+  flex: 0 0 20rem;
   gap: 1rem;
   min-width: 0;
 }
@@ -1378,7 +1379,9 @@ html.theme-light .theme-toggle__icon--dark {
   .plugin-grid { grid-template-columns: 1fr; }
   .skills-grid { grid-template-columns: 1fr; }
   .extension-grid { grid-template-columns: 1fr; }
-  .extension-detail__layout { grid-template-columns: 1fr; }
+  .extension-detail__layout { flex-direction: column; }
+  .extension-detail__main,
+  .extension-detail__sidebar { flex-basis: auto; width: 100%; }
   .extension-detail__sidebar { position: static; }
   .install__panels { grid-template-columns: 1fr; }
   .container { padding: 0 16px; }
