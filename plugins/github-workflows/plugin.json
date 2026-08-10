@@ -1,12 +1,13 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "github-workflows",
   "description": "GitHub workflow skills for PR review evaluation, Dependabot PR management, Copilot resource optimization, and AI guidance scaffolding.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": {
     "name": "Daniel Scott-Raynsford",
     "url": "https://github.com/PlagueHO"
   },
-  "repository": "https://github.com/PlagueHO/plagueho.skills",
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
   "license": "MIT",
   "keywords": [
     "github",
@@ -18,11 +19,15 @@
     "dependabot",
     "auto-merge"
   ],
-  "skills": [
-    "./skills/evaluate-pr-review-comments",
-    "./skills/merge-dependabot-prs",
-    "./skills/optimize-github-copilot-resources",
-    "./skills/release-changelog",
-    "./skills/scaffold-repo-ai-guidance"
-  ]
+  "extensions": {
+    "com.github.plagueho": {
+      "skills": [
+        "./skills/evaluate-pr-review-comments/",
+        "./skills/merge-dependabot-prs/",
+        "./skills/optimize-github-copilot-resources/",
+        "./skills/release-changelog/",
+        "./skills/scaffold-repo-ai-guidance/"
+      ]
+    }
+  }
 }

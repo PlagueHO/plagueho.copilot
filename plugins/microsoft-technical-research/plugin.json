@@ -1,12 +1,13 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "microsoft-technical-research",
   "description": "Deep technical research on Microsoft technologies with multi-agent orchestration and structured documentation output.",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": {
     "name": "Daniel Scott-Raynsford",
     "url": "https://github.com/PlagueHO"
   },
-  "repository": "https://github.com/PlagueHO/plagueho.skills",
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
   "license": "MIT",
   "keywords": [
     "microsoft",
@@ -17,10 +18,21 @@
     "microsoft-learn",
     "multi-agent"
   ],
-  "skills": [
-    "./skills/create-microsoft-research-plan",
-    "./skills/research-note-template",
-    "./skills/research-output-scaffolding",
-    "./skills/initiate-microsoft-researcher"
-  ]
+  "extensions": {
+    "com.github.plagueho": {
+      "agents": [
+        "./agents/research-content-writer.md",
+        "./agents/research-deep-reader.md",
+        "./agents/research-microsoft-technology.md",
+        "./agents/research-quality-reviewer.md",
+        "./agents/research-source-discovery.md"
+      ],
+      "skills": [
+        "./skills/create-microsoft-research-plan/",
+        "./skills/initiate-microsoft-researcher/",
+        "./skills/research-note-template/",
+        "./skills/research-output-scaffolding/"
+      ]
+    }
+  }
 }

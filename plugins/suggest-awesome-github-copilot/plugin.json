@@ -1,12 +1,13 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "suggest-awesome-github-copilot",
   "description": "Discover and install GitHub Copilot assets from the awesome-copilot repository.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Daniel Scott-Raynsford",
     "url": "https://github.com/PlagueHO"
   },
-  "repository": "https://github.com/PlagueHO/plagueho.skills",
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
   "license": "MIT",
   "keywords": [
     "awesome-copilot",
@@ -16,10 +17,14 @@
     "skills",
     "discovery"
   ],
-  "skills": [
-    "./skills/suggest-awesome-github-copilot-agents",
-    "./skills/suggest-awesome-github-copilot-instructions",
-    "./skills/suggest-awesome-github-copilot-prompts",
-    "./skills/suggest-awesome-github-copilot-skills"
-  ]
+  "extensions": {
+    "com.github.plagueho": {
+      "skills": [
+        "./skills/suggest-awesome-github-copilot-agents/",
+        "./skills/suggest-awesome-github-copilot-instructions/",
+        "./skills/suggest-awesome-github-copilot-prompts/",
+        "./skills/suggest-awesome-github-copilot-skills/"
+      ]
+    }
+  }
 }

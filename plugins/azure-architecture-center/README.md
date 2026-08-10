@@ -7,7 +7,7 @@ multitenant guidance and documentation for currency, accuracy, and completeness.
 
 ```bash
 # Using Copilot CLI
-copilot plugin install azure-architecture-center@plagueho-agent-skills
+copilot plugin install azure-architecture-center@plagueho-copilot
 ```
 
 ## What's Included
@@ -28,7 +28,7 @@ copilot plugin install azure-architecture-center@plagueho-agent-skills
 
 ## Source
 
-This plugin is part of [PlagueHO/plagueho.skills](https://github.com/PlagueHO/plagueho.skills), the agent plugin marketplace for Daniel Scott-Raynsford.
+This plugin is part of [PlagueHO/plagueho.copilot](https://github.com/PlagueHO/plagueho.copilot), the Copilot resource catalog for Daniel Scott-Raynsford.
 
 ## License
 

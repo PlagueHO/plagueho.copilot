@@ -28,13 +28,15 @@ interface SiteData {
   description: string;
   version: string;
   plugins: Plugin[];
+  extensions: { id: string }[];
 }
 
 let siteData: SiteData = {
-  name: "DSR’s Plugin Marketplace",
+  name: "DSR Copilot Catalog",
   description: '',
   version: '0.0.0',
   plugins: [],
+  extensions: [],
 };
 
 const dataPath = resolve('./public/data/data.json');
@@ -84,19 +86,28 @@ const quickLinks: QuickLink[] = [
     count: totalAgents,
     delay: 160,
   },
+  {
+    href: `${base}extensions/`,
+    title: 'Extensions',
+    desc: 'Interactive canvases for the GitHub Copilot app',
+    icon: 'canvas',
+    color: '#10b981',
+    count: siteData.extensions.length,
+    delay: 240,
+  },
 ];
 ---
-<Layout title="DSR's Plugin Marketplace" currentPage="home">
+<Layout title="DSR Copilot Catalog" currentPage="home">
 
   <!-- Hero -->
   <header class="hero">
     <div class="container">
       <h1 class="hero__title">
-        <span class="gradient-text">DSR's Plugin Marketplace</span>
+        <span class="gradient-text">DSR Copilot Catalog</span>
       </h1>
       <p class="hero__subtitle">
-        Curated agent skills and plugin bundles for GitHub Copilot and coding
-        agents by Daniel Scott-Raynsford.
+        Plugins, skills, agents, and interactive canvas extensions for GitHub
+        Copilot by Daniel Scott-Raynsford.
       </p>
       <div class="hero__stats">
         <div class="stat">
@@ -108,8 +119,12 @@ const quickLinks: QuickLink[] = [
           <span class="stat__label">Skills</span>
         </div>
         <div class="stat">
-          <span class="stat__value">{siteData.version !== '0.0.0' ? siteData.version : '—'}</span>
-          <span class="stat__label">Version</span>
+          <span class="stat__value">{totalAgents || '—'}</span>
+          <span class="stat__label">Agents</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{siteData.extensions.length || '—'}</span>
+          <span class="stat__label">Extensions</span>
         </div>
       </div>
     </div>
@@ -129,7 +144,7 @@ const quickLinks: QuickLink[] = [
           <h3 class="install__subheading">VS Code / VS Code Insiders</h3>
           <div class="install__buttons">
             <a
-              href="vscode://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.skills"
+              href="vscode://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot"
               class="install__button install__button--primary"
             >
               <svg class="install__button-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -138,7 +153,7 @@ const quickLinks: QuickLink[] = [
               Open in VS Code
             </a>
             <a
-              href="vscode-insiders://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.skills"
+              href="vscode-insiders://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot"
               class="install__button install__button--secondary"
             >
               <svg class="install__button-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -149,10 +164,10 @@ const quickLinks: QuickLink[] = [
           </div>
           <p class="install__subtitle">Or manually add to settings.json:</p>
           <div class="install__code-block">
-            <code class="install__code">"chat.plugins.marketplaces": ["PlagueHO/plagueho.skills"]</code>
+            <code class="install__code">"chat.plugins.marketplaces": ["PlagueHO/plagueho.copilot"]</code>
             <button
               class="install__copy"
-              data-copy='"chat.plugins.marketplaces": ["PlagueHO/plagueho.skills"]'
+              data-copy='"chat.plugins.marketplaces": ["PlagueHO/plagueho.copilot"]'
               title="Copy to clipboard"
               aria-label="Copy to clipboard"
             >
@@ -168,10 +183,10 @@ const quickLinks: QuickLink[] = [
           <h3 class="install__subheading">GitHub Copilot CLI / Claude Code</h3>
           <p class="install__subtitle">Add the marketplace:</p>
           <div class="install__code-block">
-            <code class="install__code">/plugin marketplace add PlagueHO/plagueho.skills</code>
+            <code class="install__code">/plugin marketplace add PlagueHO/plagueho.copilot</code>
             <button
               class="install__copy"
-              data-copy="/plugin marketplace add PlagueHO/plagueho.skills"
+              data-copy="/plugin marketplace add PlagueHO/plagueho.copilot"
               title="Copy to clipboard"
               aria-label="Copy to clipboard"
             >
@@ -182,10 +197,10 @@ const quickLinks: QuickLink[] = [
           </div>
           <p class="install__subtitle">Then install a plugin:</p>
           <div class="install__code-block">
-            <code class="install__code">/plugin install &lt;plugin&gt;@plagueho-agent-skills</code>
+            <code class="install__code">copilot plugin install &lt;plugin&gt;@plagueho-copilot</code>
             <button
               class="install__copy"
-              data-copy="/plugin install <plugin>@plagueho-agent-skills"
+              data-copy="copilot plugin install <plugin>@plagueho-copilot"
               title="Copy to clipboard"
               aria-label="Copy to clipboard"
             >

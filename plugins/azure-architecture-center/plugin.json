@@ -1,12 +1,13 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "azure-architecture-center",
   "description": "Skills for Azure Architecture Center documentation maintainers: discover needed updates and review multitenant docs for currency, accuracy, and completeness.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": {
     "name": "Daniel Scott-Raynsford",
     "url": "https://github.com/PlagueHO"
   },
-  "repository": "https://github.com/PlagueHO/plagueho.skills",
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
   "license": "MIT",
   "keywords": [
     "azure",
@@ -16,10 +17,14 @@
     "documentation",
     "review"
   ],
-  "skills": [
-    "./skills/discover-multitenant-service-updates",
-    "./skills/review-multitenant-service-specific-doc",
-    "./skills/review-multitenant-approaches-doc",
-    "./skills/review-multitenant-considerations-doc"
-  ]
+  "extensions": {
+    "com.github.plagueho": {
+      "skills": [
+        "./skills/discover-multitenant-service-updates/",
+        "./skills/review-multitenant-approaches-doc/",
+        "./skills/review-multitenant-considerations-doc/",
+        "./skills/review-multitenant-service-specific-doc/"
+      ]
+    }
+  }
 }

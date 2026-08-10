@@ -1,0 +1,119 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface Extension {
+  id: string;
+  canvasId: string;
+  name: string;
+  description: string;
+  version: string;
+  author?: { name?: string; url?: string } | null;
+  keywords: string[];
+  platform: string;
+  previewUrl: string;
+  readmeHtml: string;
+  sourceUrl: string;
+  pluginName: string;
+  installCommand: string;
+}
+
+interface SiteData {
+  extensions: Extension[];
+}
+
+export function getStaticPaths() {
+  const dataPath = resolve('./public/data/data.json');
+  if (!existsSync(dataPath)) return [];
+  const siteData = JSON.parse(readFileSync(dataPath, 'utf8')) as SiteData;
+  return siteData.extensions.map((extension) => ({
+    params: { id: extension.id },
+    props: { extension },
+  }));
+}
+
+const { extension } = Astro.props as { extension: Extension };
+const base = import.meta.env.BASE_URL;
+---
+<Layout
+  title={`${extension.name} — DSR Copilot Catalog`}
+  description={extension.description}
+  currentPage="extensions"
+>
+  <div class="page-hero">
+    <div class="container">
+      <a class="extension-detail__back" href={`${base}extensions/`}>← Canvas Extensions</a>
+      <h1 class="page-hero__title">{extension.name}</h1>
+      <p class="page-hero__description">{extension.description}</p>
+    </div>
+  </div>
+
+  <main class="extension-detail">
+    <div class="container extension-detail__layout">
+      <div class="extension-detail__main">
+        <section class="extension-detail__preview" aria-labelledby="preview-heading">
+          <h2 id="preview-heading">Preview</h2>
+          <img
+            src={`${base}${extension.previewUrl}`}
+            alt={`${extension.name} preview`}
+          />
+        </section>
+
+        <section class="extension-detail__readme" aria-labelledby="documentation-heading">
+          <h2 id="documentation-heading">Documentation</h2>
+          <div class="article-content" set:html={extension.readmeHtml} />
+        </section>
+      </div>
+
+      <aside class="extension-detail__sidebar">
+        <section class="install-card">
+          <h2>Install</h2>
+          <p>Run this command in the GitHub Copilot app:</p>
+          <code>{extension.installCommand}</code>
+          <button
+            class="install__button install__button--primary"
+            id="copy-install"
+            type="button"
+            data-command={extension.installCommand}
+          >
+            Copy install command
+          </button>
+          <p class="install-card__note">
+            Canvas extensions are supported in the GitHub Copilot app only.
+          </p>
+        </section>
+
+        <dl class="extension-metadata">
+          <div><dt>Plugin</dt><dd>{extension.pluginName}</dd></div>
+          <div><dt>Canvas ID</dt><dd>{extension.canvasId}</dd></div>
+          <div><dt>Version</dt><dd>{extension.version}</dd></div>
+          <div><dt>Platform</dt><dd>{extension.platform}</dd></div>
+          {extension.author?.name && (
+            <div><dt>Author</dt><dd>{extension.author.name}</dd></div>
+          )}
+        </dl>
+
+        <a
+          class="install__button install__button--secondary"
+          href={extension.sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View source on GitHub
+        </a>
+      </aside>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const button = document.getElementById('copy-install') as HTMLButtonElement | null;
+  button?.addEventListener('click', async () => {
+    await navigator.clipboard.writeText(button.dataset.command ?? '');
+    button.textContent = 'Copied!';
+    window.setTimeout(() => {
+      button.textContent = 'Copy install command';
+    }, 2000);
+  });
+</script>

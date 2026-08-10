@@ -1,22 +1,28 @@
 # Repository Instructions
 
-Agent skills and plugin marketplace for Daniel Scott-Raynsford (PlagueHO).
-Contains Copilot plugin bundles (skills, scripts, references) published via
-`github.com/PlagueHO/plagueho.skills`.
+Copilot resource catalog for Daniel Scott-Raynsford (PlagueHO). Contains
+reusable skills, agents, canvas extensions, and plugin manifests published via
+`github.com/PlagueHO/plagueho.copilot`.
 For code style, naming, and authoring patterns see
 `.github/copilot-instructions.md`.
 
 ## Layout
 
 ```text
-plugins/<plugin>/            # Plugin bundle root
-  plugin.json                # Plugin definition (schema-validated)
+skills/<skill-name>/         # Canonical reusable skills
+  SKILL.md
+  scripts/
+  references/
+  assets/
+agents/<agent>.agent.md      # Canonical reusable agents
+extensions/<extension>/      # Canonical canvas extension sources
+  extension.mjs
+  package.json
   README.md
-  skills/<skill-name>/
-    SKILL.md                 # Required: YAML frontmatter + instructions
-    scripts/                 # Optional: .ps1 + .sh automation pairs
-    references/              # Optional: supporting docs
-    assets/                  # Optional: templates/schemas
+  assets/preview.png
+plugins/<plugin>/            # Lightweight composition manifests
+  plugin.json
+  README.md
 tests/<skill-name>/
   trigger_tests.yaml         # Skill activation test cases
 scripts/
@@ -24,7 +30,7 @@ scripts/
   update-marketplace-from-plugins.sh
 .github/
   plugin/
-    marketplace.json         # Source of truth for marketplace index
+    marketplace.json         # Generated marketplace index
     marketplace.schema.json
     plugin.schema.json
   workflows/
@@ -33,6 +39,7 @@ scripts/
 .claude-plugin/
   marketplace.json           # Must be exact mirror of .github/plugin/marketplace.json
 docs/images/overview.svg     # Plugin catalog SVG (skill counts + names)
+eng/                         # Validation and materialization tooling
 ```
 
 ## Commands
@@ -41,6 +48,8 @@ Always run before submitting changes:
 
 ```bash
 pnpm install          # Install dependencies (required before lint)
+pnpm plugin:validate  # Validate manifests and reusable references
+pnpm test             # Test publishing tooling
 pnpm lint:md          # Lint all Markdown files (must pass)
 ```
 
@@ -67,12 +76,12 @@ diff .github/plugin/marketplace.json .claude-plugin/marketplace.json
 
 All of the following must be updated in the **same commit**:
 
-1. `plugins/<plugin>/skills/<skill-name>/SKILL.md` — create skill
-2. `plugins/<plugin>/plugin.json` — add `"./skills/<skill-name>"` to `skills` array
+1. `skills/<skill-name>/SKILL.md` — create the reusable skill
+2. `plugins/<plugin>/plugin.json` — add `"./skills/<skill-name>/"` to `extensions["com.github.plagueho"].skills`
 3. `.github/plugin/marketplace.json` — bump plugin `version` (patch or minor)
 4. `.claude-plugin/marketplace.json` — mirror step 3 exactly (must be identical)
 5. `README.md` — update plugin row if skill count or description changes
-6. `docs/images/overview.svg` — update `<text class="count">` and skill name list
+6. `docs/images/overview.svg` — update resource counts and plugin list
 7. `tests/<skill-name>/trigger_tests.yaml` — add activation test cases
 
 Omitting any of these leaves the marketplace index, README, and overview out
@@ -113,7 +122,7 @@ All checks must pass before merging.
 | PowerShell/Python indentation | 4 spaces |
 | Line endings | LF; newline at end of every file; no trailing whitespace |
 | Scripts | Always provide both `.ps1` (PowerShell 7+) and `.sh` (Bash) variants |
-| `plugin.json` repository field | Always `"https://github.com/PlagueHO/plagueho.skills"` |
+| `plugin.json` repository field | Always `"https://github.com/PlagueHO/plagueho.copilot"` |
 | SKILL.md body length | Keep under 500 lines; move detail to `references/` files |
 | Script headers | Include comment block: purpose, parameters, usage |
 
@@ -128,5 +137,5 @@ All checks must pass before merging.
 
 ## Reference Examples
 
-- **Well-structured skill**: `plugins/azure-infrastructure-deployment/skills/update-avm-modules/SKILL.md`
+- **Well-structured skill**: `skills/update-avm-modules/SKILL.md`
 - **Trigger tests**: `tests/update-avm-modules/trigger_tests.yaml`

@@ -1,84 +1,122 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Plugin Definition",
-  "description": "Schema for an individual plugin.json file within a plugin directory.",
+  "$id": "https://raw.githubusercontent.com/PlagueHO/plagueho.copilot/main/.github/plugin/plugin.schema.json",
+  "title": "PlagueHO Agent Plugin Source Manifest",
+  "description": "Agent Plugins 1.0.0 source manifest with private build-time resource composition.",
   "type": "object",
-  "required": ["name", "description", "version"],
-  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "name",
+    "description",
+    "version",
+    "repository",
+    "extensions"
+  ],
   "properties": {
+    "$schema": {
+      "const": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+    },
     "name": {
       "type": "string",
-      "minLength": 1,
-      "pattern": "^[a-z0-9][a-z0-9-]*$",
-      "description": "Plugin identifier (lowercase, hyphens allowed)."
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
     },
     "description": {
       "type": "string",
       "minLength": 1,
-      "description": "Short description of what the plugin does."
+      "maxLength": 500
     },
     "version": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "description": "Semantic version of the plugin."
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "author": {
       "type": "object",
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string",
           "minLength": 1
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^https://"
         }
       },
-      "required": ["name"],
       "additionalProperties": false
     },
     "repository": {
-      "type": "string",
-      "description": "URL of the source repository."
+      "const": "https://github.com/PlagueHO/plagueho.copilot"
     },
     "homepage": {
       "type": "string",
-      "description": "URL to the plugin homepage or documentation."
+      "pattern": "^https://"
     },
     "license": {
       "type": "string",
-      "description": "License identifier (e.g. MIT)."
+      "minLength": 1
     },
     "keywords": {
       "type": "array",
+      "maxItems": 10,
+      "uniqueItems": true,
       "items": {
         "type": "string",
-        "minLength": 1
-      },
-      "description": "Search keywords for discovery."
+        "pattern": "^[a-z0-9-]{1,30}$"
+      }
     },
-    "skills": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
+    "extensions": {
+      "type": "object",
+      "required": [
+        "com.github.plagueho"
+      ],
+      "properties": {
+        "com.github.copilot": {
+          "type": "object",
+          "required": [
+            "logo"
+          ],
+          "properties": {
+            "logo": {
+              "const": "assets/preview.png"
+            }
+          },
+          "additionalProperties": true
+        },
+        "com.github.plagueho": {
+          "$ref": "#/definitions/composition"
+        }
       },
-      "description": "Relative paths to skill directories within this plugin."
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "composition": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "agents": {
+          "$ref": "#/definitions/references"
+        },
+        "extensions": {
+          "$ref": "#/definitions/references"
+        },
+        "skills": {
+          "$ref": "#/definitions/references"
+        }
+      },
+      "additionalProperties": false
     },
-    "agents": {
+    "references": {
       "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
       "items": {
         "type": "string",
-        "minLength": 1
-      },
-      "description": "Relative paths to agent definitions within this plugin."
-    },
-    "hooks": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "minLength": 1
-      },
-      "description": "Relative paths to hook definitions within this plugin."
+        "pattern": "^\\./(agents|extensions|skills)/[a-z0-9][a-z0-9-]*(/|\\.md)?$"
+      }
     }
   }
 }

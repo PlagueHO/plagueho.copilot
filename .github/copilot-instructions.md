@@ -2,8 +2,8 @@
 
 ## Repository Purpose
 
-Agent skills and plugin marketplace for Daniel Scott-Raynsford (PlagueHO).
-Contains Copilot plugin bundles with skills, scripts, and reference data.
+Copilot resource catalog for Daniel Scott-Raynsford (PlagueHO). Contains
+reusable skills, agents, canvas extensions, and plugin composition manifests.
 See `AGENTS.md` for repository layout, build commands, and the atomic checklist
 required when adding a new skill.
 
@@ -92,18 +92,26 @@ Required fields: `name`, `description`, `version`.
 
 ```json
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "my-plugin",
   "description": "Short description of what the plugin does.",
   "version": "1.0.0",
-  "repository": "https://github.com/PlagueHO/plagueho.skills",
-  "skills": ["./skills/<skill-name>"]
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
+  "extensions": {
+    "com.github.plagueho": {
+      "skills": ["./skills/<skill-name>/"]
+    }
+  }
 }
 ```
 
 - `name` must match `^[a-z0-9][a-z0-9-]*$`
 - `version` is semver `x.y.z`
-- `repository` must always be `"https://github.com/PlagueHO/plagueho.skills"`
-- Skills listed as relative paths: `"./skills/<skill-name>"`
+- `repository` must always be `"https://github.com/PlagueHO/plagueho.copilot"`
+- Keep reusable skills in top-level `skills/` and list sorted source references under `extensions["com.github.plagueho"]`
+- Keep reusable agents in top-level `agents/` with `.agent.md` source filenames
+- Keep reusable canvas extensions in top-level `extensions/` and publish each through a matching standalone plugin
+- Do not commit extension runtime state or user-specific `copilot-extension.json` files
 
 ## Test Files — trigger_tests.yaml
 

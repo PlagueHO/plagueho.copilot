@@ -1,134 +1,96 @@
-# PlagueHO Agent Skills
+# PlagueHO Copilot Catalog
 
-This repository contains Daniel Scott-Raynsford's curated set of agent
-skills and plugin bundles for coding agents. For information about the
-Agent Skills standard, see [agentskills.io](https://agentskills.io).
-
-> **Note:** This is a personal repository/marketplace for plugins, skills,
-> and agents that I develop and use across my own projects. When a plugin or
-> skill proves to be generally beneficial, it will be contributed upstream to
-> the [github/awesome-copilot](https://github.com/github/awesome-copilot)
-> community repository.
-
-## What's Included
+This repository contains Daniel Scott-Raynsford's curated GitHub Copilot plugins, reusable skills, custom agents, and canvas extensions. Resources that prove broadly useful are contributed upstream to [github/awesome-copilot](https://github.com/github/awesome-copilot).
 
 <p align="center">
-  <img src="docs/images/overview.svg" alt="Plugin catalog overview" width="840"/>
+  <img src="docs/images/overview.svg" alt="Copilot resource catalog overview" width="840"/>
 </p>
+
+## Catalog
 
 | Plugin | Description |
 |--------|-------------|
-| [azure-architecture-center](plugins/azure-architecture-center/) | Skills for Azure Architecture Center documentation maintainers: review multitenant guidance and docs. |
-| [azure-infrastructure-deployment](plugins/azure-infrastructure-deployment/) | Provision Azure identities and manage Azure Verified Module versions. |
-| [content-and-learning](plugins/content-and-learning/) | Review content for AI readiness and generate Microsoft technology learning pathways. |
-| [developer-environment](plugins/developer-environment/) | Scaffold dotfiles repos and sync VS Code profiles across editions. |
-| [dotnet-modernization](plugins/dotnet-modernization/) | Convert legacy .NET project files to modern SDK-style format. |
-| [github-workflows](plugins/github-workflows/) | Evaluate PR review comments, merge Dependabot PRs in parallel, optimize Copilot resources, and scaffold repo AI guidance. |
-| [microsoft-technical-research](plugins/microsoft-technical-research/) | Deep technical research on Microsoft technologies with multi-agent orchestration and structured documentation output. |
-| [powershell-modernization](plugins/powershell-modernization/) | Modernize PowerShell test suites by migrating Pester v4 tests to Pester v5. |
-| [skill-lifecycle](plugins/skill-lifecycle/) | Create, convert, and generate agent skills from prompts and pull requests. |
-| [suggest-awesome-github-copilot](plugins/suggest-awesome-github-copilot/) | Discover and install GitHub Copilot assets from the awesome-copilot repository. |
+| [azure-architecture-center](plugins/azure-architecture-center/) | Review and maintain Azure Architecture Center multitenant guidance. |
+| [azure-infrastructure-deployment](plugins/azure-infrastructure-deployment/) | Provision Azure identities and update Azure Verified Modules. |
+| [content-and-learning](plugins/content-and-learning/) | Review AI content readiness and create learning pathways. |
+| [developer-environment](plugins/developer-environment/) | Scaffold dotfiles repositories and synchronize VS Code profiles. |
+| [dotnet-modernization](plugins/dotnet-modernization/) | Convert legacy .NET projects to SDK style. |
+| [github-workflows](plugins/github-workflows/) | Evaluate reviews, manage Dependabot PRs, optimize Copilot resources, and generate release content. |
+| [microsoft-technical-research](plugins/microsoft-technical-research/) | Orchestrate structured Microsoft technical research with custom agents. |
+| [powershell-modernization](plugins/powershell-modernization/) | Migrate Pester v4 tests to Pester v5. |
+| [skill-lifecycle](plugins/skill-lifecycle/) | Create and convert agent skills. |
+| [suggest-awesome-github-copilot](plugins/suggest-awesome-github-copilot/) | Discover resources from the awesome-copilot catalog. |
+| [windows-app-storage-inspector-cleanup](plugins/windows-app-storage-inspector-cleanup/) | Inspect Windows application storage and safely recycle approved cleanup items. |
 
-## Installation
+Browse the shareable catalog at [plagueho.github.io/plagueho.copilot](https://plagueho.github.io/plagueho.copilot/).
 
-### VS Code / VS Code Insiders
+## Install the Marketplace
 
-**Option A: Add marketplace via settings** (recommended)
+### VS Code
 
-[![Open in VS Code](https://img.shields.io/static/v1?label=Open&message=VS%20Code&logo=visualstudiocode&logoColor=white&labelColor=007ACC&color=007ACC)](vscode://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.skills)
-[![Open in VS Code Insiders](https://img.shields.io/static/v1?label=Open&message=VS%20Code%20Insiders&logo=visualstudiocode&logoColor=white&labelColor=6B3B9E&color=6B3B9E)](vscode-insiders://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.skills)
+[![Open in VS Code](https://img.shields.io/static/v1?label=Open&message=VS%20Code&logo=visualstudiocode&logoColor=white&labelColor=007ACC&color=007ACC)](vscode://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot)
+[![Open in VS Code Insiders](https://img.shields.io/static/v1?label=Open&message=VS%20Code%20Insiders&logo=visualstudiocode&logoColor=white&labelColor=6B3B9E&color=6B3B9E)](vscode-insiders://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot)
 
-Or manually add to your VS Code `settings.json`:
+Or add the repository to `settings.json`:
 
 ```jsonc
-// settings.json
 {
   "chat.plugins.enabled": true,
-  "chat.plugins.marketplaces": ["PlagueHO/plagueho.skills"]
+  "chat.plugins.marketplaces": ["PlagueHO/plagueho.copilot"]
 }
 ```
 
-**Option B: Install from command palette**
-
-1. Open the Command Palette (`Ctrl+Shift+P` / `⇧⌘P`)
-2. Run **Chat: Install Plugin From Source**
-3. Enter: `https://github.com/PlagueHO/plagueho.skills`
-
-Once configured, type `/plugins` in Copilot Chat or use the `@agentPlugins`
-filter in Extensions to browse and install plugins from the marketplace.
-
-### Copilot CLI / Claude Code
-
-1. Launch Copilot CLI or Claude Code
-
-2. Add the marketplace:
-
-   ```text
-   /plugin marketplace add PlagueHO/plagueho.skills
-   ```
-
-3. Install a plugin:
-
-   ```text
-   /plugin install <plugin>@plagueho-agent-skills
-   ```
-
-   Replace `<plugin>` with a specific plugin name (e.g., `azure-infrastructure-deployment`)
-
-4. Restart to load the new plugins
-
-5. View available skills:
-
-   ```text
-   /skills
-   ```
-
-### GitHub Pages Site
-
-Browse the full plugin catalog at [**plagueho.github.io/plagueho.skills**](https://plagueho.github.io/plagueho.skills)
-
-## Repository Structure
+### GitHub Copilot CLI
 
 ```text
-PlagueHO/plagueho.skills/
-├── plugins/                    # Agent plugin bundles (canonical layout)
-│   ├── <plugin-name>/
-│   │   ├── plugin.json         # Plugin definition (source of truth)
-│   │   ├── README.md           # Plugin documentation
-│   │   └── skills/
-│   │       └── <skill-name>/
-│   │           └── SKILL.md
-│   └── ...
-├── tests/                      # Skill tests
-│   └── <skill-name>/
-│       └── trigger_tests.yaml
-├── scripts/                    # Marketplace build scripts
-│   ├── Update-MarketplaceFromPlugins.ps1
-│   └── update-marketplace-from-plugins.sh
-├── docs/                       # Reference documentation
-│   └── SKILLS.md
-├── .github/
-│   ├── plugin/                 # Marketplace index and schemas
-│   │   ├── marketplace.json
-│   │   ├── marketplace.schema.json
-│   │   └── plugin.schema.json
-│   ├── workflows/              # CI workflows
-│   ├── CODEOWNERS
-│   └── copilot-instructions.md
-├── .claude-plugin/             # Claude plugin registry
-│   └── marketplace.json
-├── CONTRIBUTING.md
-├── AGENTS.md
-├── LICENSE
-├── SECURITY.md
-└── README.md
+/plugin marketplace add PlagueHO/plagueho.copilot
+/plugin install <plugin>@plagueho-copilot
+```
+
+### Canvas Extensions
+
+Canvas extensions are supported in the GitHub Copilot app. Install the Windows App Storage Inspector from Copilot:
+
+```text
+copilot plugin install windows-app-storage-inspector-cleanup@plagueho-copilot
+```
+
+## Source and Publishing Model
+
+Human-maintained reusable resources live on `main`:
+
+```text
+agents/                         # Reusable custom agents
+extensions/                     # Reusable canvas extension sources
+skills/                         # Reusable agent skills
+plugins/<plugin>/plugin.json    # Agent Plugins 1.0.0 metadata and composition
+tests/<skill>/                  # Skill trigger tests
+eng/                            # Validation, generation, and materialization
+website/                        # GitHub Pages catalog
+```
+
+Plugin manifests reference reusable sources through `extensions["com.github.plagueho"]`. The publish workflow copies those sources into conventional plugin folders, removes the private composition metadata, and updates the generated `marketplace` branch. Do not edit that branch directly.
+
+## Local Validation
+
+```bash
+pnpm install
+pnpm plugin:validate
+pnpm test
+pnpm lint:md
+npm --prefix website install
+node website/build.mjs
+npm --prefix website run build
 ```
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and how
-to add a new plugin.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the resource and extension contribution workflows.
+
+## Migration to Version 3
+
+Marketplace version `3.0.0` renames the repository from `plagueho.skills` to `plagueho.copilot` and the marketplace identifier from `plagueho-agent-skills` to `plagueho-copilot`. GitHub redirects old repository URLs, but existing marketplace configuration and plugin install commands should be updated to the new names.
 
 ## License
 
-See [LICENSE](LICENSE) for details.
+See [LICENSE](LICENSE).

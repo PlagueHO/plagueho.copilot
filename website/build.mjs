@@ -1,248 +1,259 @@
 #!/usr/bin/env node
-/**
- * Build script for the plagueho.skills GitHub Pages site.
- *
- * Reads marketplace.json and each plugin.json, then writes a
- * data.json into website/public/data/ for use by the Astro build.
- * Run this before `astro build`.
- */
 
-import { readdirSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { existsSync } from "node:fs";
 import { marked } from "marked";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, "..");
-const dataDir = join(__dirname, "public", "data");
+const websiteDir = dirname(fileURLToPath(import.meta.url));
+const root = join(websiteDir, "..");
+const dataDir = join(websiteDir, "public", "data");
+const previewDir = join(websiteDir, "public", "extension-previews");
+const compositionNamespace = "com.github.plagueho";
+const githubBase = "https://github.com/PlagueHO/plagueho.copilot";
 
-// Ensure output directory exists
 mkdirSync(dataDir, { recursive: true });
+mkdirSync(previewDir, { recursive: true });
 
-// Read marketplace
-const marketplace = JSON.parse(
-  readFileSync(join(root, ".github/plugin/marketplace.json"), "utf-8")
-);
+function readJson(path) {
+  return JSON.parse(readFileSync(path, "utf8"));
+}
 
-/**
- * Parse all top-level frontmatter fields from a SKILL.md or agent.md file.
- * Handles block scalars (>- / >), lists, and one level of nested objects.
- */
+function parseScalar(value) {
+  const trimmed = value.trim().replace(/^["']|["']$/g, "");
+  if (trimmed === "true") return true;
+  if (trimmed === "false") return false;
+  if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+    return trimmed
+      .slice(1, -1)
+      .split(",")
+      .map((item) => item.trim().replace(/^["']|["']$/g, ""))
+      .filter(Boolean);
+  }
+  return trimmed;
+}
+
 function parseFrontmatterFields(content) {
-  const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---/);
-  if (!fmMatch) return {};
+  const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
+  if (!match) return {};
 
-  const lines = fmMatch[1].split("\n");
+  const lines = match[1].split("\n");
   const result = {};
-  let i = 0;
+  let index = 0;
 
-  while (i < lines.length) {
-    const line = lines[i];
-    const topMatch = line.match(/^([a-zA-Z][a-zA-Z0-9-]*):\s*(.*)/);
-    if (!topMatch) { i++; continue; }
+  while (index < lines.length) {
+    const topLevel = lines[index].match(
+      /^([a-zA-Z][a-zA-Z0-9-]*):\s*(.*)/,
+    );
+    if (!topLevel) {
+      index++;
+      continue;
+    }
 
-    const key = topMatch[1];
-    const rest = topMatch[2].trim();
-
-    if (rest === ">-" || rest === ">") {
-      // Block scalar — collect indented continuation lines
+    const key = topLevel[1];
+    const value = topLevel[2].trim();
+    if (value === ">-" || value === ">") {
       const parts = [];
-      i++;
-      while (i < lines.length && (lines[i].startsWith("  ") || lines[i].trim() === "")) {
-        const trimmed = lines[i].trim();
-        if (trimmed !== "") parts.push(trimmed);
-        i++;
+      index++;
+      while (
+        index < lines.length &&
+        (lines[index].startsWith("  ") || lines[index].trim() === "")
+      ) {
+        if (lines[index].trim()) parts.push(lines[index].trim());
+        index++;
       }
       result[key] = parts.join(" ");
-    } else if (rest === "") {
-      // Could be a list or a nested object
-      i++;
-      if (i < lines.length && /^  - /.test(lines[i])) {
+      continue;
+    }
+
+    if (value === "") {
+      index++;
+      if (index < lines.length && /^  - /.test(lines[index])) {
         const items = [];
-        while (i < lines.length && /^  - /.test(lines[i])) {
-          items.push(lines[i].replace(/^  - /, "").trim());
-          i++;
+        while (index < lines.length && /^  - /.test(lines[index])) {
+          items.push(parseScalar(lines[index].replace(/^  - /, "")));
+          index++;
         }
         result[key] = items;
-      } else if (i < lines.length && /^  [a-zA-Z]/.test(lines[i])) {
-        const obj = {};
-        while (i < lines.length && /^  ([a-zA-Z][a-zA-Z0-9-]*):\s*(.*)/.test(lines[i])) {
-          const nm = lines[i].match(/^  ([a-zA-Z][a-zA-Z0-9-]*):\s*(.*)/);
-          if (nm) obj[nm[1]] = nm[2].trim().replace(/^["']|["']$/g, "");
-          i++;
+      } else {
+        const objectValue = {};
+        while (index < lines.length) {
+          const nested = lines[index].match(
+            /^  ([a-zA-Z][a-zA-Z0-9-]*):\s*(.*)/,
+          );
+          if (!nested) break;
+          objectValue[nested[1]] = parseScalar(nested[2]);
+          index++;
         }
-        result[key] = obj;
+        if (Object.keys(objectValue).length > 0) result[key] = objectValue;
       }
-      // else: empty value — skip
-    } else {
-      result[key] = rest.replace(/^["']|["']$/g, "");
-      i++;
+      continue;
     }
+
+    result[key] = parseScalar(value);
+    index++;
   }
 
   return result;
 }
 
-/**
- * Parse a single skill or agent entry, returning enriched metadata.
- * @param {string} skillOrAgentPath - path from plugin.json (e.g. "./skills/my-skill")
- * @param {string} pluginDir        - absolute path to the plugin directory
- * @param {string} pluginSource     - plugin source folder name (for GitHub URL)
- * @param {"skill"|"agent"} type
- */
-function parseSkillOrAgent(skillOrAgentPath, pluginDir, pluginSource, type) {
-  const dirName = type === "skill" ? "skills" : "agents";
-  const defaultExt = ".agent.md";
-  const normalized = skillOrAgentPath.replace(`./${dirName}/`, "");
-
-  const itemName = type === "agent"
-    ? normalized.replace(/\.agent\.md$/i, "")
-    : normalized;
-
-  const filePath = type === "skill"
-    ? join(pluginDir, dirName, itemName, "SKILL.md")
-    : join(pluginDir, dirName, itemName.endsWith(".agent.md") ? itemName : `${itemName}${defaultExt}`);
-
-  let description = "";
-  let metadata = null;
-  let compatibility = null;
-  let argumentHint = null;
-  let userInvocable = null;
-  let tools = null;
-  let subAgents = null;
-
-  if (existsSync(filePath)) {
-    const content = readFileSync(filePath, "utf-8");
-    const fm = parseFrontmatterFields(content);
-    description = fm.description ?? "";
-    metadata = fm.metadata ?? null;
-    compatibility = fm.compatibility ?? null;
-    argumentHint = fm["argument-hint"] ?? null;
-    userInvocable = fm["user-invocable"] ?? null;
-    if (type === "agent") {
-      tools = fm.tools ?? null;
-      subAgents = fm.agents ?? null;
-    }
-  }
-
-  // Collect scripts and reference/asset files for skills
-  let scripts = [];
-  let assets = [];
-  if (type === "skill") {
-    const skillDir = join(pluginDir, "skills", itemName);
-    const scriptsDir = join(skillDir, "scripts");
-    const refsDir = join(skillDir, "references");
-    const assetsDir = join(skillDir, "assets");
-
-    if (existsSync(scriptsDir)) {
-      scripts = readdirSync(scriptsDir).filter((f) => !f.startsWith(".")).sort();
-    }
-    for (const dir of [refsDir, assetsDir]) {
-      if (existsSync(dir)) {
-        assets.push(...readdirSync(dir).filter((f) => !f.startsWith(".")).sort());
-      }
-    }
-  }
-
-  const githubBase = "https://github.com/PlagueHO/plagueho.skills";
-  const githubUrl = type === "skill"
-    ? `${githubBase}/tree/main/plugins/${pluginSource}/skills/${itemName}`
-    : `${githubBase}/blob/main/plugins/${pluginSource}/agents/${itemName}.agent.md`;
-
-  const result = {
-    name: itemName,
-    description,
-    metadata,
-    compatibility,
-    userInvocable,
-    githubUrl,
+function parseSkill(reference) {
+  const name = reference
+    .replace("./skills/", "")
+    .replace(/\/$/, "");
+  const skillDir = join(root, "skills", name);
+  const content = readFileSync(join(skillDir, "SKILL.md"), "utf8");
+  const frontmatter = parseFrontmatterFields(content);
+  const listFiles = (folder) => {
+    const path = join(skillDir, folder);
+    return existsSync(path)
+      ? readdirSync(path).filter((item) => !item.startsWith(".")).sort()
+      : [];
   };
 
-  if (type === "skill") {
-    result.argumentHint = argumentHint;
-    result.scripts = scripts;
-    result.assets = assets;
-  } else {
-    result.tools = tools;
-    result.subAgents = subAgents;
-  }
-
-  return result;
+  return {
+    name,
+    description: frontmatter.description ?? "",
+    metadata: frontmatter.metadata ?? null,
+    compatibility: frontmatter.compatibility ?? null,
+    argumentHint: frontmatter["argument-hint"] ?? null,
+    userInvocable: frontmatter["user-invocable"] ?? null,
+    scripts: listFiles("scripts"),
+    assets: [...listFiles("references"), ...listFiles("assets")],
+    githubUrl: `${githubBase}/tree/main/skills/${name}`,
+  };
 }
 
-function discoverAgentsFromFolder(pluginDir) {
-  const agentsDir = join(pluginDir, "agents");
-  if (!existsSync(agentsDir)) {
-    return [];
-  }
+function parseAgent(reference) {
+  const name = reference
+    .replace("./agents/", "")
+    .replace(/\.md$/, "");
+  const path = join(root, "agents", `${name}.agent.md`);
+  const frontmatter = parseFrontmatterFields(readFileSync(path, "utf8"));
 
-  return readdirSync(agentsDir)
-    .filter((entry) => entry.toLowerCase().endsWith(".agent.md"))
-    .map((entry) => `./agents/${entry}`);
+  return {
+    name,
+    description: frontmatter.description ?? "",
+    tools: frontmatter.tools ?? null,
+    subAgents: frontmatter.agents ?? null,
+    userInvocable: frontmatter["user-invocable"] ?? null,
+    githubUrl: `${githubBase}/blob/main/agents/${name}.agent.md`,
+  };
 }
 
-// Enrich each plugin with skill and agent details from plugin.json
-const plugins = marketplace.plugins.map((plugin) => {
-  const pluginDir = join(root, "plugins", plugin.source);
-  const pluginJsonPath = join(pluginDir, "plugin.json");
+function extractCanvasMetadata(extensionSource) {
+  const start = extensionSource.indexOf("createCanvas({");
+  if (start === -1) return {};
+  const registration = extensionSource.slice(start, start + 1200);
+  const readField = (field) =>
+    registration.match(
+      new RegExp(`^\\s*${field}:\\s*["']([^"']+)["']`, "m"),
+    )?.[1];
 
-  let skills = [];
-  let agents = [];
-  let keywords = [];
+  return {
+    canvasId: readField("id"),
+    displayName: readField("displayName"),
+    canvasDescription: readField("description"),
+  };
+}
 
-  if (existsSync(pluginJsonPath)) {
-    const pluginJson = JSON.parse(readFileSync(pluginJsonPath, "utf-8"));
-    keywords = pluginJson.keywords || [];
+function parseExtension(reference, plugin) {
+  const id = reference.replace("./extensions/", "").replace(/\/$/, "");
+  const extensionDir = join(root, "extensions", id);
+  const source = readFileSync(join(extensionDir, "extension.mjs"), "utf8");
+  const packageJson = readJson(join(extensionDir, "package.json"));
+  const readme = readFileSync(join(extensionDir, "README.md"), "utf8");
+  const canvas = extractCanvasMetadata(source);
+  const previewName = `${id}.png`;
+  cpSync(
+    join(extensionDir, "assets", "preview.png"),
+    join(previewDir, previewName),
+    { force: true },
+  );
 
-    skills = (pluginJson.skills || []).map((skillPath) =>
-      parseSkillOrAgent(skillPath, pluginDir, plugin.source, "skill")
-    );
+  return {
+    id,
+    canvasId: canvas.canvasId ?? id,
+    name: canvas.displayName ?? plugin.name,
+    description: canvas.canvasDescription ?? plugin.description,
+    version: plugin.version,
+    author: plugin.author ?? null,
+    keywords: plugin.keywords ?? [],
+    platform: "Windows",
+    previewUrl: `extension-previews/${previewName}`,
+    readmeHtml: marked.parse(readme),
+    sourceUrl: `${githubBase}/tree/main/extensions/${id}`,
+    pluginName: plugin.name,
+    installCommand: `copilot plugin install ${plugin.name}@plagueho-copilot`,
+  };
+}
 
-    const declaredAgents = pluginJson.agents || [];
-    const fallbackAgents = declaredAgents.length > 0
-      ? []
-      : discoverAgentsFromFolder(pluginDir);
+const marketplace = readJson(
+  join(root, ".github", "plugin", "marketplace.json"),
+);
+const extensionsById = new Map();
 
-    agents = [...declaredAgents, ...fallbackAgents].map((agentPath) =>
-      parseSkillOrAgent(agentPath, pluginDir, plugin.source, "agent")
-    );
-  }
-
-  // Read and render plugin README.md to HTML
-  let readmeHtml = "";
+const plugins = marketplace.plugins.map((marketplacePlugin) => {
+  const pluginDir = join(root, "plugins", marketplacePlugin.source);
+  const plugin = readJson(join(pluginDir, "plugin.json"));
+  const composition = plugin.extensions?.[compositionNamespace] ?? {};
+  const canvasExtensions = (composition.extensions ?? []).map((reference) => {
+    const extension = parseExtension(reference, plugin);
+    extensionsById.set(extension.id, extension);
+    return extension;
+  });
   const readmePath = join(pluginDir, "README.md");
-  if (existsSync(readmePath)) {
-    const readmeContent = readFileSync(readmePath, "utf-8");
-    readmeHtml = marked.parse(readmeContent);
-  }
 
   return {
     name: plugin.name,
     description: plugin.description,
     version: plugin.version,
-    keywords,
-    skills,
-    agents,
-    readmeHtml,
+    keywords: plugin.keywords ?? [],
+    skills: (composition.skills ?? []).map(parseSkill),
+    agents: (composition.agents ?? []).map(parseAgent),
+    extensions: canvasExtensions.map(({ id, name, description }) => ({
+      id,
+      name,
+      description,
+    })),
+    readmeHtml: existsSync(readmePath)
+      ? marked.parse(readFileSync(readmePath, "utf8"))
+      : "",
   };
 });
 
-// Build data object
 const data = {
   name: marketplace.name,
   description: marketplace.metadata.description,
   version: marketplace.metadata.version,
   owner: marketplace.owner,
   plugins,
-  generatedAt: new Date().toISOString(),
+  extensions: [...extensionsById.values()].sort((left, right) =>
+    left.name.localeCompare(right.name),
+  ),
 };
 
-// Write data.json
-writeFileSync(join(dataDir, "data.json"), JSON.stringify(data, null, 2));
+writeFileSync(
+  join(dataDir, "data.json"),
+  `${JSON.stringify(data, null, 2)}\n`,
+  "utf8",
+);
 
-const totalSkills = plugins.reduce((sum, p) => sum + p.skills.length, 0);
-const totalAgents = plugins.reduce((sum, p) => sum + (p.agents?.length ?? 0), 0);
+const totalSkills = plugins.reduce(
+  (sum, plugin) => sum + plugin.skills.length,
+  0,
+);
+const totalAgents = plugins.reduce(
+  (sum, plugin) => sum + plugin.agents.length,
+  0,
+);
 console.log(
-  `Generated data: ${plugins.length} plugins, ${totalSkills} skills, ${totalAgents} agents -> website/public/data/data.json`
+  `Generated catalog data: ${plugins.length} plugins, ${totalSkills} skills, ${totalAgents} agents, ${data.extensions.length} extensions.`,
 );
