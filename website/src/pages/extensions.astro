@@ -12,6 +12,9 @@ interface Extension {
   keywords: string[];
   platform: string;
   previewUrl: string;
+  installUrl: string;
+  sourceUrl: string;
+  pluginName: string;
 }
 
 interface SiteData {
@@ -46,6 +49,14 @@ const base = import.meta.env.BASE_URL;
   <section class="listing-section">
     <div class="container">
       <div class="listing-toolbar">
+        <div class="how-to-install">
+          <h2>How to install canvas extensions</h2>
+          <p>
+            Open the GitHub Copilot app and select <strong>Install in Copilot app</strong> on an extension.
+            You can also select <strong>Copy URL</strong> to copy the extension URL for installation.
+          </p>
+          <p>To install from the CLI, open an extension to see its plugin install command.</p>
+        </div>
         <div class="listing-toolbar__row">
           <div class="search-bar">
             <Icon name="search" size={20} class="search-bar__icon" />
@@ -66,31 +77,58 @@ const base = import.meta.env.BASE_URL;
 
       <div class="extension-grid" id="extension-grid" role="list">
         {siteData.extensions.map((extension, index) => (
-          <a
+          <article
             class="extension-card"
-            href={`${base}extensions/${extension.id}/`}
             role="listitem"
             data-search-text={[extension.name, extension.description, ...extension.keywords].join(' ').toLowerCase()}
             style={`animation-delay: ${index * 60}ms;`}
           >
-            <img
-              class="extension-card__preview"
-              src={`${base}${extension.previewUrl}`}
-              alt={`${extension.name} preview`}
-              loading="lazy"
-            />
-            <div class="extension-card__body">
-              <div class="extension-card__heading">
-                <h2>{extension.name}</h2>
-                <span class="plugin-card__version">v{extension.version}</span>
+            <a class="extension-card__link" href={`${base}extensions/${extension.id}/`}>
+              <img
+                class="extension-card__preview"
+                src={`${base}${extension.previewUrl}`}
+                alt={`${extension.name} preview`}
+                loading="lazy"
+              />
+              <div class="extension-card__body">
+                <div class="extension-card__heading">
+                  <h2>{extension.name}</h2>
+                  <span class="plugin-card__version">v{extension.version}</span>
+                </div>
+                <p>{extension.description}</p>
+                <div class="plugin-card__keywords">
+                  <span class="keyword">{extension.platform}</span>
+                  {extension.keywords.map((keyword) => <span class="keyword">{keyword}</span>)}
+                </div>
               </div>
-              <p>{extension.description}</p>
-              <div class="plugin-card__keywords">
-                <span class="keyword">{extension.platform}</span>
-                {extension.keywords.map((keyword) => <span class="keyword">{keyword}</span>)}
-              </div>
+            </a>
+            <div class="extension-card__actions">
+              <a
+                class="install__button install__button--primary"
+                href={`ghapp://plugins/install?source=${encodeURIComponent(`${extension.pluginName}@plagueho-copilot`)}`}
+                title="Install in the GitHub Copilot app"
+              >
+                Install in Copilot app
+              </a>
+              <button
+                class="install__button install__button--secondary copy-extension-url"
+                type="button"
+                data-url={extension.installUrl}
+                title="Copy extension URL"
+              >
+                Copy URL
+              </button>
+              <a
+                class="install__button install__button--secondary"
+                href={extension.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="View source"
+              >
+                Source
+              </a>
             </div>
-          </a>
+          </article>
         ))}
       </div>
 
@@ -119,5 +157,16 @@ const base = import.meta.env.BASE_URL;
     });
     resultsCount.textContent = `${visible} ${visible === 1 ? 'extension' : 'extensions'}`;
     emptyState.classList.toggle('is-visible', visible === 0);
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.copy-extension-url').forEach((button) => {
+    button.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(button.dataset.url ?? '');
+      const originalText = button.textContent ?? 'Copy URL';
+      button.textContent = 'Copied!';
+      window.setTimeout(() => {
+        button.textContent = originalText;
+      }, 2000);
+    });
   });
 </script>
