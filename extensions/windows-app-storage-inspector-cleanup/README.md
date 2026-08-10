@@ -151,7 +151,7 @@ Analyzer cleanup commands have a **Run command** or **Run cleanup** button. Read
 ### Create an analyzer
 
 1. Create a module under `src\analyzers`, for example `src\analyzers\example-app.mjs`.
-2. Export one async analysis function:
+1. Export one async analysis function:
 
 ```js
 export async function analyzeExampleApp(result) {
@@ -194,7 +194,7 @@ For cleanup integration, return `cleanupItems`. Each eligible item must include:
 
 Only mark an item eligible when safety can be positively established. If application process inspection fails or the active data set is ambiguous, return `cleanupEligible: false`.
 
-3. Import and register the analyzer in `src\analyzers\custom-analyzers.mjs`:
+1. Import and register the analyzer in `src\analyzers\custom-analyzers.mjs`:
 
 ```js
 import { analyzeExampleApp } from "./example-app.mjs";
@@ -210,13 +210,13 @@ export const CUSTOM_ANALYZERS = [
 ];
 ```
 
-4. Add the analyzer ID to both `analyzerId` enums in root `extension.mjs`:
+1. Add the analyzer ID to both `analyzerId` enums in root `extension.mjs`:
    - `analyze_custom_storage`
    - `preview_cleanup`
-5. Add a purpose-built renderer in `src\ui\renderer.mjs` and dispatch to it from `renderCustomAnalyzer()`.
-6. If selecting a recognized folder should activate the analyzer automatically, add a path-segment rule to `analyzerForPath()` in `src\ui\renderer.mjs`.
-7. Add analyzer and cleanup-safety coverage to `test\self-test.mjs`.
-8. Reload extensions so the updated analyzer registry is discovered.
+1. Add a purpose-built renderer in `src\ui\renderer.mjs` and dispatch to it from `renderCustomAnalyzer()`.
+1. If selecting a recognized folder should activate the analyzer automatically, add a path-segment rule to `analyzerForPath()` in `src\ui\renderer.mjs`.
+1. Add analyzer and cleanup-safety coverage to `test\self-test.mjs`.
+1. Reload extensions so the updated analyzer registry is discovered.
 
 Do not implement a separate deletion endpoint or Recycle Bin helper for a new analyzer. Return eligible `cleanupItems` and use the centralized `preview_cleanup` and `execute_cleanup` flow so every analyzer receives the same validation, confirmation, progress, and failure handling.
 
