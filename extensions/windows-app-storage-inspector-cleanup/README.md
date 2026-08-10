@@ -1,11 +1,10 @@
 # Windows App Storage Inspector & Cleanup
 
-A GitHub Copilot app canvas extension for finding and safely reclaiming app storage under:
+Have you ever wondered why your Windows disk keeps filling up with local models, agentic tools, Docker containers, package caches, and other app data? It can be hard to tell what is using the space, what a folder actually does, and whether it is safe to remove.
 
-- The current Windows user profile
-- `C:\ProgramData`
+This GitHub Copilot app canvas helps you discover and catalog what is chewing through your disk space. Explore storage in a drill-down treemap, group files by application and category, exclude OneDrive cloud-only placeholders from local totals, use purpose-built storage analyzers, and ask GitHub Copilot to explain a folder and recommend the safest cleanup approach.
 
-The canvas is Windows-only. It visualizes storage in a drill-down treemap, groups files by application and category, excludes OneDrive cloud-only placeholders from local totals, provides purpose-built storage analyzers, and moves approved cleanup items to the Windows Recycle Bin.
+Approved cleanup items are moved to the Windows Recycle Bin rather than permanently deleted. The canvas scans the current Windows user profile and `C:\ProgramData`.
 
 ## Install
 
@@ -22,7 +21,7 @@ Canvas extensions are supported in the GitHub Copilot app only.
 1. Open **Windows App Storage Inspector & Cleanup**.
 2. Select **User profile**, **ProgramData**, or both.
 3. Select **Scan storage**.
-4. Monitor the current folder and live totals in **Scan status**.
+4. Monitor the scan status, active folder, progress, and live totals in **Live scan analysis**.
 5. After the scan completes:
    - Select treemap folders to drill down.
    - Use **Application ownership** and **File categories** to understand usage.
@@ -30,7 +29,44 @@ Canvas extensions are supported in the GitHub Copilot app only.
    - Select **Analyze folder & cleanup options** for a structured Copilot explanation of a selected folder.
    - Open **Custom storage analyzers** for application-specific analysis.
 
-Scans can take time on large profiles. Inaccessible folders are reported as warnings rather than silently ignored.
+**Live scan analysis** stays visible after a scan completes or is cancelled so you can review its final or last-observed totals. Scans can take time on large profiles. Inaccessible folders are reported as warnings rather than silently ignored.
+
+## Canvas actions
+
+The canvas exposes these actions to GitHub Copilot:
+
+| Action | Purpose |
+| --- | --- |
+| `start_scan` | Scan the selected user profile and/or `C:\ProgramData`. |
+| `get_scan_status` | Read scan progress, current totals, and completion state. |
+| `set_cleanup_safety` | Enable acknowledged direct cleanup or control protection for analyzer-managed folders. |
+| `get_results` | Retrieve treemap data, classifications, cleanup candidates, and warnings. |
+| `cancel_scan` | Stop an active scan. |
+| `list_custom_analyzers` | List specialized storage analyzers. |
+| `analyze_custom_storage` | Run the VS Code Insiders, Microsoft Scout, Docker, npm cache, or uv cache analyzer. |
+| `list_categorizers` | List built-in and user-defined categorization rules. |
+| `add_categorizer` | Add a persistent application/category rule for a path. |
+| `remove_categorizer` | Remove a custom categorization rule. |
+| `inspect_storage_item` | Inspect bounded metadata for a file or folder. |
+| `ask_copilot_to_investigate` | Generate a Copilot explanation and cleanup guidance for a folder. |
+| `preview_cleanup` | Revalidate selected cleanup items and show the exact Recycle Bin preview. |
+| `execute_cleanup` | Move confirmed, validated items to the Windows Recycle Bin. |
+
+The extension also provides the `storage_inspector_inspect_item` Copilot agent tool. Use it to inspect local storage metadata before researching what a folder does or whether cleanup is safe.
+
+## Direct cleanup safety
+
+The **Cleanup safety** panel sits below **Scan roots** in the left sidebar. Its **Allow Delete** switch defaults to disabled for every extension start. While disabled, the canvas is inspection-only: it can scan storage, explain folders, and run supported analyzer commands, but cannot preview or move files to the Recycle Bin.
+
+Enable **Allow Delete** only after acknowledging that incorrect file removal can damage applications or the system. The setting applies to all Recycle Bin cleanup, including eligible analyzer items. Analyzer commands remain available because they use the product's supported cleanup process.
+
+The **Protect analyzer folders** switch defaults to enabled. It shows locks on analyzer-managed paths, excludes their files from direct cleanup candidates, and blocks them again during validation. Changing it starts a rescan so the displayed candidates reflect the selected policy. Hover either switch for its current, detailed effect.
+
+## Protected analyzer-managed folders
+
+A **🔒** icon identifies folders managed by a custom analyzer while analyzer-folder protection is enabled. The lock appears in the treemap, breadcrumbs, and selected-folder path. These folders are excluded from direct cleanup candidates and blocked again during cleanup validation.
+
+Select the protected-folder link below the graph to open its custom analyzer and use its supported cleanup operations instead.
 
 ## Cleanup workflow
 
@@ -143,10 +179,14 @@ Current analyzers:
 - **VS Code Insiders**: identifies retained installation versions and enables cleanup only when a running process positively identifies the active version.
 - **Microsoft Scout**: separates application files, user data, and regenerable storage; cleanup is disabled while Scout is running or its process state is unknown.
 - **Docker images**: reads Docker image metadata with the Docker CLI, identifies Docker-managed storage under the user profile and `ProgramData`, and provides reviewed Docker cleanup commands. Docker layer folders and virtual disks are never offered for direct Recycle Bin cleanup.
+- **npm cache**: reads npm's configured cache location, reports its size and largest files, and provides npm-managed verification and cleanup commands. Its opaque `_cacache` contents are never offered for direct Recycle Bin cleanup.
+- **uv cache**: reads uv's configured cache location, reports uv-managed storage and largest files, and provides uv-managed cache commands. Cache files are never offered for direct Recycle Bin cleanup.
 
 Analyzer results are held in memory and are discarded on a new scan or extension restart.
 
-Analyzer cleanup commands have a **Run command** or **Run cleanup** button. Read-only commands run directly through the extension's fixed command allowlist. Destructive commands require an explicit confirmation and use non-interactive, scoped CLI arguments. The canvas never executes arbitrary command text received from the browser.
+Analyzer cleanup commands have a **Run command** or **Run cleanup** button. Each command runs through the extension's fixed command allowlist and a singleton command runner, so only one analyzer command can execute at a time across canvas instances.
+
+A blocking modal displays the command while it runs and then displays its result. Destructive commands require an explicit confirmation and use non-interactive, scoped CLI arguments. The canvas never executes arbitrary command text received from the browser.
 
 ### Create an analyzer
 
@@ -247,7 +287,7 @@ The extension does not persist general scan inventories or folder explanations b
 | `src\core\scanner.mjs` | Filesystem traversal, aggregation, classification, and conservative candidates |
 | `src\core\cleanup.mjs` | Shared path validation and Windows Recycle Bin execution |
 | `src\core\categorizers.mjs` | Built-in rules and persistent custom categorizer store |
-| `src\core\analyzer-commands.mjs` | Fixed analyzer command allowlist and guarded command execution |
+| `src\core\analyzer-commands.mjs` | Fixed analyzer command allowlist and singleton command execution |
 | `src\analyzers\custom-analyzers.mjs` | Analyzer registry and dispatch |
 | `src\analyzers\vscode-insiders.mjs` | VS Code Insiders analyzer |
 | `src\analyzers\microsoft-scout.mjs` | Microsoft Scout analyzer |

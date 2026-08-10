@@ -72,8 +72,15 @@ function isWithinRoot(candidatePath, rootPath) {
     return relative !== "" && relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
 }
 
-function isProtectedPath(candidatePath) {
+function isProtectedPath(candidatePath, analyzerProtectedPaths = []) {
     const normalized = path.resolve(candidatePath).toLowerCase();
+    const analyzerProtection = analyzerProtectedPaths.find((protectedPath) => (
+        normalized === path.resolve(protectedPath.path).toLowerCase()
+        || normalized.startsWith(`${path.resolve(protectedPath.path).toLowerCase()}${path.sep}`)
+    ));
+    if (analyzerProtection) {
+        return analyzerProtection;
+    }
     const profile = path.resolve(process.env.USERPROFILE ?? "").toLowerCase();
     const programData = path.resolve(process.env.ProgramData ?? "C:\\ProgramData").toLowerCase();
     const protectedRoots = [
@@ -93,15 +100,23 @@ function isProtectedPath(candidatePath) {
         (protectedPath) =>
             normalized === protectedPath ||
             normalized.startsWith(`${protectedPath}${path.sep}`),
-    );
+    ) ? {} : undefined;
 }
 
-async function revalidateCandidate(candidate, approvedRoots) {
+async function revalidateCandidate(candidate, approvedRoots, analyzerProtectedPaths) {
     if (!approvedRoots.some((root) => isWithinRoot(candidate.path, root.path))) {
         throw serviceError("cleanup_path_not_allowed", `Path is outside approved scan roots: ${candidate.path}`);
     }
-    if (isProtectedPath(candidate.path)) {
-        throw serviceError("cleanup_path_protected", `Path is protected from cleanup: ${candidate.path}`);
+    const protection = isProtectedPath(candidate.path, analyzerProtectedPaths);
+    if (protection) {
+        const manager = protection.name ?? "This analyzer";
+        const guidance = protection.analyzerId
+            ? ` Use the ${protection.analyzerId} custom analyzer instead.`
+            : "";
+        throw serviceError(
+            protection.analyzerId ? "cleanup_path_analyzer_managed" : "cleanup_path_protected",
+            `Path is protected from cleanup by ${manager}: ${candidate.path}.${guidance}`,
+        );
     }
 
     let stats;
@@ -207,7 +222,7 @@ function runRecycleBin(paths, onResult) {
     });
 }
 
-export async function createCleanupPreview({ itemIds, candidates, approvedRoots, source, onProgress }) {
+export async function createCleanupPreview({ itemIds, candidates, approvedRoots, analyzerProtectedPaths = [], source, onProgress }) {
     if (!Array.isArray(itemIds) || itemIds.length === 0) {
         throw serviceError("cleanup_selection_required", "Select at least one cleanup candidate");
     }
@@ -236,7 +251,7 @@ export async function createCleanupPreview({ itemIds, candidates, approvedRoots,
             total: selected.length,
         });
         try {
-            entries.push(await revalidateCandidate(candidate, approvedRoots));
+            entries.push(await revalidateCandidate(candidate, approvedRoots, analyzerProtectedPaths));
         } catch (error) {
             rejected.push({
                 id: candidate.id,
@@ -267,6 +282,7 @@ export async function createCleanupPreview({ itemIds, candidates, approvedRoots,
         rejected,
         totalBytes: entries.reduce((total, entry) => total + entry.bytes, 0),
         approvedRoots,
+        analyzerProtectedPaths,
     };
 }
 
@@ -288,7 +304,7 @@ export async function executeCleanupPreview({ preview, confirmed, onProgress }) 
             total: preview.entries.length,
         });
         try {
-            ready.push(await revalidateCandidate(entry, preview.approvedRoots));
+            ready.push(await revalidateCandidate(entry, preview.approvedRoots, preview.analyzerProtectedPaths));
         } catch (error) {
             failed.push({
                 path: entry.path,

@@ -146,6 +146,10 @@ export async function startCanvasServer(service, requestAgentInvestigation) {
                 ));
                 return;
             }
+            if (request.method === "POST" && url.pathname === "/api/safety") {
+                sendJson(response, 200, await service.setCleanupSafety(await readJson(request)));
+                return;
+            }
             if (request.method === "POST" && url.pathname === "/api/scan") {
                 sendJson(response, 202, await service.startScan(await readJson(request)));
                 return;

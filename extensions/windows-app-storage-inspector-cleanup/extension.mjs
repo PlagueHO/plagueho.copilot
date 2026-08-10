@@ -134,6 +134,20 @@ session = await joinSession({
                     handler: handle(() => service.getState()),
                 },
                 {
+                    name: "set_cleanup_safety",
+                    description: "Configure whether direct Recycle Bin cleanup is allowed and whether analyzer-managed folders remain protected from direct cleanup.",
+                    inputSchema: {
+                        type: "object",
+                        properties: {
+                            directCleanupEnabled: { type: "boolean" },
+                            analyzerProtectionEnabled: { type: "boolean" },
+                            acknowledged: { type: "boolean" },
+                        },
+                        additionalProperties: false,
+                    },
+                    handler: handle((context) => service.setCleanupSafety(context.input)),
+                },
+                {
                     name: "get_results",
                     description: "Get the latest storage treemap, tables, classifications, cleanup candidates, and warnings.",
                     inputSchema: { type: "object", additionalProperties: false },
@@ -147,11 +161,11 @@ session = await joinSession({
                 },
                 {
                     name: "analyze_custom_storage",
-                    description: "Run a purpose-built storage analyzer for VS Code Insiders, Microsoft Scout, or Docker images.",
+                    description: "Run a purpose-built storage analyzer for VS Code Insiders, Microsoft Scout, Docker images, npm cache, or uv cache.",
                     inputSchema: {
                         type: "object",
                         properties: {
-                            analyzerId: { type: "string", enum: ["vscode-insiders", "microsoft-scout", "docker-images"] },
+                            analyzerId: { type: "string", enum: ["vscode-insiders", "microsoft-scout", "docker-images", "npm-cache", "uv-cache"] },
                         },
                         required: ["analyzerId"],
                         additionalProperties: false,
@@ -216,7 +230,7 @@ session = await joinSession({
                         type: "object",
                         properties: {
                             source: { type: "string", enum: ["scan", "analyzer"] },
-                            analyzerId: { type: "string", enum: ["vscode-insiders", "microsoft-scout", "docker-images"] },
+                            analyzerId: { type: "string", enum: ["vscode-insiders", "microsoft-scout", "docker-images", "npm-cache", "uv-cache"] },
                             itemIds: {
                                 type: "array",
                                 items: { type: "string", minLength: 1 },

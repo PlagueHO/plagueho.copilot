@@ -41,6 +41,65 @@ const COMMANDS = {
             arguments: ["system", "df"],
         },
     ],
+    "npm-cache": [
+        {
+            id: "npm-cache-verify",
+            label: "Verify npm cache",
+            command: "npm cache verify",
+            shell: "PowerShell",
+            description: "Checks npm cache integrity offline and removes invalid cache content when npm identifies it.",
+            requiresElevation: false,
+            requiresConfirmation: false,
+            executable: "npm.cmd",
+            arguments: ["cache", "verify"],
+        },
+        {
+            id: "npm-cache-clean",
+            label: "Clear npm cache",
+            command: "npm cache clean --force",
+            shell: "PowerShell",
+            description: "Removes cached package data to reclaim disk space. Future package installs download required data again.",
+            requiresElevation: false,
+            requiresConfirmation: true,
+            executable: "npm.cmd",
+            arguments: ["cache", "clean", "--force"],
+        },
+    ],
+    "uv-cache": [
+        {
+            id: "uv-cache-dir",
+            label: "Show uv cache location",
+            command: "uv cache dir",
+            shell: "PowerShell",
+            description: "Reports the cache directory currently configured for uv without modifying it.",
+            requiresElevation: false,
+            requiresConfirmation: false,
+            executable: "uv.exe",
+            arguments: ["cache", "dir"],
+        },
+        {
+            id: "uv-cache-prune",
+            label: "Prune unused uv cache entries",
+            command: "uv cache prune",
+            shell: "PowerShell",
+            description: "Removes unused cache entries and centralized project environments that uv can recreate when needed.",
+            requiresElevation: false,
+            requiresConfirmation: true,
+            executable: "uv.exe",
+            arguments: ["cache", "prune"],
+        },
+        {
+            id: "uv-cache-clean",
+            label: "Clear all uv cache entries",
+            command: "uv cache clean",
+            shell: "PowerShell",
+            description: "Clears all uv cache entries. Future dependency operations rebuild required cache data.",
+            requiresElevation: false,
+            requiresConfirmation: true,
+            executable: "uv.exe",
+            arguments: ["cache", "clean"],
+        },
+    ],
 };
 
 function getCommand(analyzerId, commandId) {
@@ -68,26 +127,13 @@ function getOutput(error) {
     return String(error?.stdout || error?.stderr || error?.message || "The command failed.");
 }
 
-export async function executeAnalyzerCommand(analyzerId, commandId, confirmed = false) {
-    const command = getCommand(analyzerId, commandId);
-    if (command.requiresConfirmation && confirmed !== true) {
-        const error = new Error("Explicit confirmation is required before running this cleanup command");
-        error.code = "analyzer_command_confirmation_required";
-        throw error;
-    }
-
+async function runProcess(command) {
     try {
-        const result = await execFileAsync(command.executable, command.arguments, {
+        return await execFileAsync(command.executable, command.arguments, {
             windowsHide: true,
             timeout: COMMAND_TIMEOUT_MS,
             maxBuffer: MAX_OUTPUT_BYTES,
         });
-        return {
-            commandId: command.id,
-            command: command.command,
-            status: "completed",
-            output: String(result.stdout || result.stderr || ""),
-        };
     } catch (error) {
         const commandError = new Error(`Command failed: ${getOutput(error)}`);
         commandError.code = error?.code === "ETIMEDOUT"
@@ -95,4 +141,63 @@ export async function executeAnalyzerCommand(analyzerId, commandId, confirmed = 
             : "analyzer_command_failed";
         throw commandError;
     }
+}
+
+function commandError(code, message) {
+    const error = new Error(message);
+    error.code = code;
+    return error;
+}
+
+export function createAnalyzerCommandRunner({ executeProcess = runProcess } = {}) {
+    let activeCommand;
+
+    return {
+        getActiveCommand() {
+            return activeCommand;
+        },
+
+        async execute(analyzerId, commandId, confirmed = false) {
+            const command = getCommand(analyzerId, commandId);
+            if (command.requiresConfirmation && confirmed !== true) {
+                throw commandError(
+                    "analyzer_command_confirmation_required",
+                    "Explicit confirmation is required before running this cleanup command",
+                );
+            }
+            if (activeCommand) {
+                throw commandError(
+                    "analyzer_command_running",
+                    `Wait for the active analyzer command to finish: ${activeCommand.command}`,
+                );
+            }
+
+            const startedAt = new Date();
+            activeCommand = Object.freeze({
+                analyzerId,
+                commandId: command.id,
+                command: command.command,
+                startedAt: startedAt.toISOString(),
+            });
+            try {
+                const result = await executeProcess(command);
+                return {
+                    commandId: command.id,
+                    command: command.command,
+                    status: "completed",
+                    startedAt: activeCommand.startedAt,
+                    completedAt: new Date().toISOString(),
+                    output: String(result.stdout || result.stderr || ""),
+                };
+            } finally {
+                activeCommand = undefined;
+            }
+        },
+    };
+}
+
+const analyzerCommandRunner = createAnalyzerCommandRunner();
+
+export async function executeAnalyzerCommand(analyzerId, commandId, confirmed = false) {
+    return analyzerCommandRunner.execute(analyzerId, commandId, confirmed);
 }

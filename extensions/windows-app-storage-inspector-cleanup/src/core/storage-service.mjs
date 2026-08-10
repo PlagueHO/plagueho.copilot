@@ -69,6 +69,10 @@ export class StorageService {
         this.lastCleanup = undefined;
         this.cleanup = { status: "idle" };
         this.categorizers = undefined;
+        this.safety = {
+            directCleanupEnabled: false,
+            analyzerProtectionEnabled: true,
+        };
     }
 
     subscribe(listener) {
@@ -88,6 +92,7 @@ export class StorageService {
             generatedAt: this.result?.generatedAt,
             lastCleanup: this.lastCleanup,
             cleanup: this.cleanup,
+            safety: this.safety,
             customAnalyses: this.customAnalyses,
             categorizers: this.categorizers,
         };
@@ -150,6 +155,46 @@ export class StorageService {
             throw serviceError("analyzer_command_unknown", `Analyzer command is not available: ${commandId}`);
         }
         return executeAnalyzerCommand(analyzerId, command.id, confirmed);
+    }
+
+    async setCleanupSafety(input = {}) {
+        const hasDirectCleanupSetting = typeof input.directCleanupEnabled === "boolean";
+        const hasAnalyzerProtectionSetting = typeof input.analyzerProtectionEnabled === "boolean";
+        if (!hasDirectCleanupSetting && !hasAnalyzerProtectionSetting) {
+            throw serviceError("cleanup_safety_input_invalid", "Select a cleanup safety setting to update");
+        }
+        if (this.scan.status === "running") {
+            throw serviceError("cleanup_safety_scan_running", "Wait for the current scan to finish before changing cleanup safety");
+        }
+        if (input.directCleanupEnabled === true && input.acknowledged !== true) {
+            throw serviceError(
+                "cleanup_safety_acknowledgement_required",
+                "Acknowledge the direct cleanup risk before enabling file removal",
+            );
+        }
+
+        const nextSafety = {
+            directCleanupEnabled: hasDirectCleanupSetting
+                ? input.directCleanupEnabled
+                : this.safety.directCleanupEnabled,
+            analyzerProtectionEnabled: hasAnalyzerProtectionSetting
+                ? input.analyzerProtectionEnabled
+                : this.safety.analyzerProtectionEnabled,
+        };
+        const analyzerProtectionChanged = nextSafety.analyzerProtectionEnabled !== this.safety.analyzerProtectionEnabled;
+        this.safety = nextSafety;
+        if (!nextSafety.directCleanupEnabled) {
+            this.#previews.clear();
+            this.cleanup = { status: "idle" };
+        }
+
+        if (analyzerProtectionChanged && this.result) {
+            await this.startScan({ scopes: this.scan.scopes });
+            return { safety: this.safety, rescanStarted: true };
+        }
+
+        this.#emit();
+        return { safety: this.safety, rescanStarted: false };
     }
 
     async listCategorizers() {
@@ -235,6 +280,7 @@ export class StorageService {
         this.#runPromise = scanStorage({
             roots,
             categorizers,
+            protectAnalyzerManagedPaths: this.safety.analyzerProtectionEnabled,
             signal: this.#controller.signal,
             onProgress: (progress) => {
                 this.scan = { ...this.scan, progress };
@@ -284,6 +330,12 @@ export class StorageService {
     }
 
     async previewCleanup({ source, itemIds, analyzerId }) {
+        if (!this.safety.directCleanupEnabled) {
+            throw serviceError(
+                "cleanup_safety_disabled",
+                "Direct cleanup is disabled. Enable it in the header and acknowledge the risk before removing files.",
+            );
+        }
         if (!this.result) {
             throw serviceError("scan_results_unavailable", "Run a scan before previewing cleanup");
         }
@@ -318,6 +370,9 @@ export class StorageService {
                     label,
                     path: rootPath,
                 })),
+                analyzerProtectedPaths: this.safety.analyzerProtectionEnabled
+                    ? this.result.analyzerManagedPaths
+                    : [],
                 onProgress: (progress) => {
                     this.cleanup = { ...this.cleanup, ...progress };
                     this.#emit();
@@ -350,6 +405,12 @@ export class StorageService {
     }
 
     async executeCleanup(previewId, confirmed) {
+        if (!this.safety.directCleanupEnabled) {
+            throw serviceError(
+                "cleanup_safety_disabled",
+                "Direct cleanup is disabled. Enable it in the header and acknowledge the risk before removing files.",
+            );
+        }
         const preview = this.#previews.get(previewId);
         if (!preview) {
             throw serviceError("cleanup_preview_unknown", "Cleanup preview was not found; create a new preview");
@@ -381,7 +442,12 @@ export class StorageService {
             };
             this.#emit();
             const result = await executeCleanupPreview({
-                preview,
+                preview: {
+                    ...preview,
+                    analyzerProtectedPaths: this.safety.analyzerProtectionEnabled
+                        ? this.result?.analyzerManagedPaths ?? preview.analyzerProtectedPaths
+                        : [],
+                },
                 confirmed,
                 onProgress: (progress) => {
                     this.cleanup = { ...this.cleanup, ...progress };
