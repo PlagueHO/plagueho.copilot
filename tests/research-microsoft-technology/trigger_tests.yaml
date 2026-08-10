@@ -1,0 +1,26 @@
+name: research-microsoft-technology-triggers
+skill: research-microsoft-technology
+
+shouldTriggerPrompts:
+  - "research Azure Container Apps dynamic sessions"
+  - "deep research on Azure AI Foundry"
+  - "research Microsoft Entra Verified ID"
+  - "create a technical research report on APIM"
+  - "investigate Azure Event Grid namespaces"
+  - "research Azure Cosmos DB for PostgreSQL"
+  - "do deep technical research on Azure Functions Flex Consumption"
+  - "research Azure Kubernetes Fleet Manager"
+  - "technical research on Microsoft Copilot Studio"
+  - "research Azure Service Bus premium messaging"
+
+shouldNotTriggerPrompts:
+  - "deploy my app to Azure"
+  - "fix the build error in my project"
+  - "create a new GitHub repository"
+  - "write unit tests for my API"
+  - "update the Bicep modules"
+  - "install VS Code extensions"
+  - "scaffold repo AI guidance"
+  - "create a learning pathway"
+  - "merge the open pull requests"
+  - "optimize my Copilot prompts"

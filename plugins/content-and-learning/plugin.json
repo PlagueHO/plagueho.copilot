@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "content-and-learning",
+  "description": "Review content for AI readiness and generate Microsoft technology learning pathways.",
+  "version": "1.0.1",
+  "author": {
+    "name": "Daniel Scott-Raynsford",
+    "url": "https://github.com/PlagueHO"
+  },
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
+  "license": "MIT",
+  "keywords": [
+    "content",
+    "learning",
+    "ai-readiness",
+    "microsoft-learn",
+    "learning-pathway"
+  ]
+}

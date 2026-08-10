@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/PlagueHO/plagueho.copilot/main/.github/plugin/plugin.schema.json",
+  "title": "PlagueHO Agent Plugin Source Manifest",
+  "description": "Agent Plugins 1.0.0 source manifest with private build-time resource composition.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "name",
+    "description",
+    "version",
+    "repository",
+    "extensions"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "author": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://"
+        }
+      },
+      "additionalProperties": false
+    },
+    "repository": {
+      "const": "https://github.com/PlagueHO/plagueho.copilot"
+    },
+    "homepage": {
+      "type": "string",
+      "pattern": "^https://"
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "keywords": {
+      "type": "array",
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]{1,30}$"
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "required": [
+        "com.github.plagueho"
+      ],
+      "properties": {
+        "com.github.copilot": {
+          "type": "object",
+          "required": [
+            "logo"
+          ],
+          "properties": {
+            "logo": {
+              "const": "assets/preview.png"
+            }
+          },
+          "additionalProperties": true
+        },
+        "com.github.plagueho": {
+          "$ref": "#/definitions/composition"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "composition": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "agents": {
+          "$ref": "#/definitions/references"
+        },
+        "extensions": {
+          "$ref": "#/definitions/references"
+        },
+        "skills": {
+          "$ref": "#/definitions/references"
+        }
+      },
+      "additionalProperties": false
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^\\./(agents|extensions|skills)/[a-z0-9][a-z0-9-]*(/|\\.md)?$"
+      }
+    }
+  }
+}

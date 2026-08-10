@@ -1,0 +1,183 @@
+---
+import '../styles/global.css';
+import DetailModal from '../components/DetailModal.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  currentPage?: 'home' | 'plugins' | 'skills' | 'agents' | 'extensions';
+}
+
+const {
+  title = "DSR Copilot Catalog",
+  description = 'Copilot plugins, skills, agents, and canvas extensions by Daniel Scott-Raynsford.',
+  currentPage = 'home',
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+
+    <script>
+      (() => {
+        // Apply theme immediately before page renders to prevent flash.
+        const STORAGE_KEY = 'theme-preference';
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored || (prefersDark ? 'dark' : 'light');
+
+        if (theme === 'light') {
+          document.documentElement.classList.add('theme-light');
+        } else {
+          document.documentElement.classList.add('theme-dark');
+        }
+      })();
+    </script>
+
+    <header class="site-header">
+      <div class="container site-header__inner">
+        <a href={base} class="site-header__brand">
+          <span class="gradient-text">DSR</span>
+          <span class="site-header__brand-suffix"> Copilot Catalog</span>
+        </a>
+        <div class="site-header__controls">
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+            title="Toggle dark/light mode"
+          >
+            <svg class="theme-toggle__icon theme-toggle__icon--light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="theme-toggle__icon theme-toggle__icon--dark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M21.64 15.95a7.007 7.007 0 1 1-9.59-9.59 7 7 0 0 0 9.59 9.59z"></path>
+            </svg>
+          </button>
+          <nav class="site-nav" aria-label="Primary navigation">
+            <a
+              href={base}
+              class:list={['site-nav__link', { 'is-active': currentPage === 'home' }]}
+            >Home</a>
+            <a
+              href={`${base}plugins/`}
+              class:list={['site-nav__link', { 'is-active': currentPage === 'plugins' }]}
+            >Plugins</a>
+            <a
+              href={`${base}skills/`}
+              class:list={['site-nav__link', { 'is-active': currentPage === 'skills' }]}
+            >Skills</a>
+            <a
+              href={`${base}agents/`}
+              class:list={['site-nav__link', { 'is-active': currentPage === 'agents' }]}
+            >Agents</a>
+            <a
+              href={`${base}extensions/`}
+              class:list={['site-nav__link', { 'is-active': currentPage === 'extensions' }]}
+            >Extensions</a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <slot />
+
+    <DetailModal />
+
+    <script>
+      (() => {
+        // ── Theme toggle logic ───────────────────────────────────────
+        const STORAGE_KEY = 'theme-preference';
+        const THEMES = { light: 'light', dark: 'dark' };
+
+        // Determine initial theme.
+        function getInitialTheme(): string {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) return stored;
+
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          return prefersDark ? THEMES.dark : THEMES.light;
+        }
+
+        function applyTheme(theme: string): void {
+          const html = document.documentElement;
+
+          // Remove both theme classes.
+          html.classList.remove('theme-light', 'theme-dark');
+
+          // Add the appropriate theme class.
+          if (theme === THEMES.light) {
+            html.classList.add('theme-light');
+          } else {
+            html.classList.add('theme-dark');
+          }
+
+          localStorage.setItem(STORAGE_KEY, theme);
+
+          // Update toggle button aria-pressed state.
+          const toggle = document.getElementById('theme-toggle') as HTMLButtonElement;
+          if (toggle) {
+            toggle.setAttribute('aria-pressed', theme === THEMES.dark ? 'true' : 'false');
+          }
+        }
+
+        function toggleTheme(): void {
+          const current = localStorage.getItem(STORAGE_KEY) || getInitialTheme();
+          const next = current === THEMES.dark ? THEMES.light : THEMES.dark;
+          applyTheme(next);
+        }
+
+        // Initialize theme on page load.
+        applyTheme(getInitialTheme());
+
+        // Add toggle listener.
+        const themeToggle = document.getElementById('theme-toggle') as HTMLButtonElement;
+        if (themeToggle) {
+          themeToggle.addEventListener('click', toggleTheme);
+        }
+
+        // Listen for system theme changes.
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          if (!localStorage.getItem(STORAGE_KEY)) {
+            applyTheme(e.matches ? THEMES.dark : THEMES.light);
+          }
+        });
+      })();
+    </script>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          Made with <span aria-label="love" role="img">&#x1F49C;</span> by
+          <a href="https://danielscottraynsford.com">Daniel Scott-Raynsford</a>
+        </p>
+        <nav class="site-footer__links" aria-label="Footer links">
+          <a href="https://github.com/PlagueHO/plagueho.copilot">GitHub</a>
+          <a href="https://agentskills.io">Agent Skills Spec</a>
+          <a href="https://github.com/github/awesome-copilot">Awesome Copilot</a>
+        </nav>
+      </div>
+    </footer>
+
+  </body>
+</html>

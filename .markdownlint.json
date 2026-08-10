@@ -1,0 +1,38 @@
+{
+  "default": true,
+  "MD004": {
+    "style": "dash"
+  },
+  "MD013": {
+    "line_length": 400,
+    "code_blocks": false,
+    "tables": false
+  },
+  "MD024": {
+    "siblings_only": true
+  },
+  "MD033": false,
+  "MD034": true,
+  "MD036": false,
+  "MD040": true,
+  "MD041": false,
+  "MD046": {
+    "style": "fenced"
+  },
+  "MD048": {
+    "style": "backtick"
+  },
+  "MD049": {
+    "style": "asterisk"
+  },
+  "MD050": {
+    "style": "asterisk"
+  },
+  "MD055": {
+    "style": "leading_and_trailing"
+  },
+  "MD056": true,
+  "MD058": true,
+  "MD060": false,
+  "no-hard-tabs": true
+}

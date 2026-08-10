@@ -1,0 +1,279 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface Skill {
+  name: string;
+  description: string;
+}
+
+interface Agent {
+  name: string;
+  description: string;
+}
+
+interface Plugin {
+  name: string;
+  description: string;
+  version: string;
+  keywords: string[];
+  skills: Skill[];
+  agents?: Agent[];
+}
+
+interface SiteData {
+  name: string;
+  description: string;
+  version: string;
+  plugins: Plugin[];
+  extensions: { id: string }[];
+}
+
+let siteData: SiteData = {
+  name: "DSR Copilot Catalog",
+  description: '',
+  version: '0.0.0',
+  plugins: [],
+  extensions: [],
+};
+
+const dataPath = resolve('./public/data/data.json');
+if (existsSync(dataPath)) {
+  siteData = JSON.parse(readFileSync(dataPath, 'utf-8')) as SiteData;
+}
+
+const totalSkills = siteData.plugins.reduce((s, p) => s + p.skills.length, 0);
+const totalAgents = siteData.plugins.reduce((s, p) => s + (p.agents?.length ?? 0), 0);
+const base = import.meta.env.BASE_URL;
+
+interface QuickLink {
+  href: string;
+  title: string;
+  desc: string;
+  icon: string;
+  color: string;
+  count: number;
+  delay: number;
+}
+
+const quickLinks: QuickLink[] = [
+  {
+    href: `${base}plugins/`,
+    title: 'Plugins',
+    desc: 'Curated plugin bundles organized by domain',
+    icon: 'plug',
+    color: '#B870FF',
+    count: siteData.plugins.length,
+    delay: 0,
+  },
+  {
+    href: `${base}skills/`,
+    title: 'Skills',
+    desc: 'Individual agent skills across all plugins',
+    icon: 'lightning',
+    color: '#FE4C25',
+    count: totalSkills,
+    delay: 80,
+  },
+  {
+    href: `${base}agents/`,
+    title: 'Agents',
+    desc: 'Custom coding agents for GitHub Copilot',
+    icon: 'robot',
+    color: '#22d3ee',
+    count: totalAgents,
+    delay: 160,
+  },
+  {
+    href: `${base}extensions/`,
+    title: 'Extensions',
+    desc: 'Interactive canvases for the GitHub Copilot app',
+    icon: 'canvas',
+    color: '#10b981',
+    count: siteData.extensions.length,
+    delay: 240,
+  },
+];
+---
+<Layout title="DSR Copilot Catalog" currentPage="home">
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="container">
+      <h1 class="hero__title">
+        <span class="gradient-text">DSR Copilot Catalog</span>
+      </h1>
+      <p class="hero__subtitle">
+        Plugins, skills, agents, and interactive canvas extensions for GitHub
+        Copilot by Daniel Scott-Raynsford.
+      </p>
+      <div class="hero__stats">
+        <div class="stat">
+          <span class="stat__value">{siteData.plugins.length || '—'}</span>
+          <span class="stat__label">Plugins</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{totalSkills || '—'}</span>
+          <span class="stat__label">Skills</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{totalAgents || '—'}</span>
+          <span class="stat__label">Agents</span>
+        </div>
+        <div class="stat">
+          <span class="stat__value">{siteData.extensions.length || '—'}</span>
+          <span class="stat__label">Extensions</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <hr class="separator" />
+
+  <!-- Get Started -->
+  <section class="install">
+    <div class="container">
+      <h2 class="install__heading">Get Started</h2>
+
+      <div class="install__panels">
+
+        <!-- VS Code panel -->
+        <div class="install__panel">
+          <h3 class="install__subheading">VS Code / VS Code Insiders</h3>
+          <div class="install__buttons">
+            <a
+              href="vscode://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot"
+              class="install__button install__button--primary"
+            >
+              <svg class="install__button-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M11.214 1.005a.75.75 0 0 1 .07 1.06l-7.5 9a.75.75 0 1 1-1.13-.99l7.5-9a.75.75 0 0 1 1.06-.07Z" />
+              </svg>
+              Open in VS Code
+            </a>
+            <a
+              href="vscode-insiders://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot"
+              class="install__button install__button--secondary"
+            >
+              <svg class="install__button-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M11.214 1.005a.75.75 0 0 1 .07 1.06l-7.5 9a.75.75 0 1 1-1.13-.99l7.5-9a.75.75 0 0 1 1.06-.07Z" />
+              </svg>
+              Open in VS Code Insiders
+            </a>
+          </div>
+          <p class="install__subtitle">Or manually add to settings.json:</p>
+          <div class="install__code-block">
+            <code class="install__code">"chat.plugins.marketplaces": ["PlagueHO/plagueho.copilot"]</code>
+            <button
+              class="install__copy"
+              data-copy='"chat.plugins.marketplaces": ["PlagueHO/plagueho.copilot"]'
+              title="Copy to clipboard"
+              aria-label="Copy to clipboard"
+            >
+              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
+                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v-1a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v1zm5 0v-1H5v1h4z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Copilot CLI panel -->
+        <div class="install__panel">
+          <h3 class="install__subheading">GitHub Copilot CLI / Claude Code</h3>
+          <p class="install__subtitle">Add the marketplace:</p>
+          <div class="install__code-block">
+            <code class="install__code">/plugin marketplace add PlagueHO/plagueho.copilot</code>
+            <button
+              class="install__copy"
+              data-copy="/plugin marketplace add PlagueHO/plagueho.copilot"
+              title="Copy to clipboard"
+              aria-label="Copy to clipboard"
+            >
+              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
+                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v-1a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v1zm5 0v-1H5v1h4z" />
+              </svg>
+            </button>
+          </div>
+          <p class="install__subtitle">Then install a plugin:</p>
+          <div class="install__code-block">
+            <code class="install__code">copilot plugin install &lt;plugin&gt;@plagueho-copilot</code>
+            <button
+              class="install__copy"
+              data-copy="copilot plugin install <plugin>@plagueho-copilot"
+              title="Copy to clipboard"
+              aria-label="Copy to clipboard"
+            >
+              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
+                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v-1a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v1zm5 0v-1H5v1h4z" />
+              </svg>
+            </button>
+          </div>
+          <p class="install__subtitle">View available skills:</p>
+          <div class="install__code-block">
+            <code class="install__code">/skills</code>
+            <button
+              class="install__copy"
+              data-copy="/skills"
+              title="Copy to clipboard"
+              aria-label="Copy to clipboard"
+            >
+              <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
+                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v-1a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v1zm5 0v-1H5v1h4z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="separator" />
+
+  <!-- Quick links -->
+  <section class="quick-links">
+    <div class="container">
+      <h2 class="quick-links__heading">Browse</h2>
+      <div class="quick-links__grid">
+        {quickLinks.map((link) => (
+          <a
+            href={link.href}
+            class="quick-link-card"
+            style={`--ql-color: ${link.color}; animation-delay: ${link.delay}ms;`}
+          >
+            <div class="quick-link-card__icon">
+              <Icon name={link.icon} size={24} />
+            </div>
+            <div class="quick-link-card__content">
+              <span class="quick-link-card__title">{link.title}</span>
+              <span class="quick-link-card__desc">{link.desc}</span>
+            </div>
+            <span class="quick-link-card__count" aria-label={`${link.count} ${link.title.toLowerCase()}`}>
+              {link.count || '—'}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+</Layout>
+
+<script>
+  /* Copy-to-clipboard for install code blocks */
+  document.querySelectorAll<HTMLButtonElement>('.install__copy').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const text = btn.dataset.copy ?? '';
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.title;
+        btn.title = 'Copied!';
+        btn.classList.add('install__copy--copied');
+        setTimeout(() => {
+          btn.title = orig;
+          btn.classList.remove('install__copy--copied');
+        }, 2000);
+      });
+    });
+  });
+</script>

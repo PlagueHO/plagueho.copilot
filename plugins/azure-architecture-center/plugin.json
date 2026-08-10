@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "azure-architecture-center",
+  "description": "Skills for Azure Architecture Center documentation maintainers: discover needed updates and review multitenant docs for currency, accuracy, and completeness.",
+  "version": "2.0.1",
+  "author": {
+    "name": "Daniel Scott-Raynsford",
+    "url": "https://github.com/PlagueHO"
+  },
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
+  "license": "MIT",
+  "keywords": [
+    "azure",
+    "architecture-center",
+    "aac",
+    "multitenant",
+    "documentation",
+    "review"
+  ]
+}

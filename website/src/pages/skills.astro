@@ -1,0 +1,221 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { getCategory } from '../lib/categories';
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface Skill {
+  name: string;
+  description: string;
+  metadata?: { author?: string; version?: string; reference?: string } | null;
+  compatibility?: string[] | null;
+  argumentHint?: string | null;
+  userInvocable?: boolean | null;
+  scripts?: string[];
+  assets?: string[];
+  githubUrl?: string;
+}
+
+interface Plugin {
+  name: string;
+  description: string;
+  version: string;
+  keywords: string[];
+  skills: Skill[];
+}
+
+interface SiteData {
+  plugins: Plugin[];
+}
+
+let siteData: SiteData = { plugins: [] };
+const dataPath = resolve('./public/data/data.json');
+if (existsSync(dataPath)) {
+  siteData = JSON.parse(readFileSync(dataPath, 'utf-8')) as SiteData;
+}
+
+interface FlatSkill {
+  name: string;
+  description: string;
+  metadata: { author?: string; version?: string; reference?: string } | null;
+  compatibility: string[] | null;
+  argumentHint: string | null;
+  userInvocable: boolean | null;
+  scripts: string[];
+  assets: string[];
+  githubUrl: string;
+  pluginName: string;
+  color: string;
+  icon: string;
+  delay: number;
+  searchText: string;
+}
+
+let idx = 0;
+const allSkills: FlatSkill[] = siteData.plugins.flatMap((plugin) => {
+  const cfg = getCategory(plugin.name);
+  return plugin.skills.map((skill) => ({
+    name: skill.name,
+    description: skill.description,
+    metadata: skill.metadata ?? null,
+    compatibility: skill.compatibility ?? null,
+    argumentHint: skill.argumentHint ?? null,
+    userInvocable: skill.userInvocable ?? null,
+    scripts: skill.scripts ?? [],
+    assets: skill.assets ?? [],
+    githubUrl: skill.githubUrl ?? '',
+    pluginName: plugin.name,
+    color: cfg.color,
+    icon: cfg.icon,
+    delay: idx++ * 40,
+    searchText: [skill.name, skill.description, plugin.name].join(' ').toLowerCase(),
+  }));
+});
+
+const totalSkills = allSkills.length;
+---
+<Layout
+  title="Skills — DSR Copilot Catalog"
+  description="Browse all individual agent skills across every plugin."
+  currentPage="skills"
+>
+
+  <div class="page-hero">
+    <div class="container">
+      <h1 class="page-hero__title">
+        <span class="page-hero__icon"><Icon name="lightning" size={32} /></span>
+        Skills
+      </h1>
+      <p class="page-hero__description">
+        All individual agent skills across every plugin — searchable and filterable.
+      </p>
+    </div>
+  </div>
+
+  <section class="listing-section">
+    <div class="container">
+
+      <!-- Toolbar -->
+      <div class="listing-toolbar">
+        <div class="listing-toolbar__row">
+          <div class="search-bar">
+            <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              id="search-input"
+              class="search-bar__input"
+              type="search"
+              placeholder="Search skills…"
+              aria-label="Search skills"
+              autocomplete="off"
+            />
+          </div>
+          <p class="results-count" id="results-count" aria-live="polite">
+            {totalSkills} skill{totalSkills !== 1 ? 's' : ''}
+          </p>
+        </div>
+      </div>
+
+      <!-- Skills grid -->
+      <div class="skills-grid" id="skills-grid" role="list">
+        {allSkills.map((skill) => (
+          <article
+            class="skill-card skill-card--clickable"
+            role="listitem"
+            tabindex="0"
+            data-search-text={skill.searchText}
+            data-detail={JSON.stringify({
+              type: 'skill',
+              name: skill.name,
+              description: skill.description,
+              pluginName: skill.pluginName,
+              metadata: skill.metadata,
+              compatibility: skill.compatibility,
+              argumentHint: skill.argumentHint,
+              userInvocable: skill.userInvocable,
+              scripts: skill.scripts,
+              assets: skill.assets,
+              githubUrl: skill.githubUrl,
+            })}
+            style={`--card-accent-bar: ${skill.color}; --card-icon-color: ${skill.color}; animation-delay: ${skill.delay}ms;`}
+          >
+            <div class="skill-card__icon" aria-hidden="true">
+              <Icon name={skill.icon} size={32} />
+            </div>
+            <div class="skill-card__body">
+              <span class="skill-card__name">{skill.name}</span>
+              {skill.description && (
+                <p class="skill-card__desc">
+                  {skill.description.length > 150
+                    ? skill.description.slice(0, 150) + '\u2026'
+                    : skill.description}
+                </p>
+              )}
+              <span class="skill-card__plugin">
+                <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12" aria-hidden="true">
+                  <path d="M12 2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-1 9H5v-1h6v1zm0-3H5V7h6v1zm0-3H5V4h6v1z"/>
+                </svg>
+                {skill.pluginName}
+              </span>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="empty-state" aria-live="polite">
+        <div class="empty-state__icon">🔍</div>
+        <p class="empty-state__title">No skills found</p>
+        <p>Try a different search term.</p>
+      </div>
+
+    </div>
+  </section>
+
+</Layout>
+
+<script>
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const resultsCount = document.getElementById('results-count') as HTMLElement;
+  const grid = document.getElementById('skills-grid') as HTMLElement;
+  const emptyState = document.getElementById('empty-state') as HTMLElement;
+  const cards = Array.from(grid.querySelectorAll<HTMLElement>('.skill-card'));
+
+  function applySearch(): void {
+    const query = searchInput.value.toLowerCase().trim();
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const searchText = (card.dataset.searchText ?? '').toLowerCase();
+      const show = !query || searchText.includes(query);
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    const noun = visible === 1 ? 'skill' : 'skills';
+    resultsCount.textContent = `${visible} ${noun}`;
+    emptyState.classList.toggle('is-visible', visible === 0);
+  }
+
+  searchInput.addEventListener('input', applySearch);
+
+  // Open detail modal on card click / Enter key
+  grid.addEventListener('click', (e: MouseEvent) => {
+    const card = (e.target as HTMLElement).closest<HTMLElement>('[data-detail]');
+    if (!card) return;
+    const detail = JSON.parse(card.dataset.detail ?? '{}');
+    (window as unknown as Record<string, (d: unknown) => void>).__openDetailModal?.(detail);
+  });
+
+  grid.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = (e.target as HTMLElement).closest<HTMLElement>('[data-detail]');
+    if (!card) return;
+    e.preventDefault();
+    const detail = JSON.parse(card.dataset.detail ?? '{}');
+    (window as unknown as Record<string, (d: unknown) => void>).__openDetailModal?.(detail);
+  });
+</script>

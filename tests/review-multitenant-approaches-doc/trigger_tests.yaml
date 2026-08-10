@@ -1,0 +1,25 @@
+name: review-multitenant-approaches-doc-triggers
+skill: review-multitenant-approaches-doc
+
+# Prompts that SHOULD activate this skill
+# Generated from "WHEN:" trigger phrases in frontmatter
+shouldTriggerPrompts:
+  - "review the approaches doc for Azure Storage multitenancy"
+  - "review this multitenant approaches doc for accuracy"
+  - "review the AAC approaches doc for structural consistency"
+  - "multitenant approaches review on the compute article"
+  - "review approaches doc for messaging patterns"
+  - "check approaches doc structure for networking"
+  - "review this approaches article for multitenancy patterns"
+
+# Prompts that should NOT activate this skill
+# Generated from competing-skill scenarios and unrelated topics
+shouldNotTriggerPrompts:
+  - "review the service doc for Azure Cosmos DB"
+  - "review considerations doc for pricing models"
+  - "review this multitenant guidance for currency"
+  - "create a learning pathway for Azure multitenancy"
+  - "deploy my app to Azure Container Apps"
+  - "fix a bug in my Python code"
+  - "create a new skill from scratch"
+  - "suggest copilot skills for my project"

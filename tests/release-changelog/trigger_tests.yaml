@@ -1,0 +1,28 @@
+name: release-changelog-triggers
+skill: release-changelog
+
+# Prompts that SHOULD activate this skill
+shouldTriggerPrompts:
+  - "release version"
+  - "update changelog"
+  - "cut a release"
+  - "tag release"
+  - "ship version"
+  - "bump version tag"
+  - "prepare release"
+  - "create a new version"
+  - "changelog update"
+  - "push release"
+  - "update CHANGELOG.md for the new release"
+  - "tag and push the new version"
+
+# Prompts that should NOT activate this skill
+shouldNotTriggerPrompts:
+  - "merge dependabot PRs"
+  - "evaluate PR review comments"
+  - "scaffold repo AI guidance"
+  - "optimize GitHub Copilot resources"
+  - "create a GitHub Release"
+  - "write a commit message"
+  - "deploy to Azure"
+  - "create a pull request"

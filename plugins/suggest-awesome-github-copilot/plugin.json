@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "suggest-awesome-github-copilot",
+  "description": "Discover and install GitHub Copilot assets from the awesome-copilot repository.",
+  "version": "1.0.1",
+  "author": {
+    "name": "Daniel Scott-Raynsford",
+    "url": "https://github.com/PlagueHO"
+  },
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
+  "license": "MIT",
+  "keywords": [
+    "awesome-copilot",
+    "agents",
+    "instructions",
+    "prompts",
+    "skills",
+    "discovery"
+  ]
+}

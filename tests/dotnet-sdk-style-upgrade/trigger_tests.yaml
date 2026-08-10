@@ -1,0 +1,30 @@
+name: dotnet-sdk-style-upgrade-triggers
+skill: dotnet-sdk-style-upgrade
+
+# Prompts that SHOULD activate this skill
+# Generated from "WHEN:" trigger phrases in frontmatter
+shouldTriggerPrompts:
+  - "modernize my .NET project file"
+  - "upgrade this csproj to SDK-style"
+  - "migrate my project to SDK-style format"
+  - "convert this legacy .NET project"
+  - "this project file is non-SDK-style, can you upgrade it?"
+  - "move my .fsproj to the new SDK format"
+  - "help me convert this old .vbproj to modern format"
+  - "update my project file to use the new SDK"
+  - "I have a legacy csproj that needs modernizing"
+  - "switch this project to SDK-style"
+
+# Prompts that should NOT activate this skill
+# Generated from competing-skill scenarios and unrelated topics
+shouldNotTriggerPrompts:
+  - "create a learning pathway for Azure"
+  - "suggest GitHub Copilot skills for my project"
+  - "set up Azure access for GitHub Actions"
+  - "convert a prompt file to a skill"
+  - "scaffold a dotfiles repository"
+  - "update Azure Verified Modules in my Bicep files"
+  - "fix a bug in my Python code"
+  - "create a new agent skill"
+  - "sync my VS Code profiles"
+  - "review this document for AI readiness"

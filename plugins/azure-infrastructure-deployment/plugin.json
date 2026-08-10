@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "azure-infrastructure-deployment",
+  "description": "Provision Azure identities and manage Azure Verified Module versions.",
+  "version": "4.0.2",
+  "author": {
+    "name": "Daniel Scott-Raynsford",
+    "url": "https://github.com/PlagueHO"
+  },
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
+  "license": "MIT",
+  "keywords": [
+    "azure",
+    "infrastructure",
+    "managed-identity",
+    "oidc",
+    "bicep",
+    "avm"
+  ]
+}

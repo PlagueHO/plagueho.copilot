@@ -1,0 +1,29 @@
+name: create-dotfiles-repo-triggers
+skill: create-dotfiles-repo
+
+# Prompts that SHOULD activate this skill
+shouldTriggerPrompts:
+  - "create a dotfiles repo"
+  - "create dotfiles from this project"
+  - "generate dotfiles repository"
+  - "bootstrap dotfiles"
+  - "create a dotfiles template repo"
+  - "export my dotfiles to a GitHub org"
+  - "create dotfiles in my org"
+  - "dotfiles from project"
+  - "make a dotfiles repo from my workspace"
+  - "set up a dotfiles template repository"
+  - "I want to create dotfiles from this repo"
+  - "scaffold a dotfiles repo in my GitHub organization"
+
+# Prompts that should NOT activate this skill
+shouldNotTriggerPrompts:
+  - "edit my .gitconfig"
+  - "install dotfiles on this machine"
+  - "what are dotfiles"
+  - "create a new GitHub repository"
+  - "sync my VS Code settings"
+  - "set up a development environment"
+  - "convert prompt to skill"
+  - "deploy to Azure"
+  - "create a learning pathway"

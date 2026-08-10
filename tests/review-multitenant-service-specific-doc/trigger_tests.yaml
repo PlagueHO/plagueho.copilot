@@ -1,0 +1,25 @@
+name: review-multitenant-service-specific-doc-triggers
+skill: review-multitenant-service-specific-doc
+
+# Prompts that SHOULD activate this skill
+# Generated from "WHEN:" trigger phrases in frontmatter
+shouldTriggerPrompts:
+  - "review the service doc for Azure Cosmos DB"
+  - "review this multitenant service doc for accuracy"
+  - "review the AAC service doc for structural consistency"
+  - "multitenant service review on the App Service page"
+  - "review service-specific doc for Azure SQL Database"
+  - "check service doc structure for Azure Storage"
+  - "review this service-specific article for multitenancy"
+
+# Prompts that should NOT activate this skill
+# Generated from competing-skill scenarios and unrelated topics
+shouldNotTriggerPrompts:
+  - "review multitenant approaches doc for storage"
+  - "review considerations doc for pricing models"
+  - "review this multitenant guidance for currency"
+  - "create a learning pathway for Azure multitenancy"
+  - "deploy my app to Azure Container Apps"
+  - "fix a bug in my Python code"
+  - "create a new skill from scratch"
+  - "suggest copilot skills for my project"

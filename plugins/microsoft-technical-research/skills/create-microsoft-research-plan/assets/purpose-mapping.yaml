@@ -1,0 +1,214 @@
+# Purpose Mapping
+# Maps research purpose to enabled dimensions, research areas, and output sections.
+
+deep-guide:
+  description: "Comprehensive technical reference covering all aspects of the technology"
+  audience: "Architects, senior engineers, technical decision-makers"
+  dimensions:
+    - overview
+    - architecture
+    - configuration
+    - security
+    - networking
+    - monitoring
+    - pricing
+    - limits
+    - integration
+    - migration
+    - sdks
+    - samples
+  areas:
+    - docs
+    - tech
+    - blogs
+    - arch
+    - samples
+    - solutions
+    - other
+  output_sections:
+    - id: "01-overview"
+      title: "Overview"
+      description: "What it is, when to use it, positioning"
+      primary_areas: [docs, blogs]
+      secondary_areas: [other]
+    - id: "02-architecture"
+      title: "Architecture"
+      description: "Components, data flow, deployment models"
+      primary_areas: [arch, docs]
+      secondary_areas: [tech]
+    - id: "03-getting-started"
+      title: "Getting Started"
+      description: "Prerequisites, first deployment, quickstart"
+      primary_areas: [docs, samples]
+      secondary_areas: [solutions]
+    - id: "04-configuration"
+      title: "Configuration"
+      description: "Detailed configuration reference"
+      primary_areas: [docs, tech]
+      secondary_areas: [samples]
+    - id: "05-security"
+      title: "Security"
+      description: "Identity, networking, compliance"
+      primary_areas: [docs, arch]
+      secondary_areas: [tech]
+    - id: "06-operations"
+      title: "Operations"
+      description: "Monitoring, scaling, troubleshooting"
+      primary_areas: [docs, tech]
+      secondary_areas: [blogs]
+    - id: "07-integration"
+      title: "Integration"
+      description: "Related services, patterns"
+      primary_areas: [arch, samples, solutions]
+      secondary_areas: [docs]
+    - id: "08-samples"
+      title: "Code Samples"
+      description: "Code examples across languages"
+      primary_areas: [samples, solutions]
+      secondary_areas: [docs, other]
+    - id: "09-limitations"
+      title: "Limitations"
+      description: "Quotas, constraints, roadmap"
+      primary_areas: [docs, tech]
+      secondary_areas: [blogs, other]
+
+presentation:
+  description: "Technical presentation or demo deck"
+  audience: "Technical audiences at conferences, meetups, or internal tech talks"
+  dimensions:
+    - overview
+    - architecture
+    - integration
+    - samples
+    - limits
+  areas:
+    - docs
+    - blogs
+    - arch
+    - samples
+    - other
+  output_sections:
+    - id: "01-hook"
+      title: "Hook"
+      description: "Opening, problem statement, value proposition"
+      primary_areas: [docs, blogs]
+      secondary_areas: [other]
+    - id: "02-solution"
+      title: "Solution"
+      description: "What it is, key capabilities"
+      primary_areas: [docs, arch]
+      secondary_areas: [blogs]
+    - id: "03-architecture"
+      title: "Architecture"
+      description: "Visual architecture, component overview"
+      primary_areas: [arch, docs]
+      secondary_areas: []
+    - id: "04-demo-flow"
+      title: "Demo Flow"
+      description: "Demo talking points and steps"
+      primary_areas: [samples]
+      secondary_areas: [docs]
+    - id: "05-deep-dive"
+      title: "Deep Dive"
+      description: "Technical details for Q&A preparedness"
+      primary_areas: [docs, arch]
+      secondary_areas: [other]
+    - id: "06-comparison"
+      title: "Comparison"
+      description: "Alternatives and differentiators"
+      primary_areas: [other, blogs]
+      secondary_areas: [docs]
+    - id: "07-resources"
+      title: "Resources"
+      description: "Links and next steps"
+      primary_areas: [docs, samples]
+      secondary_areas: [other]
+
+lab:
+  description: "Hands-on workshop with progressive exercises"
+  audience: "Developers and engineers learning through hands-on practice"
+  dimensions:
+    - overview
+    - configuration
+    - samples
+    - sdks
+    - integration
+  areas:
+    - docs
+    - tech
+    - samples
+    - solutions
+    - other
+  output_sections:
+    - id: "00-prerequisites"
+      title: "Prerequisites"
+      description: "Setup, accounts, tools needed"
+      primary_areas: [docs, tech]
+      secondary_areas: [samples]
+    - id: "01-exercise"
+      title: "Exercise 1"
+      description: "First exercise — foundational setup"
+      primary_areas: [docs, samples]
+      secondary_areas: []
+    - id: "02-exercise"
+      title: "Exercise 2"
+      description: "Second exercise — core functionality"
+      primary_areas: [samples, docs]
+      secondary_areas: [tech]
+    - id: "03-exercise"
+      title: "Exercise 3"
+      description: "Third exercise — advanced scenario"
+      primary_areas: [samples, solutions]
+      secondary_areas: [arch]
+    - id: "04-exercise"
+      title: "Exercise 4"
+      description: "Fourth exercise — integration or extension"
+      primary_areas: [solutions, samples]
+      secondary_areas: [other]
+    - id: "cleanup"
+      title: "Cleanup"
+      description: "Teardown and resource cleanup"
+      primary_areas: [docs]
+      secondary_areas: []
+
+demo:
+  description: "Sample solution or proof-of-concept"
+  audience: "Developers evaluating the technology for adoption"
+  dimensions:
+    - overview
+    - configuration
+    - samples
+    - sdks
+    - integration
+  areas:
+    - docs
+    - tech
+    - samples
+    - solutions
+    - other
+  output_sections:
+    - id: "01-overview"
+      title: "Overview"
+      description: "What the demo shows, prerequisites"
+      primary_areas: [docs]
+      secondary_areas: [blogs]
+    - id: "02-architecture"
+      title: "Architecture"
+      description: "Solution architecture and components"
+      primary_areas: [arch, solutions]
+      secondary_areas: [docs]
+    - id: "03-setup"
+      title: "Setup"
+      description: "Deployment instructions"
+      primary_areas: [docs, samples]
+      secondary_areas: [tech]
+    - id: "04-walkthrough"
+      title: "Walkthrough"
+      description: "Step-by-step demo guide"
+      primary_areas: [samples, solutions]
+      secondary_areas: [docs]
+    - id: "05-extend"
+      title: "Extend"
+      description: "Customization and extension points"
+      primary_areas: [solutions, other]
+      secondary_areas: [docs, tech]

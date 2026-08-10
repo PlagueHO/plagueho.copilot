@@ -1,0 +1,27 @@
+name: create-learning-pathway-triggers
+skill: create-learning-pathway
+
+# Prompts that SHOULD activate this skill
+shouldTriggerPrompts:
+  - "create a learning pathway for Microsoft Foundry"
+  - "build a training plan for Azure Kubernetes Service"
+  - "generate a study guide for Azure AI Search"
+  - "produce a skilling roadmap for GitHub Copilot"
+  - "design a learning journey for Microsoft Fabric"
+  - "create a learning pathway from L100 to L400 for Azure OpenAI"
+  - "I need a training plan for my team to learn Azure Container Apps"
+  - "generate a structured study guide for Microsoft Entra ID"
+  - "build a skilling roadmap for Azure API Management"
+  - "design a learning journey for partners to learn Semantic Kernel"
+
+# Prompts that should NOT activate this skill
+shouldNotTriggerPrompts:
+  - "deploy my app to Azure"
+  - "look up this single Microsoft Learn module for me"
+  - "search Microsoft docs for Azure Functions quickstart"
+  - "fix a bug in my Python code"
+  - "create a GitHub Actions workflow"
+  - "set up Azure managed identity for my repository"
+  - "suggest GitHub Copilot agents for my project"
+  - "migrate my AWS Lambda to Azure Functions"
+  - "create a skill from this pull request"

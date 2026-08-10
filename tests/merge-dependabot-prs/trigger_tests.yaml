@@ -1,0 +1,33 @@
+name: merge-dependabot-prs-triggers
+skill: merge-dependabot-prs
+
+# Prompts that SHOULD activate this skill
+shouldTriggerPrompts:
+  - "merge dependabot PRs"
+  - "merge all dependabot pull requests"
+  - "auto-merge dependabot"
+  - "process dependabot updates"
+  - "bulk merge dependabot PRs"
+  - "dependabot batch merge"
+  - "merge all dependency updates"
+  - "approve dependabot PRs"
+  - "dependabot sweep"
+  - "merge my dependabot PRs in parallel"
+  - "squash merge all dependabot PRs"
+  - "handle all open dependabot PRs"
+  - "clean up dependabot PRs"
+
+# Prompts that should NOT activate this skill
+shouldNotTriggerPrompts:
+  - "evaluate PR review comments"
+  - "create a pull request"
+  - "review this PR"
+  - "update my dependencies"
+  - "run dependabot"
+  - "configure dependabot.yml"
+  - "deploy to Azure"
+  - "optimize GitHub Copilot resources"
+  - "merge this PR"
+  - "create a new skill"
+  - "set up dependabot for my repo"
+  - "check dependabot alerts"

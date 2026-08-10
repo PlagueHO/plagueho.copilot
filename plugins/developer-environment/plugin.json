@@ -1,0 +1,19 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "developer-environment",
+  "description": "Scaffold dotfiles repos and sync VS Code profiles across editions.",
+  "version": "1.0.1",
+  "author": {
+    "name": "Daniel Scott-Raynsford",
+    "url": "https://github.com/PlagueHO"
+  },
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
+  "license": "MIT",
+  "keywords": [
+    "dotfiles",
+    "vscode",
+    "profiles",
+    "developer-environment",
+    "configuration"
+  ]
+}

@@ -1,0 +1,30 @@
+name: ai-content-readiness-review-triggers
+skill: ai-content-readiness-review
+
+# Prompts that SHOULD activate this skill
+# Generated from "WHEN:" trigger phrases in frontmatter
+shouldTriggerPrompts:
+  - "review this content for AI readiness"
+  - "run an AI content audit on this document"
+  - "check this document for AI best practices"
+  - "do a content readiness review on my article"
+  - "is this document AI-ready?"
+  - "evaluate the content quality for AI consumption"
+  - "review the structure and formatting for AI parsing"
+  - "how well does this article follow AI content guidelines?"
+  - "audit my documentation for AI optimization"
+  - "assess this page for AI-friendly formatting"
+
+# Prompts that should NOT activate this skill
+# Generated from competing-skill scenarios and unrelated topics
+shouldNotTriggerPrompts:
+  - "create a learning pathway for Azure"
+  - "set up Azure access for GitHub Actions"
+  - "suggest GitHub Copilot skills for my project"
+  - "convert a prompt file to a skill"
+  - "update Azure Verified Modules in my Bicep files"
+  - "fix a bug in my Python code"
+  - "create a new agent skill"
+  - "sync my VS Code profiles"
+  - "modernize my .NET project file"
+  - "scaffold a dotfiles repository"

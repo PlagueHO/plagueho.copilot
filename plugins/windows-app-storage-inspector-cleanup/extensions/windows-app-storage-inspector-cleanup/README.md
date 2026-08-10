@@ -1,0 +1,269 @@
+# Windows App Storage Inspector & Cleanup
+
+A GitHub Copilot app canvas extension for finding and safely reclaiming app storage under:
+
+- The current Windows user profile
+- `C:\ProgramData`
+
+The canvas is Windows-only. It visualizes storage in a drill-down treemap, groups files by application and category, excludes OneDrive cloud-only placeholders from local totals, provides purpose-built storage analyzers, and moves approved cleanup items to the Windows Recycle Bin.
+
+## Install
+
+Run this command in the GitHub Copilot app:
+
+```text
+copilot plugin install windows-app-storage-inspector-cleanup@plagueho-copilot
+```
+
+Canvas extensions are supported in the GitHub Copilot app only.
+
+## Using the canvas
+
+1. Open **Windows App Storage Inspector & Cleanup**.
+2. Select **User profile**, **ProgramData**, or both.
+3. Select **Scan storage**.
+4. Monitor the current folder and live totals in **Scan status**.
+5. After the scan completes:
+   - Select treemap folders to drill down.
+   - Use **Application ownership** and **File categories** to understand usage.
+   - Use the result tabs to inspect folders, large files, cloud-only files, cleanup candidates, and warnings.
+   - Select **Analyze folder & cleanup options** for a structured Copilot explanation of a selected folder.
+   - Open **Custom storage analyzers** for application-specific analysis.
+
+Scans can take time on large profiles. Inaccessible folders are reported as warnings rather than silently ignored.
+
+## Cleanup workflow
+
+All deletion paths use the same centralized cleanup service and modal:
+
+1. Select eligible scan candidates or analyzer items.
+2. Select **Review cleanup**.
+3. Wait while every item is validated against the approved scan roots and protected-path rules.
+4. Review the exact paths and sizes in the modal.
+5. Select the explicit confirmation checkbox.
+6. Select **Move to Recycle Bin**.
+7. Keep the modal open while it reports validation and Recycle Bin progress.
+
+The service revalidates every item immediately before execution. It rejects changed files, unexpected entry types, symbolic links, protected locations, and paths outside the selected scan roots. Cleanup never permanently deletes files; successful items are moved to the Windows Recycle Bin. A refresh scan starts after cleanup.
+
+## Custom categorizers
+
+A categorizer assigns an application/owner name and storage category to a file or folder subtree. Use one when the general path and extension rules classify application data too broadly.
+
+### Create a categorizer in the canvas
+
+1. Complete a scan.
+2. Open **Folders**, **Largest files**, or **Cloud-only excluded**.
+3. Find the item to classify.
+4. Select **Categorize**.
+5. Enter:
+   - **Application or owner name**
+   - **Storage category**
+   - An optional description
+6. Wait for the automatic rescan.
+
+The path must:
+
+- Be absolute.
+- Exist when the categorizer is created.
+- Be a regular file or folder, not a symbolic link.
+- Be inside one of the selected scan roots.
+- Not already have a custom categorizer.
+
+A path categorizer applies to the selected path and all descendants. The most specific matching rule wins. Custom categorizers override general application and file-category recognition and deliberately set `cleanupPolicy` to `manual`, so matching files do not become automatic cleanup candidates.
+
+Remove a custom rule from the **Custom categorizers** panel. Removal also starts a rescan.
+
+### Categorizer storage
+
+Custom categorizers are stored as versioned JSON at:
+
+```text
+%COPILOT_HOME%\extensions\windows-app-storage-inspector-cleanup\artifacts\categorizers.json
+```
+
+When `COPILOT_HOME` is unset, it defaults to:
+
+```text
+%USERPROFILE%\.copilot\extensions\windows-app-storage-inspector-cleanup\artifacts\categorizers.json
+```
+
+Stored data has this shape:
+
+```json
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "generated-uuid",
+      "name": "Application name",
+      "category": "Storage category",
+      "description": "Optional description",
+      "path": "c:\\normalized\\absolute\\path",
+      "createdAt": "2026-08-10T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+Use the canvas to add or remove rules. The store is cached in memory and written atomically, so editing it while the extension is running can be overwritten or leave the in-memory state out of sync. Up to 200 custom rules are supported; text fields are limited to 120 characters.
+
+### Add a built-in categorizer
+
+Built-in categorizers are code-defined in `src\core\categorizers.mjs`. Add an entry to `BUILT_IN_CATEGORIZERS`:
+
+```js
+{
+    id: "built-in-example-cache",
+    name: "Example App",
+    category: "Application cache",
+    description: "Downloaded data managed by Example App.",
+    match: "token",
+    value: "\\example app\\cache",
+    cleanupPolicy: "manual",
+    source: "built-in",
+}
+```
+
+Built-in rules are not written to `categorizers.json`. Token values should be normalized, lower-case Windows path fragments. Keep `cleanupPolicy: "manual"` unless a separate, tested cleanup policy is deliberately implemented.
+
+Docker storage is categorized automatically:
+
+- `AppData\Local\Docker` is labeled **Docker Desktop / Container image and build storage**.
+- `ProgramData\Docker` is labeled **Docker Engine / Container image and build storage**.
+
+These rules are manual-only because Docker owns the layer database and virtual disk. Use the Docker CLI or Docker Desktop to reclaim image, container, volume, or build-cache storage.
+
+## Custom storage analyzers
+
+Analyzers are code modules, not user-created data records. Use an analyzer when an application needs specialized discovery, process checks, storage summaries, or cleanup eligibility rules that a categorizer cannot provide.
+
+Current analyzers:
+
+- **VS Code Insiders**: identifies retained installation versions and enables cleanup only when a running process positively identifies the active version.
+- **Microsoft Scout**: separates application files, user data, and regenerable storage; cleanup is disabled while Scout is running or its process state is unknown.
+- **Docker images**: reads Docker image metadata with the Docker CLI, identifies Docker-managed storage under the user profile and `ProgramData`, and provides reviewed Docker cleanup commands. Docker layer folders and virtual disks are never offered for direct Recycle Bin cleanup.
+
+Analyzer results are held in memory and are discarded on a new scan or extension restart.
+
+Analyzer cleanup commands have a **Run command** or **Run cleanup** button. Read-only commands run directly through the extension's fixed command allowlist. Destructive commands require an explicit confirmation and use non-interactive, scoped CLI arguments. The canvas never executes arbitrary command text received from the browser.
+
+### Create an analyzer
+
+1. Create a module under `src\analyzers`, for example `src\analyzers\example-app.mjs`.
+1. Export one async analysis function:
+
+```js
+export async function analyzeExampleApp(result) {
+    // Use the completed scan result and bounded local inspection.
+    return {
+        status: "not-running",
+        message: "Example App is not running.",
+        totalBytes: 0,
+        cleanupItems: [
+            {
+                id: "example-cache",
+                name: "Regenerable cache",
+                path: "C:\\Users\\...\\Example App\\Cache",
+                bytes: 0,
+                files: 0,
+                modifiedAt: new Date().toISOString(),
+                entryType: "directory",
+                cleanupEligible: true,
+                reason: "Cache can be regenerated by Example App",
+                risk: "low"
+            }
+        ],
+        topFiles: []
+    };
+}
+```
+
+For cleanup integration, return `cleanupItems`. Each eligible item must include:
+
+| Field | Purpose |
+| --- | --- |
+| `id` | Stable identifier within the analyzer result |
+| `path` | Absolute path inside a scanned root |
+| `bytes` | Observed logical size |
+| `modifiedAt` | ISO modification timestamp used for revalidation |
+| `entryType` | `file` or `directory` |
+| `cleanupEligible` | Must be exactly `true` to allow selection |
+| `reason` | User-facing reason cleanup is appropriate |
+| `risk` | User-facing risk level |
+
+Only mark an item eligible when safety can be positively established. If application process inspection fails or the active data set is ambiguous, return `cleanupEligible: false`.
+
+1. Import and register the analyzer in `src\analyzers\custom-analyzers.mjs`:
+
+```js
+import { analyzeExampleApp } from "./example-app.mjs";
+
+export const CUSTOM_ANALYZERS = [
+    // Existing analyzers...
+    {
+        id: "example-app",
+        name: "Example App",
+        description: "Inspect Example App storage and regenerable caches.",
+        analyze: analyzeExampleApp,
+    },
+];
+```
+
+1. Add the analyzer ID to both `analyzerId` enums in root `extension.mjs`:
+   - `analyze_custom_storage`
+   - `preview_cleanup`
+1. Add a purpose-built renderer in `src\ui\renderer.mjs` and dispatch to it from `renderCustomAnalyzer()`.
+1. If selecting a recognized folder should activate the analyzer automatically, add a path-segment rule to `analyzerForPath()` in `src\ui\renderer.mjs`.
+1. Add analyzer and cleanup-safety coverage to `test\self-test.mjs`.
+1. Reload extensions so the updated analyzer registry is discovered.
+
+Do not implement a separate deletion endpoint or Recycle Bin helper for a new analyzer. Return eligible `cleanupItems` and use the centralized `preview_cleanup` and `execute_cleanup` flow so every analyzer receives the same validation, confirmation, progress, and failure handling.
+
+For managed stores such as Docker, do not return direct filesystem cleanup items. Display supported product commands in the analyzer and explain why deleting the underlying storage folders is unsafe.
+
+## Data and persistence
+
+| Data | Storage | Lifetime |
+| --- | --- | --- |
+| Custom categorizers | `artifacts\categorizers.json` | Persistent across sessions and repositories |
+| Completed scan and file inventory | Extension memory | Current provider lifetime |
+| Analyzer results | Extension memory | Until the next scan or provider restart |
+| Cleanup previews | Extension memory | Ten minutes or until executed |
+| Cleanup result summary | Extension memory | Current provider lifetime |
+| Folder explanation cache | Canvas iframe memory | Current canvas page lifetime |
+| Reload recovery | `artifacts\reload-recovery.json` | Temporary; consumed and deleted after controlled recovery |
+
+The extension does not persist general scan inventories or folder explanations by default.
+
+## Key files
+
+| File | Responsibility |
+| --- | --- |
+| `extension.mjs` | Canvas registration, action schemas, and Copilot folder-explanation handoff |
+| `src\api\server.mjs` | Loopback-only HTTP and Server-Sent Events API |
+| `src\ui\renderer.mjs` | Canvas UI, treemap, analyzer widgets, and centralized cleanup modal |
+| `src\core\storage-service.mjs` | Scan, categorizer, analyzer, preview, cleanup, and progress orchestration |
+| `src\core\scanner.mjs` | Filesystem traversal, aggregation, classification, and conservative candidates |
+| `src\core\cleanup.mjs` | Shared path validation and Windows Recycle Bin execution |
+| `src\core\categorizers.mjs` | Built-in rules and persistent custom categorizer store |
+| `src\core\analyzer-commands.mjs` | Fixed analyzer command allowlist and guarded command execution |
+| `src\analyzers\custom-analyzers.mjs` | Analyzer registry and dispatch |
+| `src\analyzers\vscode-insiders.mjs` | VS Code Insiders analyzer |
+| `src\analyzers\microsoft-scout.mjs` | Microsoft Scout analyzer |
+| `src\analyzers\docker-images.mjs` | Docker image and managed-storage analyzer |
+| `src\core\folder-explanation.mjs` | Structured Copilot prompt and response validation |
+| `test\self-test.mjs` | Regression tests for scanning, classification, cleanup, and explanations |
+
+## Validate changes
+
+Run the existing syntax and regression checks:
+
+```powershell
+node --check .\extension.mjs
+node --check .\src\ui\renderer.mjs
+node --check .\src\core\storage-service.mjs
+node .\test\self-test.mjs
+```
+
+After changing extension code, reload extensions and reopen the canvas to load the new provider and iframe.

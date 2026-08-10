@@ -1,0 +1,702 @@
+---
+/**
+ * DetailModal.astro
+ * Shared popover for skill and agent detail views.
+ * Rendered once in the layout; populated at runtime via window.__openDetailModal().
+ */
+---
+
+<div
+  id="detail-modal"
+  class="detail-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="detail-modal-title"
+  hidden
+>
+  <div class="detail-modal__backdrop"></div>
+  <div class="detail-modal__panel">
+
+    <div class="detail-modal__header">
+      <div class="detail-modal__header-left">
+        <span class="detail-modal__type-badge" id="detail-modal-type"></span>
+        <h2 class="detail-modal__title" id="detail-modal-title"></h2>
+        <span class="detail-modal__plugin" id="detail-modal-plugin"></span>
+      </div>
+      <div class="detail-modal__header-actions">
+        <a
+          id="detail-modal-github"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="detail-modal__github-link"
+          aria-label="View on GitHub"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span>View on GitHub</span>
+        </a>
+        <button
+          id="detail-modal-share"
+          type="button"
+          class="detail-modal__share-btn"
+          aria-label="Copy item URL"
+          title="Copy item URL"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <span id="detail-modal-share-label">Share</span>
+        </button>
+        <button
+          class="detail-modal__close"
+          id="detail-modal-close"
+          aria-label="Close"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-modal__body">
+      <p class="detail-modal__description" id="detail-modal-description"></p>
+      <div class="detail-modal__fields" id="detail-modal-fields"></div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  /* ── Overlay ─────────────────────────────────────────────────── */
+  .detail-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .detail-modal[hidden] { display: none; }
+
+  .detail-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* ── Panel ───────────────────────────────────────────────────── */
+  .detail-modal__panel {
+    position: relative;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 680px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Header ──────────────────────────────────────────────────── */
+  .detail-modal__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .detail-modal__header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .detail-modal__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    padding-top: 0.1rem;
+  }
+
+  .detail-modal__type-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+  }
+
+  .detail-modal__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text-emphasis);
+    font-family: var(--font-mono);
+    word-break: break-all;
+    line-height: 1.3;
+  }
+
+  .detail-modal__plugin {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    margin-top: 0.1rem;
+  }
+
+  /* ── GitHub link ─────────────────────────────────────────────── */
+  .detail-modal__github-link,
+  .detail-modal__share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background: var(--color-glass);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 0.35rem 0.65rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color var(--transition), background var(--transition), border-color var(--transition);
+    white-space: nowrap;
+  }
+  .detail-modal__github-link:hover,
+  .detail-modal__share-btn:hover {
+    color: var(--color-text-emphasis);
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .detail-modal__share-btn.is-copied {
+    color: var(--color-text-emphasis);
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+  }
+
+  /* ── Close button ────────────────────────────────────────────── */
+  .detail-modal__close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0.25rem;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition), background var(--transition);
+  }
+  .detail-modal__close:hover {
+    color: var(--color-text-emphasis);
+    background: var(--color-glass);
+  }
+
+  /* ── Body ────────────────────────────────────────────────────── */
+  .detail-modal__body {
+    padding: 1.25rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .detail-modal__description {
+    font-size: 0.875rem;
+    color: var(--color-text);
+    line-height: 1.65;
+  }
+
+  .detail-modal__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* ── Section ─────────────────────────────────────────────────── */
+  :global(.detail-section) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  :global(.detail-section__title) {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.35rem;
+  }
+
+  /* ── Field row ───────────────────────────────────────────────── */
+  :global(.detail-field) {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.5rem;
+    align-items: start;
+  }
+
+  :global(.detail-field__label) {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    padding-top: 0.15rem;
+  }
+
+  :global(.detail-field__value) {
+    font-size: 0.85rem;
+    color: var(--color-text);
+    word-break: break-word;
+    line-height: 1.5;
+  }
+
+  :global(.detail-field__value a) {
+    color: var(--color-link);
+    word-break: break-all;
+  }
+  :global(.detail-field__value a:hover) { color: var(--color-link-hover); }
+
+  /* ── Tags ────────────────────────────────────────────────────── */
+  :global(.detail-tags) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  :global(.detail-tag) {
+    font-size: 0.72rem;
+    padding: 0.18rem 0.5rem;
+    background: var(--color-glass);
+    border: 1px solid var(--color-border);
+    border-radius: 100px;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  /* ── File list ───────────────────────────────────────────────── */
+  :global(.detail-file-list) {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  :global(.detail-file-list li) {
+    font-size: 0.78rem;
+    font-family: var(--font-mono);
+    color: var(--color-text);
+    padding: 0.22rem 0.55rem;
+    background: var(--color-glass);
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+  }
+
+  /* ── Boolean badge ───────────────────────────────────────────── */
+  :global(.detail-bool) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+  }
+
+  :global(.detail-bool--yes) {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+  }
+
+  :global(.detail-bool--no) {
+    background: var(--color-glass);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+  }
+
+  /* ── README content ──────────────────────────────────────────── */
+  :global(.detail-readme) {
+    border-top: 1px solid var(--color-border);
+    padding-top: 1rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--color-text);
+  }
+
+  :global(.detail-readme h1) {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-text-emphasis);
+    margin: 1rem 0 0.5rem;
+  }
+
+  :global(.detail-readme h2) {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-emphasis);
+    margin: 1rem 0 0.4rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.3rem;
+  }
+
+  :global(.detail-readme h3) {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-emphasis);
+    margin: 0.8rem 0 0.3rem;
+  }
+
+  :global(.detail-readme p) {
+    margin: 0.5rem 0;
+  }
+
+  :global(.detail-readme a) {
+    color: var(--color-link);
+    text-decoration: underline;
+  }
+
+  :global(.detail-readme a:hover) {
+    color: var(--color-link-hover);
+  }
+
+  :global(.detail-readme code) {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    background: var(--color-glass);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.15rem 0.4rem;
+  }
+
+  :global(.detail-readme pre) {
+    background: var(--color-bg-tertiary, var(--color-glass));
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    margin: 0.6rem 0;
+  }
+
+  :global(.detail-readme pre code) {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  :global(.detail-readme ul),
+  :global(.detail-readme ol) {
+    padding-left: 1.5rem;
+    margin: 0.5rem 0;
+  }
+
+  :global(.detail-readme li) {
+    margin: 0.2rem 0;
+  }
+
+  :global(.detail-readme table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.6rem 0;
+    font-size: 0.8rem;
+  }
+
+  :global(.detail-readme th),
+  :global(.detail-readme td) {
+    border: 1px solid var(--color-border);
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+  }
+
+  :global(.detail-readme th) {
+    background: var(--color-glass);
+    font-weight: 600;
+    color: var(--color-text-emphasis);
+  }
+
+  :global(.detail-readme blockquote) {
+    border-left: 3px solid var(--color-accent);
+    margin: 0.5rem 0;
+    padding: 0.3rem 0.8rem;
+    color: var(--color-text-muted);
+    background: var(--color-glass);
+    border-radius: 0 4px 4px 0;
+  }
+</style>
+
+<script>
+  const modal = document.getElementById('detail-modal') as HTMLElement;
+  const backdrop = modal?.querySelector('.detail-modal__backdrop') as HTMLElement;
+  const closeBtn = document.getElementById('detail-modal-close') as HTMLButtonElement;
+  const githubLink = document.getElementById('detail-modal-github') as HTMLAnchorElement;
+  const shareBtn = document.getElementById('detail-modal-share') as HTMLButtonElement;
+  const shareLabel = document.getElementById('detail-modal-share-label') as HTMLSpanElement;
+  const typeBadge = document.getElementById('detail-modal-type') as HTMLElement;
+  const titleEl = document.getElementById('detail-modal-title') as HTMLElement;
+  const pluginEl = document.getElementById('detail-modal-plugin') as HTMLElement;
+  const descEl = document.getElementById('detail-modal-description') as HTMLElement;
+  const fieldsEl = document.getElementById('detail-modal-fields') as HTMLElement;
+  let currentShareUrl = '';
+  let shareResetTimer: number | undefined;
+
+  interface SkillDetail {
+    type: 'skill';
+    name: string;
+    description: string;
+    pluginName: string;
+    metadata?: { author?: string; version?: string; reference?: string } | null;
+    compatibility?: string[] | null;
+    argumentHint?: string | null;
+    userInvocable?: boolean | string | null;
+    scripts?: string[];
+    assets?: string[];
+    githubUrl: string;
+  }
+
+  interface AgentDetail {
+    type: 'agent';
+    name: string;
+    description: string;
+    pluginName: string;
+    tools?: string[] | null;
+    subAgents?: string[] | null;
+    userInvocable?: boolean | string | null;
+    githubUrl: string;
+  }
+
+  interface PluginDetail {
+    type: 'plugin';
+    name: string;
+    description: string;
+    version: string;
+    keywords: string[];
+    skillsCount: number;
+    agentsCount: number;
+    githubUrl: string;
+    readmeHtml?: string;
+  }
+
+  type Detail = SkillDetail | AgentDetail | PluginDetail;
+
+  function esc(str: string): string {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function toStringArray(value: unknown): string[] {
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => (typeof item === 'string' ? item : String(item)))
+        .filter((item) => item.trim().length > 0);
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      return trimmed ? [trimmed] : [];
+    }
+
+    if (value === null || value === undefined) {
+      return [];
+    }
+
+    return [String(value)];
+  }
+
+  function makeTags(items: unknown): string {
+    const normalized = toStringArray(items);
+    return `<div class="detail-tags">${normalized.map((i) => `<span class="detail-tag">${esc(i)}</span>`).join('')}</div>`;
+  }
+
+  function makeFileList(items: unknown): string {
+    const normalized = toStringArray(items);
+    return `<ul class="detail-file-list">${normalized.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>`;
+  }
+
+  function makeBool(val: boolean | string | null | undefined): string {
+    const yes = val === true || val === 'true';
+    return `<span class="detail-bool detail-bool--${yes ? 'yes' : 'no'}">${yes ? '✓ Yes' : '✗ No'}</span>`;
+  }
+
+  function makeField(label: string, valueHtml: string): string {
+    return `<div class="detail-field">
+      <span class="detail-field__label">${label}</span>
+      <div class="detail-field__value">${valueHtml}</div>
+    </div>`;
+  }
+
+  function makeSection(title: string, content: string): string {
+    return `<div class="detail-section">
+      <div class="detail-section__title">${title}</div>
+      ${content}
+    </div>`;
+  }
+
+  function openModal(detail: Detail): void {
+    typeBadge.textContent = detail.type === 'skill' ? 'Skill' : detail.type === 'agent' ? 'Agent' : 'Plugin';
+    titleEl.textContent = detail.name;
+    pluginEl.textContent = detail.type === 'plugin' ? '' : `Plugin: ${(detail as SkillDetail | AgentDetail).pluginName}`;
+    descEl.textContent = detail.description;
+    githubLink.href = detail.githubUrl;
+    currentShareUrl = detail.githubUrl;
+    resetShareButton();
+
+    const parts: string[] = [];
+
+    if (detail.type === 'plugin') {
+      const fields: string[] = [];
+      fields.push(makeField('Version', esc(`v${detail.version}`)));
+      const keywords = toStringArray(detail.keywords);
+      if (keywords.length) {
+        fields.push(makeField('Keywords', makeTags(keywords)));
+      }
+      const counts: string[] = [];
+      if (detail.skillsCount > 0) {
+        counts.push(`${detail.skillsCount} skill${detail.skillsCount !== 1 ? 's' : ''}`);
+      }
+      if (detail.agentsCount > 0) {
+        counts.push(`${detail.agentsCount} agent${detail.agentsCount !== 1 ? 's' : ''}`);
+      }
+      if (counts.length > 0) {
+        fields.push(makeField('Contents', esc(counts.join(', '))));
+      }
+      if (fields.length > 0) parts.push(makeSection('Details', fields.join('')));
+
+      if (detail.readmeHtml) {
+        parts.push(`<div class="detail-readme">${detail.readmeHtml}</div>`);
+      }
+    } else if (detail.type === 'skill') {
+      const fields: string[] = [];
+      const m = detail.metadata;
+      if (m?.author) fields.push(makeField('Author', esc(m.author)));
+      if (m?.version) fields.push(makeField('Version', esc(m.version)));
+      if (m?.reference) {
+        fields.push(makeField('Reference', `<a href="${esc(m.reference)}" target="_blank" rel="noopener noreferrer">${esc(m.reference)}</a>`));
+      }
+      const compatibility = toStringArray(detail.compatibility);
+      if (compatibility.length) {
+        fields.push(makeField('Compatibility', makeTags(compatibility)));
+      }
+      if (detail.userInvocable !== null && detail.userInvocable !== undefined) {
+        fields.push(makeField('User Invocable', makeBool(detail.userInvocable)));
+      }
+      if (detail.argumentHint) {
+        fields.push(makeField('Argument Hint', `<em>${esc(detail.argumentHint)}</em>`));
+      }
+      if (fields.length > 0) parts.push(makeSection('Details', fields.join('')));
+
+      const scripts = toStringArray(detail.scripts);
+      if (scripts.length) {
+        parts.push(makeSection('Scripts', makeFileList(scripts)));
+      }
+      const assets = toStringArray(detail.assets);
+      if (assets.length) {
+        parts.push(makeSection('References &amp; Assets', makeFileList(assets)));
+      }
+    } else {
+      const fields: string[] = [];
+      if (detail.userInvocable !== null && detail.userInvocable !== undefined) {
+        fields.push(makeField('User Invocable', makeBool(detail.userInvocable)));
+      }
+      const tools = toStringArray(detail.tools);
+      if (tools.length) {
+        fields.push(makeField('Tools', makeTags(tools)));
+      }
+      const subAgents = toStringArray(detail.subAgents);
+      if (subAgents.length) {
+        fields.push(makeField('Sub-agents', makeTags(subAgents)));
+      }
+      if (fields.length > 0) parts.push(makeSection('Details', fields.join('')));
+    }
+
+    fieldsEl.innerHTML = parts.join('');
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function resetShareButton(): void {
+    if (shareResetTimer) {
+      window.clearTimeout(shareResetTimer);
+      shareResetTimer = undefined;
+    }
+    shareBtn?.classList.remove('is-copied');
+    if (shareLabel) shareLabel.textContent = 'Share';
+  }
+
+  async function copyToClipboard(value: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(value);
+      return true;
+    } catch {
+      try {
+        const input = document.createElement('input');
+        input.value = value;
+        input.setAttribute('readonly', '');
+        input.style.position = 'absolute';
+        input.style.opacity = '0';
+        document.body.appendChild(input);
+        input.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(input);
+        return ok;
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  async function onShareClick(): Promise<void> {
+    if (!currentShareUrl) {
+      return;
+    }
+
+    const copied = await copyToClipboard(currentShareUrl);
+    if (!copied) {
+      if (shareLabel) shareLabel.textContent = 'Copy failed';
+      shareResetTimer = window.setTimeout(resetShareButton, 1500);
+      return;
+    }
+
+    shareBtn?.classList.add('is-copied');
+    if (shareLabel) shareLabel.textContent = 'Copied';
+    shareResetTimer = window.setTimeout(resetShareButton, 1400);
+  }
+
+  function closeModal(): void {
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  closeBtn?.addEventListener('click', closeModal);
+  shareBtn?.addEventListener('click', () => {
+    void onShareClick();
+  });
+  backdrop?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && !modal.hidden) closeModal();
+  });
+
+  // Expose opener to page scripts
+  (window as unknown as Record<string, unknown>).__openDetailModal = openModal;
+</script>

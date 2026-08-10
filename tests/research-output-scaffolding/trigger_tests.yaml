@@ -1,0 +1,26 @@
+name: research-output-scaffolding-triggers
+skill: research-output-scaffolding
+
+shouldTriggerPrompts:
+  - "scaffold research output for my topic"
+  - "create research folder structure"
+  - "initialize research directory for Azure Functions"
+  - "set up research workspace for the topic"
+  - "research output structure for deep-guide"
+  - "scaffold .research folder for container apps"
+  - "create the output folders for my research"
+  - "set up the research notes directory"
+  - "scaffold research output for presentation"
+  - "initialize the research folder for my lab"
+
+shouldNotTriggerPrompts:
+  - "create a research plan for Azure"
+  - "extract notes from this URL"
+  - "write the research output sections"
+  - "review the research quality"
+  - "deploy to Azure"
+  - "run the build"
+  - "create a new skill"
+  - "update the plugin JSON"
+  - "merge Dependabot PRs"
+  - "sync VS Code profiles"

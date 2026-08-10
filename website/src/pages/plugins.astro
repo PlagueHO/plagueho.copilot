@@ -1,0 +1,315 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { CATEGORY_LABELS, getCategory } from '../lib/categories';
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface Skill {
+  name: string;
+  description: string;
+  metadata?: { author?: string; version?: string; reference?: string } | null;
+  compatibility?: string[] | null;
+  argumentHint?: string | null;
+  userInvocable?: boolean | null;
+  scripts?: string[];
+  assets?: string[];
+  githubUrl?: string;
+}
+
+interface Agent {
+  name: string;
+  description: string;
+  tools?: string[] | null;
+  subAgents?: string[] | null;
+  userInvocable?: boolean | null;
+  githubUrl?: string;
+}
+
+interface Plugin {
+  name: string;
+  description: string;
+  version: string;
+  keywords: string[];
+  skills: Skill[];
+  agents?: Agent[];
+  readmeHtml?: string;
+}
+
+interface SiteData {
+  plugins: Plugin[];
+}
+
+let siteData: SiteData = { plugins: [] };
+const dataPath = resolve('./public/data/data.json');
+if (existsSync(dataPath)) {
+  siteData = JSON.parse(readFileSync(dataPath, 'utf-8')) as SiteData;
+}
+
+// Collect all categories present in data for the filter tabs
+const presentCategories = [...new Set(
+  siteData.plugins.map((p) => getCategory(p.name).cat)
+)];
+
+const totalPlugins = siteData.plugins.length;
+---
+<Layout
+  title="Plugins — DSR Copilot Catalog"
+  description="Browse all agent plugin bundles for GitHub Copilot."
+  currentPage="plugins"
+>
+
+  <div class="page-hero">
+    <div class="container">
+      <h1 class="page-hero__title">
+        <span class="page-hero__icon"><Icon name="plug" size={32} /></span>
+        Plugins
+      </h1>
+      <p class="page-hero__description">
+        Curated plugin bundles with skills and agents organized by domain.
+      </p>
+    </div>
+  </div>
+
+  <section class="listing-section">
+    <div class="container">
+
+      <!-- Toolbar -->
+      <div class="listing-toolbar">
+        <div class="listing-toolbar__row">
+          <div class="search-bar">
+            <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              id="search-input"
+              class="search-bar__input"
+              type="search"
+              placeholder="Search plugins…"
+              aria-label="Search plugins"
+              autocomplete="off"
+            />
+          </div>
+          <p class="results-count" id="results-count" aria-live="polite">
+            {totalPlugins} plugin{totalPlugins !== 1 ? 's' : ''}
+          </p>
+        </div>
+
+        {presentCategories.length > 1 && (
+          <div class="filter-tabs" role="group" aria-label="Filter by category">
+            <button class="filter-tab is-active" data-filter="all">All</button>
+            {presentCategories.map((cat) => (
+              <button class="filter-tab" data-filter={cat}>
+                {CATEGORY_LABELS[cat] ?? cat}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <!-- Plugin grid -->
+      <div class="plugin-grid" id="plugin-grid" role="list">
+        {siteData.plugins.map((plugin, idx) => {
+          const cfg = getCategory(plugin.name);
+          const delay = idx * 60;
+          const searchText = [
+            plugin.name,
+            plugin.description,
+            ...(plugin.keywords ?? []),
+            ...plugin.skills.map((s) => s.name),
+            ...(plugin.agents ?? []).map((a) => a.name),
+          ].join(' ').toLowerCase();
+
+          const githubUrl = `https://github.com/PlagueHO/plagueho.copilot/tree/main/plugins/${plugin.name}`;
+
+          return (
+            <article
+              class="plugin-card plugin-card--clickable"
+              role="listitem"
+              tabindex="0"
+              data-category={cfg.cat}
+              data-search-text={searchText}
+              data-detail={JSON.stringify({
+                type: 'plugin',
+                name: plugin.name,
+                description: plugin.description,
+                version: plugin.version,
+                keywords: plugin.keywords ?? [],
+                skillsCount: plugin.skills.length,
+                agentsCount: (plugin.agents ?? []).length,
+                githubUrl: githubUrl,
+                readmeHtml: plugin.readmeHtml ?? '',
+              })}
+              style={`--card-accent-bar: ${cfg.color}; --card-icon-color: ${cfg.color}; animation-delay: ${delay}ms;`}
+            >
+              <div class="plugin-card__header">
+                <div class="plugin-card__icon" aria-hidden="true">
+                  <Icon name={cfg.icon} size={40} />
+                </div>
+                <div class="plugin-card__meta">
+                  <span class="plugin-card__name">{plugin.name}</span>
+                  <span class="plugin-card__version">v{plugin.version}</span>
+                </div>
+              </div>
+
+              <p class="plugin-card__desc">{plugin.description}</p>
+
+              {(plugin.skills.length > 0 || (plugin.agents ?? []).length > 0) && (
+                <div class="plugin-card__sections">
+                  {plugin.skills.length > 0 && (
+                    <section class="plugin-card__section" aria-label="Skills in this plugin">
+                      <h3 class="plugin-card__section-title">Skills</h3>
+                      <ul class="skill-list">
+                        {plugin.skills.map((skill) => (
+                          <li
+                            class="skill-item skill-item--clickable"
+                            tabindex="0"
+                            data-detail={JSON.stringify({
+                              type: 'skill',
+                              name: skill.name,
+                              description: skill.description,
+                              pluginName: plugin.name,
+                              metadata: skill.metadata ?? null,
+                              compatibility: skill.compatibility ?? null,
+                              argumentHint: skill.argumentHint ?? null,
+                              userInvocable: skill.userInvocable ?? null,
+                              scripts: skill.scripts ?? [],
+                              assets: skill.assets ?? [],
+                              githubUrl: skill.githubUrl ?? '',
+                            })}
+                          >
+                            <span class="skill-item__icon">
+                              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                                <path d="M8 1a.75.75 0 0 1 .75.75v6.5a.75.75 0 0 1-1.5 0v-6.5A.75.75 0 0 1 8 1ZM4.11 3.05a.75.75 0 0 1 1.06 0l.463.464a.75.75 0 0 1-1.061 1.06l-.463-.463a.75.75 0 0 1 0-1.06Zm8.24 0a.75.75 0 0 1 0 1.06l-.463.464a.75.75 0 1 1-1.06-1.061l.462-.463a.75.75 0 0 1 1.061 0ZM8 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-3.5 2a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0Z"/>
+                              </svg>
+                            </span>
+                            <span class="skill-item__name">{skill.name}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+
+                  {(plugin.agents ?? []).length > 0 && (
+                    <section class="plugin-card__section" aria-label="Agents in this plugin">
+                      <h3 class="plugin-card__section-title">Agents</h3>
+                      <ul class="skill-list">
+                        {(plugin.agents ?? []).map((agent) => (
+                          <li
+                            class="skill-item skill-item--clickable"
+                            tabindex="0"
+                            data-detail={JSON.stringify({
+                              type: 'agent',
+                              name: agent.name,
+                              description: agent.description,
+                              pluginName: plugin.name,
+                              tools: agent.tools ?? null,
+                              subAgents: agent.subAgents ?? null,
+                              userInvocable: agent.userInvocable ?? null,
+                              githubUrl: agent.githubUrl ?? '',
+                            })}
+                          >
+                            <span class="skill-item__icon">
+                              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                                <path d="M8 1.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-3 5A2.5 2.5 0 0 0 2.5 9v3A2.5 2.5 0 0 0 5 14.5h6A2.5 2.5 0 0 0 13.5 12V9A2.5 2.5 0 0 0 11 6.5H5Z"/>
+                              </svg>
+                            </span>
+                            <span class="skill-item__name">{agent.name}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                </div>
+              )}
+
+              {plugin.keywords && plugin.keywords.length > 0 && (
+                <div class="plugin-card__keywords">
+                  {plugin.keywords.map((kw) => (
+                    <span class="keyword">{kw}</span>
+                  ))}
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="empty-state" aria-live="polite">
+        <div class="empty-state__icon">🔍</div>
+        <p class="empty-state__title">No plugins found</p>
+        <p>Try a different search term or clear the filter.</p>
+      </div>
+
+    </div>
+  </section>
+
+</Layout>
+
+<script>
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const resultsCount = document.getElementById('results-count') as HTMLElement;
+  const grid = document.getElementById('plugin-grid') as HTMLElement;
+  const emptyState = document.getElementById('empty-state') as HTMLElement;
+  const cards = Array.from(grid.querySelectorAll<HTMLElement>('.plugin-card'));
+  const filterTabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.filter-tab'));
+
+  let activeFilter = 'all';
+
+  function applyFilters(): void {
+    const query = searchInput.value.toLowerCase().trim();
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const searchText = (card.dataset.searchText ?? '').toLowerCase();
+      const category = card.dataset.category ?? '';
+      const matchesSearch = !query || searchText.includes(query);
+      const matchesFilter = activeFilter === 'all' || category === activeFilter;
+      const show = matchesSearch && matchesFilter;
+
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    const noun = visible === 1 ? 'plugin' : 'plugins';
+    resultsCount.textContent = `${visible} ${noun}`;
+    emptyState.classList.toggle('is-visible', visible === 0);
+  }
+
+  searchInput.addEventListener('input', applyFilters);
+
+  filterTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      activeFilter = tab.dataset.filter ?? 'all';
+      filterTabs.forEach((t) => t.classList.toggle('is-active', t === tab));
+      applyFilters();
+    });
+  });
+
+  // Open detail modal when a skill-item, agent-item, or plugin-card is clicked
+  function openDetailItem(el: HTMLElement): void {
+    const raw = el.dataset.detail;
+    if (!raw) return;
+    const detail = JSON.parse(raw);
+    (window as unknown as Record<string, (d: unknown) => void>).__openDetailModal?.(detail);
+  }
+
+  grid.addEventListener('click', (e: MouseEvent) => {
+    const plugin = (e.target as HTMLElement).closest<HTMLElement>('.plugin-card--clickable');
+    const item = (e.target as HTMLElement).closest<HTMLElement>('[data-detail]');
+    if (!item) return;
+    e.stopPropagation();
+    openDetailItem(item);
+  });
+
+  grid.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const item = (e.target as HTMLElement).closest<HTMLElement>('[data-detail]');
+    if (!item) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openDetailItem(item);
+  });
+</script>

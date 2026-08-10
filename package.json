@@ -1,0 +1,27 @@
+{
+  "name": "plagueho-copilot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run plugin:validate && npm run marketplace:generate && npm run website:build",
+    "lint:md": "markdownlint-cli2",
+    "lint:md:fix": "markdownlint-cli2 --fix",
+    "lint:md:ci": "markdownlint-cli2",
+    "marketplace:generate": "node eng/generate-marketplace.mjs",
+    "plugin:materialize": "node eng/materialize-plugins.mjs",
+    "plugin:validate": "node eng/validate-plugins.mjs",
+    "test": "node --test eng/*.test.mjs",
+    "website:build": "npm --prefix website run build"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.23.2"
+  },
+  "description": "Copilot plugins, skills, agents, and canvas extensions",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PlagueHO/plagueho.copilot.git"
+  },
+  "author": "Daniel Scott-Raynsford",
+  "license": "MIT"
+}

@@ -1,0 +1,26 @@
+name: create-microsoft-research-plan-triggers
+skill: create-microsoft-research-plan
+
+shouldTriggerPrompts:
+  - "create a research plan for Azure Container Apps"
+  - "plan Microsoft research on Entra ID"
+  - "research plan for Azure AI Foundry"
+  - "plan technical research on Service Bus"
+  - "scope research topic Azure Functions"
+  - "define research areas for Cosmos DB"
+  - "create research plan for APIM"
+  - "generate a research plan for Azure OpenAI"
+  - "plan research on Azure Kubernetes Service"
+  - "I need a research plan for Azure Event Grid"
+
+shouldNotTriggerPrompts:
+  - "deploy my application to Azure"
+  - "write a blog post about Kubernetes"
+  - "create a PowerPoint presentation"
+  - "update the README file"
+  - "run the unit tests"
+  - "fix the build error"
+  - "install VS Code extensions"
+  - "create a new GitHub issue"
+  - "merge the pull request"
+  - "scaffold a new skill"

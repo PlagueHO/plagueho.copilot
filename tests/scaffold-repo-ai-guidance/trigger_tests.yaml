@@ -1,0 +1,28 @@
+name: scaffold-repo-ai-guidance-triggers
+skill: scaffold-repo-ai-guidance
+
+# Derived from WHEN: phrases in skill description
+shouldTriggerPrompts:
+  - "create AGENTS.md for my repo"
+  - "add copilot instructions to this repository"
+  - "onboard this repo for Copilot"
+  - "generate copilot-instructions.md for my project"
+  - "scaffold repo AI instructions"
+  - "add agent instructions to my repo"
+  - "I need AGENTS.md and copilot-instructions.md for this repo"
+  - "set up AI guidance files for this codebase"
+  - "create copilot instructions for this project"
+  - "scaffold AGENTS.md and copilot-instructions"
+
+# Competing skills and unrelated topics
+shouldNotTriggerPrompts:
+  - "create a learning pathway for Azure"
+  - "merge my Dependabot PRs"
+  - "evaluate these PR review comments"
+  - "create a new skill from scratch"
+  - "update Azure Verified Modules in my Bicep files"
+  - "review this multitenant doc for accuracy"
+  - "suggest copilot skills for my project"
+  - "convert this prompt to a skill"
+  - "sync my VS Code profiles"
+  - "review this PR"

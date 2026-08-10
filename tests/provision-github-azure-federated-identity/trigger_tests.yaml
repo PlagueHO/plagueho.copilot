@@ -1,0 +1,28 @@
+name: azure-github-managed-identity-triggers
+skill: azure-github-managed-identity
+
+# Prompts that SHOULD activate this skill
+shouldTriggerPrompts:
+  - "set up Azure access for GitHub Actions in my repository"
+  - "configure a managed identity for my GitHub repository"
+  - "enable passwordless Azure authentication in my CI/CD pipeline"
+  - "configure OIDC federation between GitHub and Azure"
+  - "set up a Copilot coding agent Azure identity"
+  - "create a user assigned managed identity for GitHub Actions"
+  - "I need to authenticate GitHub Actions to Azure without storing secrets"
+  - "set up Azure RBAC for my GitHub Actions workflows"
+  - "provision OIDC federated credentials for GitHub and Azure"
+  - "create managed identities for my GitHub environments test, staging, and prod"
+
+# Prompts that should NOT activate this skill
+shouldNotTriggerPrompts:
+  - "create a learning pathway for Azure"
+  - "deploy my app to Azure Container Apps"
+  - "fix a bug in my Python code"
+  - "create a GitHub Actions workflow for CI"
+  - "set up Azure Key Vault for my application"
+  - "generate Bicep templates for my infrastructure"
+  - "migrate my AWS Lambda to Azure Functions"
+  - "create a skill from this pull request"
+  - "suggest GitHub Copilot agents for my project"
+  - "set up Azure Application Insights monitoring"

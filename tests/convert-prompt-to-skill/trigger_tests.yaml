@@ -1,0 +1,30 @@
+name: convert-prompt-to-skill-triggers
+skill: convert-prompt-to-skill
+
+# Prompts that SHOULD activate this skill
+# Generated from "WHEN:" trigger phrases in frontmatter
+shouldTriggerPrompts:
+  - "convert this prompt to a skill"
+  - "turn my prompt into a skill"
+  - "make a skill from this prompt file"
+  - "prompt to skill conversion"
+  - "upgrade this prompt to an agent skill"
+  - "transform my prompt.md into a SKILL.md"
+  - "migrate this prompt to a skill"
+  - "I want to convert a prompt file to a skill"
+  - "can you turn .github/prompts/my-prompt.prompt.md into a skill?"
+  - "create a skill from my existing prompt"
+
+# Prompts that should NOT activate this skill
+# Generated from competing-skill scenarios and unrelated topics
+shouldNotTriggerPrompts:
+  - "create a new skill from scratch"
+  - "create a skill from a pull request"
+  - "suggest copilot skills for my project"
+  - "suggest copilot prompts for my project"
+  - "optimize this prompt for fewer tokens"
+  - "assess PR review comments"
+  - "create a learning pathway for Azure"
+  - "set up Azure access for GitHub Actions"
+  - "run sensei on my skill"
+  - "fix a bug in my Python code"

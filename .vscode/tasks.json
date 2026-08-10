@@ -1,0 +1,63 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "markdown: lint",
+            "type": "shell",
+            "command": "pnpm",
+            "args": ["lint:md"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "group": "test",
+            "icon": {
+                "id": "checklist",
+                "color": "terminal.ansiMagenta"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "markdown: fix",
+            "type": "shell",
+            "command": "pnpm",
+            "args": ["lint:md:fix"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "wrench",
+                "color": "terminal.ansiGreen"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "whitespace: fix trailing",
+            "type": "shell",
+            "command": "Get-ChildItem -Recurse -File -Include *.md,*.yml,*.yaml,*.json,*.ps1,*.py,*.sh | Where-Object { $_.FullName -notmatch '[/\\\\]\\.git[/\\\\]' -and $_.FullName -notmatch '[/\\\\]node_modules[/\\\\]' } | ForEach-Object { $content = [System.IO.File]::ReadAllText($_.FullName); $fixed = ($content -replace '[ \\t]+(?=\\r?\\n)', ''); if ($content -ne $fixed) { [System.IO.File]::WriteAllText($_.FullName, $fixed); Write-Host \"Fixed: $($_.FullName)\" } }; Write-Host 'Done.'",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "pwsh",
+                    "args": ["-NoProfile", "-Command"]
+                }
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "whitespace",
+                "color": "terminal.ansiYellow"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}

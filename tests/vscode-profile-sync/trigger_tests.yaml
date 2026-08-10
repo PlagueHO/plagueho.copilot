@@ -1,0 +1,28 @@
+name: vscode-profile-sync-triggers
+skill: vscode-profile-sync
+
+# Prompts that SHOULD activate this skill
+shouldTriggerPrompts:
+  - "sync VS Code profiles"
+  - "copy profiles from Insiders"
+  - "replicate VS Code Insiders profiles"
+  - "sync extensions to VS Code stable"
+  - "mirror Insiders profiles"
+  - "copy VS Code profiles"
+  - "sync Insiders extensions"
+  - "How do I sync my VS Code Insiders profiles to stable?"
+  - "Copy all my Insiders extensions to VS Code"
+  - "I want the same profiles in VS Code as in Insiders"
+
+# Prompts that should NOT activate this skill
+shouldNotTriggerPrompts:
+  - "install a VS Code extension"
+  - "create a new VS Code profile"
+  - "configure VS Code settings"
+  - "deploy to Azure"
+  - "sync my git repository"
+  - "update VS Code to latest version"
+  - "list installed extensions"
+  - "change VS Code theme"
+  - "set up a dev container"
+  - "migrate from Atom to VS Code"

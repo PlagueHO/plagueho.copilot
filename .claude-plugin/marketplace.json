@@ -1,0 +1,81 @@
+{
+  "name": "plagueho-copilot",
+  "metadata": {
+    "description": "Copilot plugins, skills, agents, and canvas extensions by Daniel Scott-Raynsford.",
+    "version": "3.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "owner": {
+    "name": "Daniel Scott-Raynsford",
+    "email": "dscottraynsford@outlook.com",
+    "url": "https://github.com/PlagueHO"
+  },
+  "plugins": [
+    {
+      "name": "azure-architecture-center",
+      "source": "azure-architecture-center",
+      "description": "Skills for Azure Architecture Center documentation maintainers: discover needed updates and review multitenant docs for currency, accuracy, and completeness.",
+      "version": "2.0.1"
+    },
+    {
+      "name": "azure-infrastructure-deployment",
+      "source": "azure-infrastructure-deployment",
+      "description": "Provision Azure identities and manage Azure Verified Module versions.",
+      "version": "4.0.2"
+    },
+    {
+      "name": "content-and-learning",
+      "source": "content-and-learning",
+      "description": "Review content for AI readiness and generate Microsoft technology learning pathways.",
+      "version": "1.0.1"
+    },
+    {
+      "name": "developer-environment",
+      "source": "developer-environment",
+      "description": "Scaffold dotfiles repos and sync VS Code profiles across editions.",
+      "version": "1.0.1"
+    },
+    {
+      "name": "dotnet-modernization",
+      "source": "dotnet-modernization",
+      "description": "Convert legacy .NET project files to modern SDK-style format.",
+      "version": "1.0.1"
+    },
+    {
+      "name": "github-workflows",
+      "source": "github-workflows",
+      "description": "GitHub workflow skills for PR review evaluation, Dependabot PR management, Copilot resource optimization, and AI guidance scaffolding.",
+      "version": "1.4.1"
+    },
+    {
+      "name": "microsoft-technical-research",
+      "source": "microsoft-technical-research",
+      "description": "Deep technical research on Microsoft technologies with multi-agent orchestration and structured documentation output.",
+      "version": "2.1.1"
+    },
+    {
+      "name": "powershell-modernization",
+      "source": "powershell-modernization",
+      "description": "Modernize PowerShell test suites by migrating Pester v4 tests to Pester v5.",
+      "version": "1.1.1"
+    },
+    {
+      "name": "skill-lifecycle",
+      "source": "skill-lifecycle",
+      "description": "Create, convert, and generate agent skills from prompts and pull requests.",
+      "version": "1.0.1"
+    },
+    {
+      "name": "suggest-awesome-github-copilot",
+      "source": "suggest-awesome-github-copilot",
+      "description": "Discover and install GitHub Copilot assets from the awesome-copilot repository.",
+      "version": "1.0.1"
+    },
+    {
+      "name": "windows-app-storage-inspector-cleanup",
+      "source": "windows-app-storage-inspector-cleanup",
+      "description": "Inspect Windows application storage, understand local disk usage, and safely move approved cleanup items to the Recycle Bin.",
+      "version": "1.0.0"
+    }
+  ]
+}

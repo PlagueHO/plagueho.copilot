@@ -1,0 +1,33 @@
+name: Build Docs
+
+on:
+  workflow_call:
+
+jobs:
+  build-docs:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Install website dependencies
+        run: npm install
+        working-directory: website
+
+      - name: Generate data
+        run: node website/build.mjs
+
+      - name: Build Astro site
+        run: npm run build
+        working-directory: website
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: website/dist

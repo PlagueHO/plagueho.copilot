@@ -1,0 +1,30 @@
+name: discover-multitenant-service-updates-triggers
+skill: discover-multitenant-service-updates
+
+# Prompts that SHOULD activate this skill
+# Generated from "WHEN:" trigger phrases in frontmatter
+shouldTriggerPrompts:
+  - "discover what needs updating in this multitenant service doc"
+  - "what new Azure features should be added to this multitenant doc"
+  - "scan the service-specific guidance for Azure SQL multitenancy updates"
+  - "audit multitenant currency for this service doc"
+  - "what changed since last review of this multitenant guidance"
+  - "find new multitenant-relevant features for this Azure Cosmos DB doc"
+  - "run a gap analysis on this multitenant service doc"
+  - "discover multitenant updates for App Service guidance"
+  - "what new features need adding to this AAC multitenant doc"
+  - "scan this multitenant guidance for Azure API Management updates"
+
+# Prompts that should NOT activate this skill
+# Generated from competing-skill scenarios and unrelated topics
+shouldNotTriggerPrompts:
+  - "create a learning pathway for Azure"
+  - "deploy my app to Azure Container Apps"
+  - "fix a bug in my Python code"
+  - "create a new skill from scratch"
+  - "convert this prompt to a skill"
+  - "suggest copilot skills for my project"
+  - "set up Azure access for GitHub Actions"
+  - "review this document for AI content readiness"
+  - "create a dotfiles repo from my project"
+  - "update AVM modules in my Bicep files"

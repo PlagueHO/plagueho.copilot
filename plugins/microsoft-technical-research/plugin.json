@@ -1,0 +1,21 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "microsoft-technical-research",
+  "description": "Deep technical research on Microsoft technologies with multi-agent orchestration and structured documentation output.",
+  "version": "2.1.1",
+  "author": {
+    "name": "Daniel Scott-Raynsford",
+    "url": "https://github.com/PlagueHO"
+  },
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
+  "license": "MIT",
+  "keywords": [
+    "microsoft",
+    "research",
+    "documentation",
+    "technical-writing",
+    "azure",
+    "microsoft-learn",
+    "multi-agent"
+  ]
+}

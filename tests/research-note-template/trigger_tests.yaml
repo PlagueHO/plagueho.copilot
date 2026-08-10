@@ -1,0 +1,26 @@
+name: research-note-template-triggers
+skill: research-note-template
+
+shouldTriggerPrompts:
+  - "create research note from this URL"
+  - "extract research note from the documentation"
+  - "note from URL https://learn.microsoft.com/..."
+  - "research note template for this article"
+  - "take research notes from the blog post"
+  - "extract findings from the architecture guide"
+  - "create a note for the docs area"
+  - "extract research from this Microsoft Learn page"
+  - "capture notes from this technical document"
+  - "write a research note from the API reference"
+
+shouldNotTriggerPrompts:
+  - "create a plan for Azure research"
+  - "scaffold the research output folder"
+  - "deploy to Azure Container Apps"
+  - "write a blog post"
+  - "generate a presentation"
+  - "update the marketplace JSON"
+  - "run markdown linting"
+  - "create a pull request"
+  - "summarize this GitHub issue"
+  - "install a VS Code extension"

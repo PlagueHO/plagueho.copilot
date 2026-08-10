@@ -1,0 +1,206 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { getCategory } from '../lib/categories';
+import { readFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface Agent {
+  name: string;
+  description: string;
+  tools?: string[] | null;
+  subAgents?: string[] | null;
+  userInvocable?: boolean | null;
+  githubUrl?: string;
+}
+
+interface Plugin {
+  name: string;
+  agents?: Agent[];
+}
+
+interface SiteData {
+  plugins: Plugin[];
+}
+
+interface FlatAgent {
+  name: string;
+  description: string;
+  tools: string[] | null;
+  subAgents: string[] | null;
+  userInvocable: boolean | null;
+  githubUrl: string;
+  pluginName: string;
+  color: string;
+  icon: string;
+  delay: number;
+  searchText: string;
+}
+
+let siteData: SiteData = { plugins: [] };
+const dataPath = resolve('./public/data/data.json');
+if (existsSync(dataPath)) {
+  siteData = JSON.parse(readFileSync(dataPath, 'utf-8')) as SiteData;
+}
+
+let idx = 0;
+const allAgents: FlatAgent[] = siteData.plugins.flatMap((plugin) => {
+  const cfg = getCategory(plugin.name);
+  return (plugin.agents ?? []).map((agent) => ({
+    name: agent.name,
+    description: agent.description,
+    tools: agent.tools ?? null,
+    subAgents: agent.subAgents ?? null,
+    userInvocable: agent.userInvocable ?? null,
+    githubUrl: agent.githubUrl ?? '',
+    pluginName: plugin.name,
+    color: cfg.color,
+    icon: cfg.icon,
+    delay: idx++ * 40,
+    searchText: [agent.name, agent.description, plugin.name].join(' ').toLowerCase(),
+  }));
+});
+
+const totalAgents = allAgents.length;
+---
+<Layout
+  title="Agents — DSR Copilot Catalog"
+  description="Browse all custom coding agents for GitHub Copilot."
+  currentPage="agents"
+>
+
+  <div class="page-hero">
+    <div class="container">
+      <h1 class="page-hero__title">
+        <span class="page-hero__icon"><Icon name="robot" size={32} /></span>
+        Agents
+      </h1>
+      <p class="page-hero__description">
+        All custom coding agents bundled in plugins.
+      </p>
+    </div>
+  </div>
+
+  <section class="listing-section">
+    <div class="container">
+
+      <!-- Toolbar -->
+      <div class="listing-toolbar">
+        <div class="listing-toolbar__row">
+          <div class="search-bar">
+            <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input
+              id="search-input"
+              class="search-bar__input"
+              type="search"
+              placeholder="Search agents…"
+              aria-label="Search agents"
+              autocomplete="off"
+            />
+          </div>
+          <p class="results-count" id="results-count" aria-live="polite">
+            {totalAgents} agent{totalAgents !== 1 ? 's' : ''}
+          </p>
+        </div>
+      </div>
+
+      <!-- Agents grid -->
+      <div class="skills-grid" id="agents-grid" role="list">
+        {allAgents.map((agent) => (
+          <article
+            class="skill-card skill-card--clickable"
+            role="listitem"
+            tabindex="0"
+            data-search-text={agent.searchText}
+            data-detail={JSON.stringify({
+              type: 'agent',
+              name: agent.name,
+              description: agent.description,
+              pluginName: agent.pluginName,
+              tools: agent.tools,
+              subAgents: agent.subAgents,
+              userInvocable: agent.userInvocable,
+              githubUrl: agent.githubUrl,
+            })}
+            style={`--card-accent-bar: ${agent.color}; --card-icon-color: ${agent.color}; animation-delay: ${agent.delay}ms;`}
+          >
+            <div class="skill-card__icon" aria-hidden="true">
+              <Icon name={agent.icon} size={32} />
+            </div>
+            <div class="skill-card__body">
+              <span class="skill-card__name">{agent.name}</span>
+              {agent.description && (
+                <p class="skill-card__desc">
+                  {agent.description.length > 150
+                    ? agent.description.slice(0, 150) + '\u2026'
+                    : agent.description}
+                </p>
+              )}
+              <span class="skill-card__plugin">
+                <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12" aria-hidden="true">
+                  <path d="M12 2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-1 9H5v-1h6v1zm0-3H5V7h6v1zm0-3H5V4h6v1z"/>
+                </svg>
+                {agent.pluginName}
+              </span>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="empty-state" aria-live="polite">
+        <div class="empty-state__icon">🤖</div>
+        <p class="empty-state__title">No agents found</p>
+        <p>Try a different search term.</p>
+      </div>
+
+    </div>
+  </section>
+
+</Layout>
+
+<script>
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const resultsCount = document.getElementById('results-count') as HTMLElement;
+  const grid = document.getElementById('agents-grid') as HTMLElement;
+  const emptyState = document.getElementById('empty-state') as HTMLElement;
+  const cards = Array.from(grid.querySelectorAll<HTMLElement>('.skill-card'));
+
+  function applySearch(): void {
+    const query = searchInput.value.toLowerCase().trim();
+    let visible = 0;
+
+    cards.forEach((card) => {
+      const searchText = (card.dataset.searchText ?? '').toLowerCase();
+      const show = !query || searchText.includes(query);
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    const noun = visible === 1 ? 'agent' : 'agents';
+    resultsCount.textContent = `${visible} ${noun}`;
+    emptyState.classList.toggle('is-visible', visible === 0);
+  }
+
+  searchInput.addEventListener('input', applySearch);
+
+  // Open detail modal on card click / Enter key
+  grid.addEventListener('click', (e: MouseEvent) => {
+    const card = (e.target as HTMLElement).closest<HTMLElement>('[data-detail]');
+    if (!card) return;
+    const detail = JSON.parse(card.dataset.detail ?? '{}');
+    (window as unknown as Record<string, (d: unknown) => void>).__openDetailModal?.(detail);
+  });
+
+  grid.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = (e.target as HTMLElement).closest<HTMLElement>('[data-detail]');
+    if (!card) return;
+    e.preventDefault();
+    const detail = JSON.parse(card.dataset.detail ?? '{}');
+    (window as unknown as Record<string, (d: unknown) => void>).__openDetailModal?.(detail);
+  });
+</script>

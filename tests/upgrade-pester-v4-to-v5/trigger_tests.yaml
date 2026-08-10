@@ -1,0 +1,30 @@
+name: upgrade-pester-v4-to-v5-triggers
+skill: upgrade-pester-v4-to-v5
+
+# Prompts that SHOULD activate this skill
+# Generated from "WHEN:" trigger phrases in frontmatter
+shouldTriggerPrompts:
+  - "upgrade my Pester tests to v5"
+  - "migrate Pester v4 to v5"
+  - "convert these Pester tests to Pester 5"
+  - "modernize my Pester test suite"
+  - "fix Pester v5 discovery errors in my tests"
+  - "my Pester tests fail after upgrading to Pester 5"
+  - "replace Should Be with Should -Be in my tests"
+  - "change Assert-MockCalled to Should -Invoke"
+  - "help me move my Pester setup into BeforeAll"
+  - "update Invoke-Pester to the new configuration object"
+
+# Prompts that should NOT activate this skill
+# Generated from competing-skill scenarios and unrelated topics
+shouldNotTriggerPrompts:
+  - "upgrade this csproj to SDK-style"
+  - "write new Pester tests for this function"
+  - "create a learning pathway for Azure"
+  - "convert a prompt file to a skill"
+  - "update Azure Verified Modules in my Bicep files"
+  - "scaffold a dotfiles repository"
+  - "review this document for AI readiness"
+  - "migrate my xUnit tests to MSTest"
+  - "sync my VS Code profiles"
+  - "fix a bug in my Python code"

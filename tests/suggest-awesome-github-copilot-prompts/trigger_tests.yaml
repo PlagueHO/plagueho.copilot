@@ -1,0 +1,30 @@
+name: suggest-awesome-github-copilot-prompts-triggers
+skill: suggest-awesome-github-copilot-prompts
+
+# Prompts that SHOULD activate this skill
+# Generated from "WHEN:" trigger phrases in frontmatter
+shouldTriggerPrompts:
+  - "suggest copilot prompts for my project"
+  - "find awesome copilot prompts that would help me"
+  - "check for prompt updates in my repository"
+  - "install prompts from awesome-copilot into my repo"
+  - "discover new GitHub Copilot prompts available"
+  - "what GitHub Copilot prompts should I install?"
+  - "show me available prompts from the awesome-copilot repository"
+  - "are my GitHub Copilot prompts up to date?"
+  - "I want to add more Copilot prompts to my repo"
+  - "download prompts from awesome-copilot for my project"
+
+# Prompts that should NOT activate this skill
+# Generated from competing-skill scenarios and unrelated topics
+shouldNotTriggerPrompts:
+  - "create a learning pathway for Azure"
+  - "set up Azure access for GitHub Actions"
+  - "suggest GitHub Copilot agents for my project"
+  - "suggest GitHub Copilot instruction files for my repo"
+  - "suggest GitHub Copilot skills for my repo"
+  - "create a skill from this pull request"
+  - "run sensei on my skill"
+  - "create an Azure managed identity for GitHub"
+  - "fix a bug in my Python code"
+  - "configure OIDC federation between GitHub and Azure"

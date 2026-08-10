@@ -1,0 +1,5 @@
+* @PlagueHO
+plugins/ @PlagueHO
+tests/ @PlagueHO
+scripts/ @PlagueHO
+.github/ @PlagueHO
