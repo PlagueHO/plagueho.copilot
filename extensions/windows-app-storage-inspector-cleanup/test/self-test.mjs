@@ -86,14 +86,18 @@ try {
         { code: "analyzer_command_confirmation_required" },
     );
     let completeCommand;
+    let executedCommand;
     const commandRunner = createAnalyzerCommandRunner({
-        executeProcess: async () => new Promise((resolve) => {
+        executeProcess: async (command) => new Promise((resolve) => {
+            executedCommand = command;
             completeCommand = resolve;
         }),
     });
     const firstCommand = commandRunner.execute("npm-cache", "npm-cache-verify");
     await new Promise((resolve) => setImmediate(resolve));
     assert.equal(commandRunner.getActiveCommand().commandId, "npm-cache-verify");
+    assert.equal(executedCommand.executable, "cmd.exe");
+    assert.deepEqual(executedCommand.arguments, ["/d", "/s", "/c", "npm.cmd cache verify"]);
     await assert.rejects(
         commandRunner.execute("uv-cache", "uv-cache-dir"),
         { code: "analyzer_command_running" },
