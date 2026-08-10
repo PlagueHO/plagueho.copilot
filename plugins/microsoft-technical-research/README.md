@@ -7,20 +7,20 @@ orchestration and structured documentation output.
 
 | Skill | Description |
 |-------|-------------|
-| [initiate-microsoft-researcher](skills/initiate-microsoft-researcher/) | **MANDATORY entry point** — validates topic, confirms plan with user, scaffolds folder structure, creates `.initiated` marker. |
-| [create-microsoft-research-plan](skills/create-microsoft-research-plan/) | Generate structured research plans with scope, areas, search terms, and output mapping. |
-| [research-note-template](skills/research-note-template/) | Extract structured notes from sources using standardized extraction rules. |
-| [research-output-scaffolding](skills/research-output-scaffolding/) | Scaffold the .research/ folder structure with note directories and section placeholders. |
+| [initiate-microsoft-researcher](../../skills/initiate-microsoft-researcher/) | **MANDATORY entry point** — validates topic, confirms plan with user, scaffolds folder structure, creates `.initiated` marker. |
+| [create-microsoft-research-plan](../../skills/create-microsoft-research-plan/) | Generate structured research plans with scope, areas, search terms, and output mapping. |
+| [research-note-template](../../skills/research-note-template/) | Extract structured notes from sources using standardized extraction rules. |
+| [research-output-scaffolding](../../skills/research-output-scaffolding/) | Scaffold the .research/ folder structure with note directories and section placeholders. |
 
 ## Agents
 
 | Agent | Description |
 |-------|-------------|
-| [research-microsoft-technology](agents/research-microsoft-technology.agent.md) | Orchestrator — coordinates the full research lifecycle from plan to finished output. |
-| [research-source-discovery](agents/research-source-discovery.agent.md) | Discovers and ranks candidate sources across all enabled research areas. |
-| [research-deep-reader](agents/research-deep-reader.agent.md) | Fetches sources and extracts structured notes following extraction rules. |
-| [research-content-writer](agents/research-content-writer.agent.md) | Synthesizes notes into polished output sections with full attribution. |
-| [research-quality-reviewer](agents/research-quality-reviewer.agent.md) | Reviews output for attribution, completeness, and source validity. |
+| [research-microsoft-technology](../../agents/research-microsoft-technology.agent.md) | Orchestrator — coordinates the full research lifecycle from plan to finished output. |
+| [research-source-discovery](../../agents/research-source-discovery.agent.md) | Discovers and ranks candidate sources across all enabled research areas. |
+| [research-deep-reader](../../agents/research-deep-reader.agent.md) | Fetches sources and extracts structured notes following extraction rules. |
+| [research-content-writer](../../agents/research-content-writer.agent.md) | Synthesizes notes into polished output sections with full attribution. |
+| [research-quality-reviewer](../../agents/research-quality-reviewer.agent.md) | Reviews output for attribution, completeness, and source validity. |
 
 ## Research Workflow
 

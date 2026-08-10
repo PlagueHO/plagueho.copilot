@@ -1,0 +1,123 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+interface Extension {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  keywords: string[];
+  platform: string;
+  previewUrl: string;
+}
+
+interface SiteData {
+  extensions: Extension[];
+}
+
+let siteData: SiteData = { extensions: [] };
+const dataPath = resolve('./public/data/data.json');
+if (existsSync(dataPath)) {
+  siteData = JSON.parse(readFileSync(dataPath, 'utf8')) as SiteData;
+}
+
+const base = import.meta.env.BASE_URL;
+---
+<Layout
+  title="Canvas Extensions — DSR Copilot Catalog"
+  description="Browse canvas extensions for the GitHub Copilot app."
+  currentPage="extensions"
+>
+  <div class="page-hero">
+    <div class="container">
+      <h1 class="page-hero__title">
+        <span class="page-hero__icon"><Icon name="canvas" size={32} /></span>
+        Canvas Extensions
+      </h1>
+      <p class="page-hero__description">
+        Interactive canvas experiences built for the GitHub Copilot app.
+      </p>
+    </div>
+  </div>
+
+  <section class="listing-section">
+    <div class="container">
+      <div class="listing-toolbar">
+        <div class="listing-toolbar__row">
+          <div class="search-bar">
+            <Icon name="search" size={20} class="search-bar__icon" />
+            <input
+              id="search-input"
+              class="search-bar__input"
+              type="search"
+              placeholder="Search extensions…"
+              aria-label="Search extensions"
+              autocomplete="off"
+            />
+          </div>
+          <p class="results-count" id="results-count" aria-live="polite">
+            {siteData.extensions.length} extension{siteData.extensions.length !== 1 ? 's' : ''}
+          </p>
+        </div>
+      </div>
+
+      <div class="extension-grid" id="extension-grid" role="list">
+        {siteData.extensions.map((extension, index) => (
+          <a
+            class="extension-card"
+            href={`${base}extensions/${extension.id}/`}
+            role="listitem"
+            data-search-text={[extension.name, extension.description, ...extension.keywords].join(' ').toLowerCase()}
+            style={`animation-delay: ${index * 60}ms;`}
+          >
+            <img
+              class="extension-card__preview"
+              src={`${base}${extension.previewUrl}`}
+              alt={`${extension.name} preview`}
+              loading="lazy"
+            />
+            <div class="extension-card__body">
+              <div class="extension-card__heading">
+                <h2>{extension.name}</h2>
+                <span class="plugin-card__version">v{extension.version}</span>
+              </div>
+              <p>{extension.description}</p>
+              <div class="plugin-card__keywords">
+                <span class="keyword">{extension.platform}</span>
+                {extension.keywords.map((keyword) => <span class="keyword">{keyword}</span>)}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div class="empty-state" id="empty-state" aria-live="polite">
+        <div class="empty-state__icon">🔍</div>
+        <p class="empty-state__title">No extensions found</p>
+        <p>Try a different search term.</p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const resultsCount = document.getElementById('results-count') as HTMLElement;
+  const emptyState = document.getElementById('empty-state') as HTMLElement;
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.extension-card'));
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+    let visible = 0;
+    cards.forEach((card) => {
+      const show = !query || (card.dataset.searchText ?? '').includes(query);
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    resultsCount.textContent = `${visible} ${visible === 1 ? 'extension' : 'extensions'}`;
+    emptyState.classList.toggle('is-visible', visible === 0);
+  });
+</script>

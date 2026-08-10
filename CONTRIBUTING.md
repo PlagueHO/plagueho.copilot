@@ -1,98 +1,83 @@
 # Contributing
 
-Thanks for your interest in contributing to the PlagueHO Agent Skills
-repository.
+Thanks for contributing to the PlagueHO Copilot Catalog.
 
 ## Repository Layout
 
 ```text
-plugins/
-  <plugin>/
-    plugin.json
-    README.md
-    skills/
-      <skill-name>/
-        SKILL.md
-        scripts/
-        references/
-        assets/
-tests/
-  <skill-name>/
-    trigger_tests.yaml
-    <fixture files>
+agents/<agent>.agent.md
+extensions/<extension>/
+  extension.mjs
+  package.json
+  README.md
+  assets/preview.png
+skills/<skill>/
+  SKILL.md
+  scripts/
+  references/
+  assets/
+plugins/<plugin>/
+  plugin.json
+  README.md
+tests/<skill>/trigger_tests.yaml
 ```
 
-Every plugin must have a `plugin.json` file in the plugin root that is
-linked to from the marketplace index (`.github/plugin/marketplace.json`).
+Reusable resources live once at the repository root. Plugins compose them through `extensions["com.github.plagueho"]`; do not copy reusable source into plugin directories on `main`.
 
-## Proposing a New Skill
+## Add a Skill
 
-A skill should be self-contained and:
+1. Create `skills/<skill-name>/SKILL.md` with valid frontmatter.
+2. Add `"./skills/<skill-name>/"` to a plugin's sorted `extensions["com.github.plagueho"].skills` array.
+3. Add `tests/<skill-name>/trigger_tests.yaml`.
+4. Bump the plugin version.
+5. Regenerate the marketplace indexes with `pnpm marketplace:generate`.
+6. Update the root catalog and overview when counts or descriptions change.
 
-- Clearly state **what it does** and **when to use it**
-- Keep the SKILL.md body under 500 lines for optimal performance
-- Specify required inputs (repo context, environment, access needs)
-- Prefer concrete checklists and verification steps over vague guidance
+Keep `SKILL.md` under 500 lines, use kebab-case names, and keep bundled scripts, references, and assets within the skill directory.
 
-Create a new folder under a plugin's `skills/` directory:
+## Add an Agent
 
-```text
-plugins/<plugin>/skills/<skill-name>/SKILL.md
+1. Create `agents/<agent-name>.agent.md`.
+2. Add `"./agents/<agent-name>.md"` to a plugin's sorted `extensions["com.github.plagueho"].agents` array.
+3. Bump the plugin version and regenerate the marketplace indexes.
+
+The `.agent.md` source suffix is materialized as `.md` in the installable plugin.
+
+## Add a Canvas Extension
+
+1. Create `extensions/<extension-name>/` with `extension.mjs`, `package.json`, `README.md`, and `assets/preview.png`.
+2. Exclude user-specific configuration and runtime state such as `copilot-extension.json` and `artifacts/`.
+3. Create a matching standalone `plugins/<extension-name>/plugin.json` and `README.md`.
+4. Reference `"./extensions/<extension-name>"` in the plugin composition metadata.
+5. Set `extensions["com.github.copilot"].logo` to `assets/preview.png`.
+6. Add focused extension tests and update the website catalog.
+
+Canvas extensions published here target the GitHub Copilot app. Do not advertise unsupported canvas hosts.
+
+## Validate Changes
+
+```bash
+pnpm install
+pnpm plugin:validate
+pnpm test
+pnpm marketplace:generate
+pnpm lint:md
+npx --yes ajv-cli validate -s .github/plugin/marketplace.schema.json -d .github/plugin/marketplace.json
+npx --yes ajv-cli validate \
+  -s .github/plugin/plugin.schema.json \
+  -d "plugins/*/plugin.json"
 ```
 
-### Skill Naming
+Build the website when catalog data or presentation changes:
 
-Use short, kebab-case names that mirror how developers naturally phrase the
-task — e.g., `update-avm-modules`, `create-dotfiles-repo`,
-`discover-multitenant-service-updates`.
-
-### SKILL.md Frontmatter
-
-The `SKILL.md` is required to have frontmatter at a minimum:
-
-```yaml
----
-name: <skill-name>
-description: <description of what the skill does, when to use it>
----
+```bash
+npm --prefix website install
+node website/build.mjs
+npm --prefix website run build
 ```
 
-### Recommended Sections
+## Security and Licensing
 
-- **Purpose**: one paragraph describing the outcome
-- **When to use** / **When not to use**
-- **Inputs**: what the agent needs (files, commands, permissions)
-- **Workflow**: numbered steps with checkpoints
-- **Validation**: how to confirm the result
-- **Common pitfalls**: known traps and how to avoid them
-
-## Creating a New Plugin
-
-1. Add `plugins/<plugin-name>/plugin.json` and a `skills/` directory.
-2. Run the aggregation script to rebuild `marketplace.json`:
-
-   ```powershell
-   ./scripts/Update-MarketplaceFromPlugins.ps1
-   ```
-
-3. Add the plugin to the **What's Included** table in `README.md`.
-4. Create a `tests/<skill-name>/` directory for skill tests.
-
-## Writing Style
-
-- Be concise and specific
-- Prefer numbered steps for workflows
-- Prefer checklists for requirements
-- Define terminology the first time it appears
-- Avoid clever wording that could be misread by an agent
-
-## Security
-
-- Do not include secrets, tokens, or internal URLs
-- If you discover a security issue, use the repository security reporting
-  process
-
-## Licensing
-
-Only submit content that you have the right to contribute. Do not include
-copyrighted text from other projects.
+- Never include secrets, tokens, private URLs, or user data.
+- Validate external inputs and apply least privilege.
+- Submit only content you have the right to contribute.

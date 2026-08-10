@@ -1055,6 +1055,217 @@ html.theme-light .theme-toggle__icon--dark {
   gap: 1rem;
 }
 
+/* ── Canvas extension catalog ─────────────────────────────────── */
+.extension-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 28rem), 1fr));
+  gap: 1.5rem;
+}
+
+.extension-card {
+  color: var(--color-text);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  opacity: 0;
+  animation: card-enter 0.4s ease-out forwards;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.extension-card:hover {
+  color: var(--color-text);
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: var(--shadow-md), 0 0 40px -10px var(--category-extension-glow);
+  text-decoration: none;
+  transform: translateY(-3px);
+}
+
+.extension-card__preview {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: top;
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-glass-border);
+}
+
+.extension-card__body {
+  padding: 1.25rem;
+}
+
+.extension-card__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.extension-card__heading h2 {
+  color: var(--color-text-emphasis);
+  font-size: 1.1rem;
+  line-height: 1.35;
+}
+
+.extension-card__body p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.extension-detail {
+  padding: 2.5rem 0 4rem;
+}
+
+.extension-detail__back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.extension-detail__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+  gap: 2rem;
+  align-items: start;
+}
+
+.extension-detail__main {
+  display: grid;
+  gap: 2rem;
+  min-width: 0;
+}
+
+.extension-detail__preview,
+.extension-detail__readme,
+.install-card,
+.extension-metadata {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+}
+
+.extension-detail__preview h2,
+.extension-detail__readme > h2,
+.install-card h2 {
+  color: var(--color-text-emphasis);
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.extension-detail__preview img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--border-radius);
+}
+
+.extension-detail__sidebar {
+  display: grid;
+  gap: 1rem;
+  position: sticky;
+  top: 5rem;
+}
+
+.install-card p {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.install-card code {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--color-text);
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.install-card .install__button {
+  width: 100%;
+}
+
+.install-card .install-card__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+}
+
+.extension-metadata {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.extension-metadata div {
+  border-bottom: 1px solid var(--color-glass-border);
+  padding-bottom: 0.75rem;
+}
+
+.extension-metadata div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.extension-metadata dt {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.extension-metadata dd {
+  color: var(--color-text);
+  margin-top: 0.2rem;
+  overflow-wrap: anywhere;
+}
+
+.article-content {
+  color: var(--color-text);
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3 {
+  color: var(--color-text-emphasis);
+  line-height: 1.3;
+  margin: 1.5rem 0 0.75rem;
+}
+
+.article-content h1:first-child {
+  margin-top: 0;
+}
+
+.article-content p,
+.article-content ul,
+.article-content ol,
+.article-content pre {
+  margin-bottom: 1rem;
+}
+
+.article-content ul,
+.article-content ol {
+  padding-left: 1.5rem;
+}
+
+.article-content code {
+  font-family: var(--font-mono);
+}
+
+.article-content pre {
+  overflow-x: auto;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+}
+
 /* ── Empty state ─────────────────────────────────────────────── */
 .empty-state {
   text-align: center;
@@ -1106,11 +1317,15 @@ html.theme-light .theme-toggle__icon--dark {
   .hero__stats { gap: 1.5rem; }
   .plugin-grid { grid-template-columns: 1fr; }
   .skills-grid { grid-template-columns: 1fr; }
+  .extension-grid { grid-template-columns: 1fr; }
+  .extension-detail__layout { grid-template-columns: 1fr; }
+  .extension-detail__sidebar { position: static; }
   .install__panels { grid-template-columns: 1fr; }
   .container { padding: 0 16px; }
   .listing-toolbar__row { flex-direction: column; align-items: stretch; }
   .search-bar { max-width: 100%; }
   .site-nav__link { padding: 0.375rem 0.5rem; font-size: 0.8rem; }
+  .site-header__brand-suffix { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1120,7 +1335,8 @@ html.theme-light .theme-toggle__icon--dark {
   .skill-card { animation: none !important; opacity: 1 !important; transform: none !important; }
   .plugin-card:hover,
   .quick-link-card:hover,
-  .skill-card:hover { transform: none; }
+  .skill-card:hover,
+  .extension-card:hover { transform: none; }
 }
 
 html.theme-dark .site-header {

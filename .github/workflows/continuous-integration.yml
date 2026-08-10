@@ -52,16 +52,62 @@ jobs:
       - name: Validate Markdown
         run: pnpm lint:md
 
+      - name: Validate source composition
+        run: pnpm plugin:validate
+
+      - name: Test publishing tooling
+        run: pnpm test
+
       - name: Validate marketplace.json schema
         run: npx --yes ajv-cli validate -s .github/plugin/marketplace.schema.json -d .github/plugin/marketplace.json
 
       - name: Validate plugin.json schemas
-        run: |
-          find plugins -maxdepth 2 -name 'plugin.json' -exec \
-            npx --yes ajv-cli validate -s .github/plugin/plugin.schema.json -d {} \;
+        run: npx --yes ajv-cli validate -s .github/plugin/plugin.schema.json -d "plugins/*/plugin.json"
 
       - name: Verify marketplace.json and .claude-plugin/marketplace.json are in sync
         run: diff .github/plugin/marketplace.json .claude-plugin/marketplace.json
+
+      - name: Verify generated marketplace is current
+        run: |
+          pnpm marketplace:generate
+          git diff --exit-code -- .github/plugin/marketplace.json .claude-plugin/marketplace.json
+
+      - name: Verify installable plugin materialization
+        run: |
+          pnpm plugin:materialize
+          if grep -R '"com.github.plagueho"' plugins/*/plugin.json; then
+            echo "Private composition metadata remained in a served manifest." >&2
+            exit 1
+          fi
+          test -f plugins/windows-app-storage-inspector-cleanup/extensions/windows-app-storage-inspector-cleanup/extension.mjs
+          test -f plugins/windows-app-storage-inspector-cleanup/assets/preview.png
+
+  validate-windows-extension:
+    name: Validate Windows Extension
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Check JavaScript syntax
+        shell: pwsh
+        run: |
+          Get-ChildItem extensions/windows-app-storage-inspector-cleanup -Recurse -Filter *.mjs |
+            ForEach-Object {
+              node --check $_.FullName
+              if ($LASTEXITCODE -ne 0) {
+                exit $LASTEXITCODE
+              }
+            }
+
+      - name: Run extension regression tests
+        run: node extensions/windows-app-storage-inspector-cleanup/test/self-test.mjs
 
   build-docs:
     name: Build Docs

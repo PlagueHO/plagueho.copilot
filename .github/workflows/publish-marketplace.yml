@@ -1,0 +1,75 @@
+name: Publish Marketplace
+
+on:
+  workflow_run:
+    workflows:
+      - Continuous Integration
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-marketplace
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish Generated Marketplace
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        run: npm install --global pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate source
+        run: |
+          pnpm plugin:validate
+          pnpm test
+
+      - name: Generate installable marketplace
+        run: |
+          pnpm marketplace:generate
+          pnpm plugin:materialize
+
+      - name: Publish marketplace branch
+        env:
+          TARGET_BRANCH: marketplace
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+
+          remote_tip="$(git ls-remote --heads origin "$TARGET_BRANCH" | awk '{print $1}')"
+          tree="$(git write-tree)"
+          if [[ -n "$remote_tip" ]]; then
+            git fetch origin "$TARGET_BRANCH"
+            commit="$(printf '%s\n' "Publish marketplace from ${GITHUB_SHA}" | git commit-tree "$tree" -p "$remote_tip")"
+            git push origin "$commit:refs/heads/$TARGET_BRANCH" \
+              --force-with-lease="refs/heads/$TARGET_BRANCH:$remote_tip"
+          else
+            commit="$(printf '%s\n' "Publish marketplace from ${GITHUB_SHA}" | git commit-tree "$tree")"
+            git push origin "$commit:refs/heads/$TARGET_BRANCH"
+          fi

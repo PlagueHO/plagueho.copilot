@@ -54,7 +54,7 @@ const presentCategories = [...new Set(
 const totalPlugins = siteData.plugins.length;
 ---
 <Layout
-  title={`Plugins — DSR's Plugin Marketplace`}
+  title="Plugins — DSR Copilot Catalog"
   description="Browse all agent plugin bundles for GitHub Copilot."
   currentPage="plugins"
 >
@@ -121,7 +121,7 @@ const totalPlugins = siteData.plugins.length;
             ...(plugin.agents ?? []).map((a) => a.name),
           ].join(' ').toLowerCase();
 
-          const githubUrl = `https://github.com/PlagueHO/plagueho.skills/tree/main/plugins/${plugin.name}`;
+          const githubUrl = `https://github.com/PlagueHO/plagueho.copilot/tree/main/plugins/${plugin.name}`;
 
           return (
             <article

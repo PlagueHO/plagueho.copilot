@@ -1,263 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 180">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 240" role="img" aria-labelledby="title description">
+  <title id="title">PlagueHO Copilot Catalog</title>
+  <desc id="description">Eleven plugins compose twenty-eight skills, five agents, and one canvas extension.</desc>
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0d1117"/>
-      <stop offset="100%" style="stop-color:#161b22"/>
+    <linearGradient id="background" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
     </linearGradient>
   </defs>
   <style>
-    .card { opacity: 0; animation: cycle 55s infinite; }
-    .card:nth-child(1) { animation-delay: 0s; }
-    .card:nth-child(2) { animation-delay: 5s; }
-    .card:nth-child(3) { animation-delay: 10s; }
-    .card:nth-child(4) { animation-delay: 15s; }
-    .card:nth-child(5) { animation-delay: 20s; }
-    .card:nth-child(6) { animation-delay: 25s; }
-    .card:nth-child(7) { animation-delay: 30s; }
-    .card:nth-child(8) { animation-delay: 35s; }
-    .card:nth-child(9) { animation-delay: 40s; }
-    .card:nth-child(10) { animation-delay: 45s; }
-    .card:nth-child(11) { animation-delay: 50s; }
-    @keyframes cycle {
-      0%    { opacity: 0; }
-      0.9%  { opacity: 1; }
-      9.1%  { opacity: 1; }
-      10%   { opacity: 0; }
-      100%  { opacity: 0; }
-    }
-    .emoji   { font-size: 36px; }
-    .title   { font: bold 22px 'Segoe UI',system-ui,sans-serif; fill: #58a6ff; }
-    .desc    { font: 15px 'Segoe UI',system-ui,sans-serif; fill: #c9d1d9; }
-    .count   { font: bold 14px 'Segoe UI',system-ui,sans-serif; fill: #8b949e; }
-    .path    { font: 13px 'SFMono-Regular',Consolas,monospace; fill: #7ee787; }
-    .border  { fill: none; stroke: #30363d; stroke-width: 1.5; rx: 12; }
-    .pip     { fill: #30363d; }
-    .pip-on  { fill: #58a6ff; }
+    .heading { fill: #f0f6fc; font: 700 25px "Segoe UI", system-ui, sans-serif; }
+    .subtitle { fill: #8b949e; font: 14px "Segoe UI", system-ui, sans-serif; }
+    .count { fill: #58a6ff; font: 700 28px "Segoe UI", system-ui, sans-serif; }
+    .label { fill: #c9d1d9; font: 13px "Segoe UI", system-ui, sans-serif; }
+    .catalog { fill: #7ee787; font: 12px "SFMono-Regular", Consolas, monospace; }
   </style>
-
-  <!-- Background -->
-  <rect width="840" height="180" rx="12" fill="url(#bg)"/>
-  <rect class="border" x="1" y="1" width="838" height="178"/>
-
-  <g id="slides">
-  <!-- Slide 1: Quickstart -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x1F680;</text>
-    <text class="title" x="90" y="58">Quick Start</text>
-    <text class="desc" x="90" y="82">Add to VS Code settings.json to install plugins via Copilot Chat:</text>
-    <text class="path" x="90" y="108">"chat.plugins.marketplaces": ["PlagueHO/plagueho.skills"]</text>
-    <text class="count" x="90" y="130">10 plugins &#x2022; 26 skills &#x2022; ready to install</text>
-    <circle class="pip-on" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
+  <rect width="840" height="240" rx="12" fill="url(#background)"/>
+  <rect x="1" y="1" width="838" height="238" rx="11" fill="none" stroke="#30363d" stroke-width="1.5"/>
+  <text class="heading" x="36" y="48">PlagueHO Copilot Catalog</text>
+  <text class="subtitle" x="36" y="72">Reusable resources on main, installable plugins on the generated marketplace branch</text>
+  <g transform="translate(36 98)">
+    <text class="count" x="0" y="28">11</text>
+    <text class="label" x="0" y="50">plugins</text>
+    <text class="count" x="118" y="28">28</text>
+    <text class="label" x="118" y="50">skills</text>
+    <text class="count" x="236" y="28">5</text>
+    <text class="label" x="236" y="50">agents</text>
+    <text class="count" x="354" y="28">1</text>
+    <text class="label" x="354" y="50">canvas extension</text>
   </g>
-
-  <!-- Slide 2: azure-architecture-center -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x1F3DB;</text>
-    <text class="title" x="90" y="58">azure-architecture-center</text>
-    <text class="desc" x="90" y="82">For AAC doc maintainers: review multitenant guidance and docs for currency</text>
-    <text class="count" x="90" y="106">4 skills: discover-multitenant-service-updates, review-multitenant-*-doc (&#x00D7;3)</text>
-    <text class="path" x="90" y="128">plugins/azure-architecture-center/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip-on" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 3: azure-infrastructure-deployment -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x2601;</text>
-    <text class="title" x="90" y="58">azure-infrastructure-deployment</text>
-    <text class="desc" x="90" y="82">Provision Azure identities and manage Azure Verified Module versions</text>
-    <text class="count" x="90" y="106">2 skills: azure-github-managed-identity, update-avm-modules</text>
-    <text class="path" x="90" y="128">plugins/azure-infrastructure-deployment/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip-on" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 4: content-and-learning -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x1F4DA;</text>
-    <text class="title" x="90" y="58">content-and-learning</text>
-    <text class="desc" x="90" y="82">Review content for AI readiness and generate Microsoft learning pathways</text>
-    <text class="count" x="90" y="106">2 skills: ai-content-readiness-review, create-learning-pathway</text>
-    <text class="path" x="90" y="128">plugins/content-and-learning/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip-on" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 5: developer-environment -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x1F6E0;</text>
-    <text class="title" x="90" y="58">developer-environment</text>
-    <text class="desc" x="90" y="82">Scaffold dotfiles repos and sync VS Code profiles across editions</text>
-    <text class="count" x="90" y="106">2 skills: create-dotfiles-repo, vscode-profile-sync</text>
-    <text class="path" x="90" y="128">plugins/developer-environment/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip-on" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 6: dotnet-modernization -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x1F504;</text>
-    <text class="title" x="90" y="58">dotnet-modernization</text>
-    <text class="desc" x="90" y="82">Convert legacy .NET project files to modern SDK-style format</text>
-    <text class="count" x="90" y="106">1 skill: dotnet-sdk-style-upgrade</text>
-    <text class="path" x="90" y="128">plugins/dotnet-modernization/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip-on" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 7: github-workflows -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x1F500;</text>
-    <text class="title" x="90" y="58">github-workflows</text>
-    <text class="desc" x="90" y="82">Evaluate PR review comments, merge Dependabot PRs in parallel, and optimize Copilot resources</text>
-    <text class="count" x="90" y="106">4 skills: evaluate-pr-review-comments, merge-dependabot-prs, optimize-copilot-resources, scaffold-repo-ai-guidance</text>
-    <text class="path" x="90" y="128">plugins/github-workflows/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip-on" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 8: skill-lifecycle -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x2699;</text>
-    <text class="title" x="90" y="58">skill-lifecycle</text>
-    <text class="desc" x="90" y="82">Create, convert, and generate agent skills from prompts and pull requests</text>
-    <text class="count" x="90" y="106">3 skills: skill-creator, convert-prompt-to-skill, create-skill-from-pr</text>
-    <text class="path" x="90" y="128">plugins/skill-lifecycle/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip-on" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 9: suggest-awesome-github-copilot -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x2B50;</text>
-    <text class="title" x="90" y="58">suggest-awesome-github-copilot</text>
-    <text class="desc" x="90" y="82">Discover and install GitHub Copilot assets from the awesome-copilot repo</text>
-    <text class="count" x="90" y="106">4 skills: skills, agents, prompts, instructions suggestions</text>
-    <text class="path" x="90" y="128">plugins/suggest-awesome-github-copilot/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip-on" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 10: microsoft-technical-research -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x1F50D;</text>
-    <text class="title" x="90" y="58">microsoft-technical-research</text>
-    <text class="desc" x="90" y="82">Deep technical research on Microsoft technologies with multi-agent orchestration</text>
-    <text class="count" x="90" y="106">3 skills + 5 agents: plan, note-template, scaffolding, orchestrator, discovery, reader, writer, reviewer</text>
-    <text class="path" x="90" y="128">plugins/microsoft-technical-research/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip-on" cx="502" cy="160" r="4"/>
-    <circle class="pip" cx="522" cy="160" r="4"/>
-  </g>
-
-  <!-- Slide 11: powershell-modernization -->
-  <g class="card">
-    <text class="emoji" x="40" y="70">&#x1F9EA;</text>
-    <text class="title" x="90" y="58">powershell-modernization</text>
-    <text class="desc" x="90" y="82">Migrate PowerShell Pester v4 tests to Pester v5</text>
-    <text class="count" x="90" y="106">1 skill: upgrade-pester-v4-to-v5</text>
-    <text class="path" x="90" y="128">plugins/powershell-modernization/</text>
-    <circle class="pip" cx="322" cy="160" r="4"/>
-    <circle class="pip" cx="342" cy="160" r="4"/>
-    <circle class="pip" cx="362" cy="160" r="4"/>
-    <circle class="pip" cx="382" cy="160" r="4"/>
-    <circle class="pip" cx="402" cy="160" r="4"/>
-    <circle class="pip" cx="422" cy="160" r="4"/>
-    <circle class="pip" cx="442" cy="160" r="4"/>
-    <circle class="pip" cx="462" cy="160" r="4"/>
-    <circle class="pip" cx="482" cy="160" r="4"/>
-    <circle class="pip" cx="502" cy="160" r="4"/>
-    <circle class="pip-on" cx="522" cy="160" r="4"/>
-  </g>
-  </g>
+  <text class="catalog" x="36" y="178">azure-architecture-center · azure-infrastructure-deployment · content-and-learning · developer-environment</text>
+  <text class="catalog" x="36" y="200">dotnet-modernization · github-workflows · microsoft-technical-research · powershell-modernization · skill-lifecycle</text>
+  <text class="catalog" x="36" y="222">suggest-awesome-github-copilot · windows-app-storage-inspector-cleanup</text>
 </svg>

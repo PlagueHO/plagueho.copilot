@@ -6,11 +6,14 @@ on:
       - main
     paths:
       - website/**
-      - plugins/**/plugin.json
-      - plugins/**/SKILL.md
+      - agents/**
+      - extensions/**
+      - plugins/**
+      - skills/**
       - .github/plugin/marketplace.json
       - .github/workflows/build-docs.yml
       - .github/workflows/deploy-docs.yml
+      - eng/**
 
   workflow_dispatch:
 

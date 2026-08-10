@@ -1,12 +1,13 @@
 {
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "dotnet-modernization",
   "description": "Convert legacy .NET project files to modern SDK-style format.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Daniel Scott-Raynsford",
     "url": "https://github.com/PlagueHO"
   },
-  "repository": "https://github.com/PlagueHO/plagueho.skills",
+  "repository": "https://github.com/PlagueHO/plagueho.copilot",
   "license": "MIT",
   "keywords": [
     "dotnet",
@@ -15,7 +16,11 @@
     "csproj",
     "migration"
   ],
-  "skills": [
-    "./skills/dotnet-sdk-style-upgrade"
-  ]
+  "extensions": {
+    "com.github.plagueho": {
+      "skills": [
+        "./skills/dotnet-sdk-style-upgrade/"
+      ]
+    }
+  }
 }
