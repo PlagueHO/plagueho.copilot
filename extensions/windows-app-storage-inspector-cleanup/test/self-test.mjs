@@ -173,6 +173,49 @@ try {
     await assert.rejects(access(cacheFile));
     await access(regularFile);
 
+    const originalUserProfile = process.env.USERPROFILE;
+    try {
+        process.env.USERPROFILE = root;
+        const protectedFileStats = await stat(regularFile);
+        const allowedCleanupFile = path.join(root, "Temporary", "cleanup.bin");
+        await mkdir(path.dirname(allowedCleanupFile), { recursive: true });
+        await writeFile(allowedCleanupFile, Buffer.alloc(64, 1));
+        const allowedCleanupFileStats = await stat(allowedCleanupFile);
+        const protectedLocationPreview = await createCleanupPreview({
+            itemIds: ["protected-documents-file", "allowed-cleanup-file"],
+            candidates: [{
+                id: "protected-documents-file",
+                path: regularFile,
+                bytes: protectedFileStats.size,
+                modifiedAt: protectedFileStats.mtime.toISOString(),
+                entryType: "file",
+                cleanupEligible: true,
+                reason: "Test protected file",
+                risk: "low",
+            }, {
+                id: "allowed-cleanup-file",
+                path: allowedCleanupFile,
+                bytes: allowedCleanupFileStats.size,
+                modifiedAt: allowedCleanupFileStats.mtime.toISOString(),
+                entryType: "file",
+                cleanupEligible: true,
+                reason: "Test allowed file",
+                risk: "low",
+            }],
+            source: { type: "scan" },
+            approvedRoots: [{ id: "test", label: "Test root", path: root }],
+        });
+        assert.equal(protectedLocationPreview.entries.length, 1);
+        assert.equal(protectedLocationPreview.rejected[0].code, "cleanup_path_protected");
+        assert.match(protectedLocationPreview.rejected[0].message, /protected location/);
+    } finally {
+        if (originalUserProfile === undefined) {
+            delete process.env.USERPROFILE;
+        } else {
+            process.env.USERPROFILE = originalUserProfile;
+        }
+    }
+
     const dockerRoot = path.join(root, "AppData", "Local", "Docker", "wsl");
     const dockerData = path.join(dockerRoot, "docker-data.bin");
     await mkdir(dockerRoot, { recursive: true });

@@ -109,13 +109,16 @@ async function revalidateCandidate(candidate, approvedRoots, analyzerProtectedPa
     }
     const protection = isProtectedPath(candidate.path, analyzerProtectedPaths);
     if (protection) {
+        if (!protection.analyzerId) {
+            throw serviceError(
+                "cleanup_path_protected",
+                `Path is protected from cleanup because it is in a protected location: ${candidate.path}.`,
+            );
+        }
         const manager = protection.name ?? "This analyzer";
-        const guidance = protection.analyzerId
-            ? ` Use the ${protection.analyzerId} custom analyzer instead.`
-            : "";
         throw serviceError(
-            protection.analyzerId ? "cleanup_path_analyzer_managed" : "cleanup_path_protected",
-            `Path is protected from cleanup by ${manager}: ${candidate.path}.${guidance}`,
+            "cleanup_path_analyzer_managed",
+            `Path is protected from cleanup by ${manager}: ${candidate.path}. Use the ${protection.analyzerId} custom analyzer instead.`,
         );
     }
 

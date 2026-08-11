@@ -190,7 +190,7 @@ Current analyzers:
 
 Analyzer results are held in memory and are discarded on a new scan or extension restart.
 
-Analyzer cleanup commands have a **Run command** or **Run cleanup** button. Each command runs through the extension's fixed command allowlist and a singleton command runner, so only one analyzer command can execute at a time across canvas instances.
+Analyzer commands have a **Run** button. Each command runs through the extension's fixed command allowlist and a singleton command runner, so only one analyzer command can execute at a time across canvas instances.
 
 A blocking modal displays the command, an indeterminate progress bar, and a **Cancel** button while it runs, then displays its result. Cancellation terminates the centralized child process and reports the command as cancelled. Destructive commands require an explicit confirmation and use non-interactive, scoped CLI arguments. The canvas never executes arbitrary command text received from the browser.
 

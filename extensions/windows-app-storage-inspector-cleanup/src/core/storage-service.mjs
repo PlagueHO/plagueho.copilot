@@ -337,7 +337,7 @@ export class StorageService {
         if (!this.safety.directCleanupEnabled) {
             throw serviceError(
                 "cleanup_safety_disabled",
-                "Direct cleanup is disabled. Enable it in the header and acknowledge the risk before removing files.",
+                "Direct cleanup is disabled. Enable it in the Cleanup safety panel and acknowledge the risk before removing files.",
             );
         }
         if (!this.result) {
@@ -412,7 +412,7 @@ export class StorageService {
         if (!this.safety.directCleanupEnabled) {
             throw serviceError(
                 "cleanup_safety_disabled",
-                "Direct cleanup is disabled. Enable it in the header and acknowledge the risk before removing files.",
+                "Direct cleanup is disabled. Enable it in the Cleanup safety panel and acknowledge the risk before removing files.",
             );
         }
         const preview = this.#previews.get(previewId);

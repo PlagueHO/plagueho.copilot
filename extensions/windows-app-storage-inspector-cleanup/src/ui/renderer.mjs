@@ -853,6 +853,7 @@ export function renderHtml(token) {
     }
 
     function runAnalyzerCommand(analyzerId, command) {
+      if (["awaiting-confirmation", "running"].includes(state.analyzerCommand.status)) return;
       state.analyzerCommand = {
         analyzerId,
         command,
