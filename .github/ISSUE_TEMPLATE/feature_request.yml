@@ -1,0 +1,69 @@
+name: Feature request
+description: Suggest a new skill, plugin, or extension enhancement.
+title: "[FEATURE] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the catalog. Please describe the problem and use case so the proposal can be evaluated.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Clearly describe the feature you would like.
+      placeholder: I would like the plugin to ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What real-world problem would this solve?
+      placeholder: This would help when ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: resource-type
+    attributes:
+      label: Proposed resource type
+      description: What would this change?
+      options:
+        - Existing skill
+        - Existing plugin
+        - Existing extension or canvas
+        - New skill
+        - New plugin
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: plugin
+    attributes:
+      label: Plugin
+      description: Which plugin should this affect, if known?
+      placeholder: windows-app-storage-inspector-cleanup
+
+  - type: input
+    id: skill
+    attributes:
+      label: Skill, canvas, or extension
+      description: Which resource should this affect, if known?
+      placeholder: storage-inspector
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe how you think this could work.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add examples, references, mockups, or other useful context.

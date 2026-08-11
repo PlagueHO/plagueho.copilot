@@ -1,5 +1,7 @@
 import { analyzeDockerImages } from "./docker-images.mjs";
 import { analyzeMicrosoftScout } from "./microsoft-scout.mjs";
+import { analyzeNpmCache } from "./npm-cache.mjs";
+import { analyzeUvCache } from "./uv-cache.mjs";
 import { analyzeVsCodeInsiders } from "./vscode-insiders.mjs";
 
 export const CUSTOM_ANALYZERS = [
@@ -20,6 +22,18 @@ export const CUSTOM_ANALYZERS = [
         name: "Docker images",
         description: "Inspect Docker image usage and managed storage without directly deleting Docker data files.",
         analyze: analyzeDockerImages,
+    },
+    {
+        id: "npm-cache",
+        name: "npm cache",
+        description: "Inspect npm-managed package cache storage and use supported npm maintenance commands.",
+        analyze: analyzeNpmCache,
+    },
+    {
+        id: "uv-cache",
+        name: "uv cache",
+        description: "Inspect uv-managed Python package cache storage and use supported uv cache commands.",
+        analyze: analyzeUvCache,
     },
 ];
 

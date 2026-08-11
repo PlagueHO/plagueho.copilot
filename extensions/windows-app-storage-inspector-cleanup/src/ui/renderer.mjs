@@ -52,6 +52,55 @@ export function renderHtml(token) {
         var(--true-color-blue, #0969da);
       filter: brightness(.96);
     }
+    .github-menu { position: relative; }
+    .github-menu summary {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border-color-default, #d0d7de);
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: inherit;
+      text-decoration: none;
+      background: var(--background-color-default, #fff);
+      cursor: pointer;
+      list-style: none;
+    }
+    .github-menu summary::-webkit-details-marker { display: none; }
+    .github-menu summary:focus-visible { outline: 2px solid var(--color-focus-outline, #0969da); outline-offset: 2px; }
+    .github-menu summary:hover, .github-menu summary:focus-visible, .github-menu[open] summary {
+      background: var(--background-color-muted, #f6f8fa);
+    }
+    .github-icon {
+      display: block;
+      width: 18px;
+      height: 18px;
+      background: currentColor;
+      -webkit-mask: url("/assets/github-mark-16.svg") center / contain no-repeat;
+      mask: url("/assets/github-mark-16.svg") center / contain no-repeat;
+    }
+    .github-menu-items {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 5;
+      min-width: 180px;
+      padding: 4px;
+      border: 1px solid var(--border-color-default, #d0d7de);
+      border-radius: 6px;
+      background: var(--background-color-default, #fff);
+      box-shadow: 0 8px 24px rgba(31,35,40,.15);
+    }
+    .github-menu-items a {
+      display: block;
+      padding: 6px 8px;
+      border-radius: 4px;
+      color: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .github-menu-items a:hover, .github-menu-items a:focus-visible {
+      background: var(--background-color-muted, #f6f8fa);
+    }
     .danger {
       color: var(--color-white, #fff);
       background:
@@ -76,6 +125,16 @@ export function renderHtml(token) {
     h2 { margin: 0 0 12px; font-size: var(--text-title-small, 16px); }
     .subtitle, .muted { color: var(--text-color-muted, #656d76); }
     .header-actions, .scope-options, .toolbar, .tabs, .modal-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .safety-options { display: grid; gap: 8px; }
+    .safety-switch { display: inline-flex; align-items: center; gap: 8px; width: 100%; margin: 0; padding: 6px 9px; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; cursor: pointer; }
+    .safety-switch.direct-cleanup { border-color: var(--true-color-red, #cf222e); background: rgba(207,34,46,.08); }
+    .safety-switch.direct-cleanup.enabled { border-color: #1a7f37; background: rgba(26,127,55,.1); }
+    .safety-switch input { appearance: none; position: relative; flex: 0 0 auto; width: 34px; height: 18px; margin: 0; border-radius: 999px; background: var(--border-color-default, #d0d7de); cursor: pointer; }
+    .safety-switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform .15s ease; }
+    .safety-switch input:checked { background: #1a7f37; }
+    .safety-switch input:checked::after { transform: translateX(16px); }
+    .safety-switch input:disabled { cursor: not-allowed; opacity: .6; }
+    .safety-switch strong { display: block; line-height: 16px; }
     .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: calc(100vh - 65px); }
     aside { padding: 16px; border-right: 1px solid var(--border-color-default, #d0d7de); }
     main { min-width: 0; padding: 16px; }
@@ -93,6 +152,7 @@ export function renderHtml(token) {
       border-bottom: 1px solid var(--border-color-default, #d0d7de);
       background: linear-gradient(90deg, rgba(9,105,218,.055), transparent 82%);
     }
+    .scan-analysis-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .panel-body { padding: 14px; }
     .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .stat { padding: 10px; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; }
@@ -101,10 +161,12 @@ export function renderHtml(token) {
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-color-muted, #656d76); }
     .dot.running { background: var(--true-color-blue, #0969da); animation: pulse 1.2s infinite; }
     .dot.completed { background: #1a7f37; }
+    .dot.cancelled { background: #bf8700; }
     .dot.failed { background: var(--true-color-red, #cf222e); }
     @keyframes pulse { 50% { opacity: .35; } }
     .progress { height: 6px; margin: 10px 0; border-radius: 999px; overflow: hidden; background: var(--background-color-muted, #f6f8fa); }
     .progress > div { width: 35%; height: 100%; background: var(--true-color-blue, #0969da); animation: travel 1.4s infinite linear; }
+    .command-progress { margin: 12px 0; }
     @keyframes travel { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
     .scan-analysis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
     .scan-analysis .stat { text-align: left; }
@@ -128,6 +190,14 @@ export function renderHtml(token) {
     .treemap-label { pointer-events: none; fill: white; font-family: var(--font-sans, sans-serif); font-weight: 600; }
     .treemap-size { pointer-events: none; fill: rgba(255,255,255,.85); font-family: var(--font-sans, sans-serif); }
     .treemap-cell { cursor: pointer; }
+    .protected-folder-guidance { width: 100%; margin: 0; }
+    .protected-folder-guidance .analyzer-link {
+      color: var(--true-color-blue, #0969da);
+      cursor: pointer;
+      text-decoration: underline;
+      font: inherit;
+    }
+    .selected-folder-details .folder-path { display: block; overflow-wrap: anywhere; }
     .tab { border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
     .tab.active { border-bottom-color: var(--true-color-blue, #0969da); font-weight: 600; }
     .table-wrap { overflow: auto; max-height: 500px; }
@@ -165,8 +235,9 @@ export function renderHtml(token) {
     .categorizer strong, .categorizer span { display: block; }
     .item-actions { display: flex; gap: 6px; flex-wrap: wrap; }
     .item-actions button { width: 120px; min-width: 120px; text-align: center; }
-    .selected-folder-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-top: 1px solid var(--border-color-default, #d0d7de); background: rgba(9,105,218,.055); }
+    .selected-folder-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px 12px; padding: 12px 14px; border-top: 1px solid var(--border-color-default, #d0d7de); background: rgba(9,105,218,.055); }
     .selected-folder-details { overflow-wrap: anywhere; }
+    .selected-folder-actions .protected-folder-guidance { grid-column: 1 / -1; }
     .folder-explanation { padding: 14px; border-top: 1px solid var(--border-color-default, #d0d7de); }
     .folder-explanation h2, .folder-explanation h3 { margin: 0 0 8px; }
     .folder-explanation h3 { margin-top: 16px; font-size: 14px; }
@@ -177,9 +248,11 @@ export function renderHtml(token) {
     .recommendation.not-recommended { color: var(--true-color-red, #cf222e); background: var(--true-color-red-muted, rgba(207,34,46,.1)); }
     .command-list { display: grid; gap: 10px; margin-top: 8px; }
     .command-card { padding: 10px; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; background: var(--background-color-default, #fff); }
-    .command-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-    .command-card code { display: block; padding: 8px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; font-family: var(--font-mono, Consolas, monospace); background: var(--background-color-muted, #f6f8fa); }
-    .command-actions { display: flex; align-items: center; gap: 6px; }
+    .command-header { margin-bottom: 6px; }
+    .command-line { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+    .icon-button { display: inline-grid; width: 32px; height: 32px; padding: 0; place-items: center; }
+    .icon-button svg { width: 16px; height: 16px; fill: currentColor; }
+    .command-card code { display: block; min-width: 0; padding: 8px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; font-family: var(--font-mono, Consolas, monospace); background: var(--background-color-muted, #f6f8fa); }
     .command-output { margin: 8px 0 0; padding: 8px; max-height: 180px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; font-family: var(--font-mono, Consolas, monospace); background: var(--background-color-muted, #f6f8fa); }
     .source-list a { overflow-wrap: anywhere; }
     dialog { width: min(760px, calc(100vw - 32px)); max-height: 80vh; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 10px; color: inherit; background: var(--background-color-default, #fff); }
@@ -187,6 +260,8 @@ export function renderHtml(token) {
     .modal-list { max-height: 320px; overflow: auto; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; padding: 8px; }
     .modal-entry { padding: 6px; border-bottom: 1px solid var(--border-color-default, #d0d7de); overflow-wrap: anywhere; }
     .modal-actions { justify-content: flex-end; margin-top: 14px; }
+    .investigation-path { margin: 8px 0; }
+    .investigation-response { max-height: 52vh; overflow: auto; margin-top: 14px; padding: 14px; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; }
     #cleanupProgress > div { width: 0; animation: none; transform: none; transition: width .2s ease; }
     #cleanupCurrentPath { min-height: 20px; overflow-wrap: anywhere; font-family: var(--font-mono, Consolas, monospace); font-size: var(--text-code-inline, 12px); }
     @media (max-width: 850px) {
@@ -201,26 +276,22 @@ export function renderHtml(token) {
 <body>
   <header>
     <div><h1>Windows App Storage Inspector &amp; Cleanup</h1><div class="subtitle">Windows-only · app storage in the local user profile and ProgramData</div></div>
-    <div class="header-actions"><button id="cancelScan" hidden>Cancel scan</button><button id="startScan" class="primary">Scan storage</button></div>
+  <div class="header-actions"><button id="cancelScan" hidden>Cancel scan</button><button id="startScan" class="primary">Scan storage</button><details class="github-menu"><summary aria-label="GitHub feedback and issues" title="Raise an issue or request a feature on GitHub"><span class="github-icon" aria-hidden="true"></span></summary><div class="github-menu-items"><a href="https://github.com/PlagueHO/plagueho.copilot/issues/new?template=bug_report.yml" target="_blank" rel="noopener noreferrer">Submit issue</a><a href="https://github.com/PlagueHO/plagueho.copilot/issues/new?template=feature_request.yml" target="_blank" rel="noopener noreferrer">Request feature</a></div></details></div>
   </header>
   <div class="layout">
     <aside>
-      <section class="panel">
-        <div class="panel-header"><strong>📡 Scan status</strong></div>
-        <div class="panel-body">
-          <div class="status"><span id="statusDot" class="dot"></span><span id="statusText">Idle</span></div>
-          <div id="progress" class="progress" hidden><div></div></div>
-          <div id="scanLocation" class="scan-location muted"></div>
-          <div id="progressText" class="muted"></div>
-          <div id="scanError" class="error" hidden></div>
-          <p class="muted">Local totals exclude OneDrive Files On-Demand placeholders. Sizes are logical file sizes; sparse and compressed files can use less physical disk space.</p>
-        </div>
-      </section>
       <section class="panel">
         <div class="panel-header"><strong>🗂️ Scan roots</strong></div>
         <div class="panel-body scope-options">
           <label><input id="scopeProfile" type="checkbox" checked /> User profile</label>
           <label><input id="scopeProgramData" type="checkbox" checked /> ProgramData</label>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-header"><strong>🛡️ Cleanup safety</strong></div>
+        <div class="panel-body safety-options">
+          <label id="directCleanupSafety" class="safety-switch direct-cleanup" title="Direct file cleanup is disabled by default. Enable only after acknowledging the risk."><input id="directCleanupEnabled" type="checkbox" role="switch" /><span><strong>Allow Delete</strong></span></label>
+          <label id="analyzerProtectionSafety" class="safety-switch" title="Prevent direct cleanup of folders managed by a custom analyzer."><input id="analyzerProtectionEnabled" type="checkbox" role="switch" checked /><span><strong>Protect analyzer folders</strong></span></label>
         </div>
       </section>
       <section class="panel">
@@ -251,9 +322,13 @@ export function renderHtml(token) {
     <main>
       <section id="welcome" class="panel"><div class="empty"><h2>Windows-only storage analysis</h2><p>This canvas runs only on Windows. Scan the selected local roots to explore folders, file types, applications, and conservative cleanup candidates.</p><button id="welcomeStartScan" class="primary" type="button">Scan storage</button></div></section>
       <section id="scanAnalysis" class="panel" hidden>
-        <div class="panel-header"><strong>🔄 Live scan analysis</strong></div>
+        <div class="panel-header scan-analysis-header"><strong>🔄 Live scan analysis</strong><div class="status"><span id="statusDot" class="dot"></span><span id="statusText">Idle</span></div></div>
         <div class="panel-body">
-          <p class="muted">The storage treemap is built after the scan finishes so folders can be sized consistently. These totals update while scanning continues.</p>
+          <p class="muted">Follow the active folder and live totals here. The storage treemap is built after the scan finishes so folders can be sized consistently.</p>
+          <div id="progress" class="progress" hidden><div></div></div>
+          <div id="scanLocation" class="scan-location muted"></div>
+          <div id="progressText" class="muted"></div>
+          <div id="scanError" class="error" hidden></div>
           <div class="scan-analysis">
             <div class="stat"><strong id="scanObservedBytes">—</strong><span class="muted">Local data observed</span></div>
             <div class="stat"><strong id="scanObservedFiles">—</strong><span class="muted">Files observed</span></div>
@@ -273,6 +348,7 @@ export function renderHtml(token) {
           <div id="selectedFolderActions" class="selected-folder-actions" hidden>
             <div class="selected-folder-details"><strong id="selectedFolderName"></strong><div id="selectedFolderDetails" class="muted"></div></div>
             <button id="explainFolder" class="primary" type="button" title="Ask Copilot to explain this folder and recommend safe cleanup options">Analyze folder &amp; cleanup options</button>
+            <div id="protectedFolderGuidance" class="warning protected-folder-guidance" hidden></div>
           </div>
           <div id="folderExplanation" class="folder-explanation" aria-live="polite" hidden></div>
         </section>
@@ -291,7 +367,7 @@ export function renderHtml(token) {
           </div>
         </section>
         <section class="panel">
-          <details class="expander analyzers">
+          <details id="custom-storage-analyzers" class="expander analyzers">
             <summary>🧰 Custom storage analyzers</summary>
             <div class="panel-body">
               <div class="analyzer-toolbar">
@@ -341,6 +417,31 @@ export function renderHtml(token) {
     </div>
     <div class="modal-actions"><button id="closeDialog">Close</button><button id="executeCleanup" class="danger" hidden disabled>Move to Recycle Bin</button></div>
   </dialog>
+  <dialog id="analyzerCommandDialog">
+    <h2 id="analyzerCommandTitle">Analyzer command</h2>
+    <p id="analyzerCommandStatus" class="muted"></p>
+    <code id="analyzerCommandText"></code>
+    <div id="analyzerCommandProgress" class="progress command-progress" role="progressbar" aria-label="Analyzer command in progress" hidden><div></div></div>
+    <div id="analyzerCommandError" class="error" hidden></div>
+    <pre id="analyzerCommandOutput" class="command-output" hidden></pre>
+    <div class="modal-actions">
+      <button id="cancelAnalyzerCommand">Cancel</button>
+      <button id="confirmAnalyzerCommand" class="danger" hidden>Run cleanup command</button>
+      <button id="closeAnalyzerCommand" hidden>Close</button>
+    </div>
+  </dialog>
+  <dialog id="copilotInvestigationDialog">
+    <h2 id="copilotInvestigationTitle">Ask Copilot</h2>
+    <p id="copilotInvestigationStatus" class="muted"></p>
+    <div id="copilotInvestigationPath" class="investigation-path scan-location"></div>
+    <div id="copilotInvestigationProgress" class="progress command-progress" role="progressbar" aria-label="Copilot investigation in progress" hidden><div></div></div>
+    <div id="copilotInvestigationError" class="error" hidden></div>
+    <div id="copilotInvestigationResponse" class="investigation-response" hidden></div>
+    <div class="modal-actions">
+      <button id="cancelCopilotInvestigation">Cancel</button>
+      <button id="closeCopilotInvestigation" hidden>Close</button>
+    </div>
+  </dialog>
   <script>
     const token = __TOKEN__;
     const state = {
@@ -351,15 +452,18 @@ export function renderHtml(token) {
       selected: new Set(),
       preview: null,
       cleanup: { status: "idle" },
+      safety: { directCleanupEnabled: false, analyzerProtectionEnabled: true },
       customAnalyzers: [],
       analyzerId: "vscode-insiders",
       customAnalyses: {},
+      analyzerCommand: { status: "idle" },
       analyzerSelected: new Set(),
       categorizers: null,
       selectedFolder: null,
       folderExplanations: new Map(),
       folderExplanationErrors: new Map(),
       explainingPath: null,
+      investigation: { status: "idle" },
     };
     const $ = (id) => document.getElementById(id);
 
@@ -381,8 +485,48 @@ export function renderHtml(token) {
         headers: { "content-type": "application/json", "x-storage-inspector-token": token, ...(options && options.headers) },
       });
       const body = await response.json();
-      if (!response.ok) throw new Error(body.message || "Request failed");
+      if (!response.ok) {
+        const error = new Error(body.message || "Request failed");
+        error.code = body.code;
+        throw error;
+      }
       return body;
+    }
+
+    function renderSafety(safety) {
+      state.safety = safety || state.safety;
+      const directCleanupEnabled = state.safety.directCleanupEnabled === true;
+      if (!directCleanupEnabled) {
+        state.selected.clear();
+        state.analyzerSelected.clear();
+        state.preview = null;
+      }
+      $("directCleanupEnabled").checked = directCleanupEnabled;
+      $("analyzerProtectionEnabled").checked = state.safety.analyzerProtectionEnabled !== false;
+      $("directCleanupSafety").classList.toggle("enabled", directCleanupEnabled);
+      $("directCleanupSafety").title = directCleanupEnabled
+        ? "Direct cleanup is enabled. Validated files can be moved to the Windows Recycle Bin."
+        : "Direct file cleanup is disabled by default. Enable only after acknowledging the risk.";
+      $("analyzerProtectionSafety").title = state.safety.analyzerProtectionEnabled !== false
+        ? "Analyzer-managed folders are protected from direct cleanup. Use the analyzer's supported commands instead."
+        : "Analyzer-managed folders can be offered as direct cleanup candidates after a rescan.";
+      const disabled = state.scan?.status === "running";
+      $("directCleanupEnabled").disabled = disabled;
+      $("analyzerProtectionEnabled").disabled = disabled;
+      if (state.result) {
+        renderSelection();
+        renderCustomAnalyzer();
+      }
+    }
+
+    async function updateSafety(input, restoreControl) {
+      try {
+        const result = await api("/api/safety", { method: "POST", body: JSON.stringify(input) });
+        renderSafety(result.safety);
+      } catch (error) {
+        restoreControl();
+        alert(error.message);
+      }
     }
 
     function textCell(row, value, className) {
@@ -395,6 +539,7 @@ export function renderHtml(token) {
 
     function renderScanState(next) {
       state.scan = next;
+      if (next.safety) renderSafety(next.safety);
       const scan = next.scan;
       $("statusText").textContent = scan.status.charAt(0).toUpperCase() + scan.status.slice(1);
       $("statusDot").className = "dot " + scan.status;
@@ -413,7 +558,7 @@ export function renderHtml(token) {
       $("progressText").textContent = progress
         ? progress.directoriesScanned.toLocaleString() + " folders · " + progress.filesScanned.toLocaleString() + " files · " + formatBytes(progress.bytesScanned) + " · updates at most once per second"
         : "";
-      $("scanAnalysis").hidden = !running;
+      $("scanAnalysis").hidden = scan.status === "idle";
       if (running && progress) {
         $("welcome").hidden = true;
         $("scanObservedBytes").textContent = formatBytes(progress.bytesScanned);
@@ -425,7 +570,12 @@ export function renderHtml(token) {
         $("fileCount").textContent = next.resultSummary.files.toLocaleString();
         $("reclaimable").textContent = formatBytes(next.resultSummary.reclaimableBytes);
         $("warningCount").textContent = next.resultSummary.warnings.toLocaleString();
-          $("cloudOnly").textContent = formatCloudOnlySummary(next.resultSummary);
+        $("cloudOnly").textContent = formatCloudOnlySummary(next.resultSummary);
+        if (!running) {
+          $("scanObservedBytes").textContent = formatBytes(next.resultSummary.bytes);
+          $("scanObservedFiles").textContent = next.resultSummary.files.toLocaleString();
+          $("scanObservedFolders").textContent = next.resultSummary.directories.toLocaleString();
+        }
       }
       if (next.categorizers) {
         state.categorizers = next.categorizers;
@@ -546,6 +696,7 @@ export function renderHtml(token) {
         state.customAnalyzers.forEach((analyzer) => select.add(new Option(analyzer.name, analyzer.id)));
         select.value = state.analyzerId;
         updateAnalyzerDescription();
+        if (state.selectedFolder) renderSelectedFolderAction();
         const analyzersPanel = document.querySelector("details.analyzers");
         if (state.result && analyzersPanel.open) runSelectedAnalyzer();
       } catch (error) {
@@ -605,39 +756,112 @@ export function renderHtml(token) {
       container.appendChild(section);
     }
 
-    async function runAnalyzerCommand(analyzerId, command, card, button) {
-      if (command.requiresConfirmation && !window.confirm(
-        "Run this cleanup command? It may permanently remove Docker-managed data:\n\n" + command.command,
-      )) {
+    function ensureAnalyzerCommandDialog() {
+      if (!$("analyzerCommandDialog").open) $("analyzerCommandDialog").showModal();
+    }
+
+    function renderAnalyzerCommandDialog() {
+      const active = state.analyzerCommand;
+      const command = active.command;
+      const isRunning = active.status === "running";
+      const isFinished = ["completed", "cancelled", "failed"].includes(active.status);
+      $("analyzerCommandTitle").textContent = command?.label || "Analyzer command";
+      $("analyzerCommandText").textContent = command?.command || "";
+      $("analyzerCommandProgress").hidden = !isRunning;
+      $("analyzerCommandError").hidden = true;
+      $("analyzerCommandOutput").hidden = true;
+      $("confirmAnalyzerCommand").hidden = true;
+      $("cancelAnalyzerCommand").hidden = isFinished;
+      $("cancelAnalyzerCommand").disabled = active.cancellationRequested === true;
+      $("cancelAnalyzerCommand").textContent = active.cancellationRequested ? "Cancelling..." : "Cancel";
+      $("closeAnalyzerCommand").hidden = active.status === "awaiting-confirmation" || isRunning;
+
+      if (active.status === "awaiting-confirmation") {
+        $("analyzerCommandStatus").textContent = "This cleanup command can remove managed data. Review the command, then explicitly confirm execution.";
+        $("confirmAnalyzerCommand").hidden = false;
         return;
       }
-      button.disabled = true;
-      button.textContent = "Running...";
-      let output = card.querySelector(".command-output");
-      if (!output) {
-        output = document.createElement("pre");
-        output.className = "command-output";
-        card.appendChild(output);
+      if (isRunning) {
+        $("analyzerCommandStatus").textContent = active.cancellationRequested
+          ? "Cancelling the analyzer command..."
+          : "Running through the extension's centralized command runner. Other canvas actions are blocked until it completes.";
+        return;
       }
+      if (active.status === "completed") {
+        $("analyzerCommandStatus").textContent = "Command completed.";
+        $("analyzerCommandOutput").hidden = false;
+        $("analyzerCommandOutput").textContent = active.result.output || "Command completed without output.";
+        return;
+      }
+      if (active.status === "failed") {
+        $("analyzerCommandStatus").textContent = "Command did not complete.";
+        $("analyzerCommandError").hidden = false;
+        $("analyzerCommandError").textContent = active.error.message;
+        return;
+      }
+      if (active.status === "cancelled") {
+        $("analyzerCommandStatus").textContent = "Command cancelled.";
+        $("analyzerCommandError").hidden = false;
+        $("analyzerCommandError").textContent = active.error.message;
+      }
+    }
+
+    async function executeAnalyzerCommand() {
+      const active = state.analyzerCommand;
+      if (!active.command || !["awaiting-confirmation", "running"].includes(active.status)) return;
+      state.analyzerCommand = { ...active, status: "running" };
+      renderAnalyzerCommandDialog();
       try {
         const result = await api("/api/analyzers/command", {
           method: "POST",
           body: JSON.stringify({
-            analyzerId,
-            commandId: command.id,
-            confirmed: command.requiresConfirmation === true,
+            analyzerId: active.analyzerId,
+            commandId: active.command.id,
+            confirmed: active.command.requiresConfirmation === true,
           }),
         });
-        output.className = "command-output";
-        output.textContent = result.output || "Command completed without output.";
-        button.textContent = "Run again";
+        state.analyzerCommand = { ...active, status: "completed", result };
       } catch (error) {
-        output.className = "command-output error";
-        output.textContent = error.message;
-        button.textContent = "Retry";
-      } finally {
-        button.disabled = false;
+        state.analyzerCommand = {
+          ...active,
+          status: error.code === "analyzer_command_cancelled" ? "cancelled" : "failed",
+          error,
+        };
       }
+      renderAnalyzerCommandDialog();
+    }
+
+    async function cancelAnalyzerCommand() {
+      const active = state.analyzerCommand;
+      if (active.status === "awaiting-confirmation") {
+        $("analyzerCommandDialog").close();
+        return;
+      }
+      if (active.status !== "running" || active.cancellationRequested) return;
+      state.analyzerCommand = { ...active, cancellationRequested: true };
+      renderAnalyzerCommandDialog();
+      try {
+        await api("/api/analyzers/command/cancel", {
+          method: "POST",
+          body: JSON.stringify({}),
+        });
+      } catch (error) {
+        state.analyzerCommand = { ...active, cancellationRequested: false, error };
+        renderAnalyzerCommandDialog();
+        alert(error.message);
+      }
+    }
+
+    function runAnalyzerCommand(analyzerId, command) {
+      if (["awaiting-confirmation", "running"].includes(state.analyzerCommand.status)) return;
+      state.analyzerCommand = {
+        analyzerId,
+        command,
+        status: command.requiresConfirmation ? "awaiting-confirmation" : "running",
+      };
+      ensureAnalyzerCommandDialog();
+      renderAnalyzerCommandDialog();
+      if (!command.requiresConfirmation) executeAnalyzerCommand();
     }
 
     function appendAnalyzerCommands(container, analyzerId, title, noteText, commands) {
@@ -659,26 +883,23 @@ export function renderHtml(token) {
         header.className = "command-header";
         const label = document.createElement("strong");
         label.textContent = item.label;
-        const actions = document.createElement("div");
-        actions.className = "command-actions";
-        const shell = document.createElement("span");
-        shell.className = "muted";
-        shell.textContent = item.shell;
         const run = document.createElement("button");
         run.type = "button";
-        run.textContent = item.requiresConfirmation ? "Run cleanup" : "Run command";
+        run.textContent = "Run";
         run.title = item.requiresConfirmation
           ? "Run this cleanup command after confirmation"
           : "Run this read-only command";
-        run.addEventListener("click", () => runAnalyzerCommand(analyzerId, item, card, run));
-        actions.append(shell, run);
-        header.append(label, actions);
+        run.addEventListener("click", () => runAnalyzerCommand(analyzerId, item));
+        header.append(label);
         const command = document.createElement("code");
         command.textContent = item.command;
+        const commandLine = document.createElement("div");
+        commandLine.className = "command-line";
+        commandLine.append(command, run);
         const description = document.createElement("div");
         description.className = "muted";
         description.textContent = item.description;
-        card.append(header, command, description);
+        card.append(header, commandLine, description);
         list.appendChild(card);
       });
       section.appendChild(list);
@@ -687,13 +908,16 @@ export function renderHtml(token) {
 
     function appendAnalyzerCleanup(container, items) {
       const eligible = items.filter((item) => item.cleanupEligible);
+      const directCleanupEnabled = state.safety.directCleanupEnabled === true;
       const selectedBytes = eligible
         .filter((item) => state.analyzerSelected.has(item.id))
         .reduce((total, item) => total + item.bytes, 0);
       const bar = document.createElement("div");
       bar.className = "analyzer-cleanup";
       const summary = document.createElement("span");
-      summary.textContent = state.analyzerSelected.size
+      summary.textContent = !directCleanupEnabled
+        ? "🛡️ Allow delete is disabled. Enable it in Cleanup safety to move selected items to the Recycle Bin."
+        : state.analyzerSelected.size
         ? state.analyzerSelected.size.toLocaleString() + " selected · " + formatBytes(selectedBytes)
         : eligible.length
           ? "Select storage to move to the Recycle Bin"
@@ -702,7 +926,7 @@ export function renderHtml(token) {
       button.type = "button";
       button.className = "danger";
       button.textContent = "Review cleanup";
-      button.disabled = state.analyzerSelected.size === 0;
+      button.disabled = !directCleanupEnabled || state.analyzerSelected.size === 0;
       button.addEventListener("click", () => previewCleanup({
         source: "analyzer",
         analyzerId: state.analyzerId,
@@ -716,7 +940,7 @@ export function renderHtml(token) {
       const cell = document.createElement("td");
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.disabled = !item.cleanupEligible;
+      checkbox.disabled = !item.cleanupEligible || state.safety.directCleanupEnabled !== true;
       checkbox.checked = state.analyzerSelected.has(item.id);
       checkbox.setAttribute("aria-label", "Select " + item.path);
       checkbox.addEventListener("change", () => {
@@ -946,6 +1170,133 @@ export function renderHtml(token) {
       );
     }
 
+    function renderNpmCacheAnalyzer(container, analysis) {
+      container.replaceChildren();
+      const stats = document.createElement("div");
+      stats.className = "analysis-stats";
+      appendAnalysisStat(stats, "npm cache storage", formatBytes(analysis.totalBytes));
+      appendAnalysisStat(stats, "Cached files", (analysis.location?.files || 0).toLocaleString());
+      appendAnalysisStat(stats, "Location", analysis.configurationSource);
+      container.appendChild(stats);
+
+      const status = document.createElement("div");
+      status.className = analysis.status === "available" ? "warning" : "error";
+      status.textContent = analysis.message;
+      container.appendChild(status);
+      if (analysis.configurationError) {
+        const error = document.createElement("div");
+        error.className = "warning";
+        error.textContent = analysis.configurationError;
+        container.appendChild(error);
+      }
+      if (analysis.warning) {
+        const warning = document.createElement("div");
+        warning.className = "warning";
+        warning.textContent = analysis.warning;
+        container.appendChild(warning);
+      }
+
+      appendAnalysisTable(
+        container,
+        "Configured npm cache location",
+        ["Location", "Size", "Files", "Modified"],
+        analysis.location ? [[
+          analysis.location.path,
+          formatBytes(analysis.location.bytes),
+          analysis.location.files.toLocaleString(),
+          new Date(analysis.location.modifiedAt).toLocaleString(),
+        ]] : [[analysis.configuredPath, "Not found", "—", "—"]],
+      );
+
+      if (analysis.location) {
+        appendAnalysisTable(
+          container,
+          "Largest npm cache files",
+          ["File", "Size", "Category", "Modified"],
+          analysis.topFiles.slice(0, 10).map((item) => [
+            item.path,
+            formatBytes(item.bytes),
+            item.category,
+            new Date(item.modifiedAt).toLocaleString(),
+          ]),
+        );
+      }
+
+      appendAnalyzerCommands(
+        container,
+        "npm-cache",
+        "Supported npm cache commands",
+        "Verify the cache first. Clear it only to reclaim disk space; npm recreates needed cache entries on later package installs.",
+        analysis.cleanupCommands,
+      );
+    }
+
+    function renderUvCacheAnalyzer(container, analysis) {
+      container.replaceChildren();
+      const stats = document.createElement("div");
+      stats.className = "analysis-stats";
+      appendAnalysisStat(stats, "uv-managed storage", formatBytes(analysis.totalBytes));
+      appendAnalysisStat(stats, "uv cache storage", formatBytes(analysis.cacheBytes));
+      appendAnalysisStat(stats, "Storage locations", analysis.locations.length.toLocaleString());
+      container.appendChild(stats);
+
+      const status = document.createElement("div");
+      status.className = analysis.status === "available" ? "warning" : "error";
+      status.textContent = analysis.message;
+      container.appendChild(status);
+      if (analysis.configurationError) {
+        const error = document.createElement("div");
+        error.className = "warning";
+        error.textContent = analysis.configurationError;
+        container.appendChild(error);
+      }
+      if (analysis.warning) {
+        const warning = document.createElement("div");
+        warning.className = "warning";
+        warning.textContent = analysis.warning;
+        container.appendChild(warning);
+      }
+
+      appendAnalysisTable(
+        container,
+        "uv storage locations",
+        ["Location", "Purpose", "Size", "Files", "Modified"],
+        analysis.locations.map((item) => [
+          item.path,
+          item.name,
+          formatBytes(item.bytes),
+          item.files.toLocaleString(),
+          new Date(item.modifiedAt).toLocaleString(),
+        ]),
+      );
+      if (!analysis.locations.length) {
+        appendAnalysisTable(
+          container,
+          "Configured uv cache location",
+          ["Location", "Status"],
+          [[analysis.configuredCachePath, "Not found"]],
+        );
+      }
+      appendAnalysisTable(
+        container,
+        "Largest uv files",
+        ["File", "Size", "Category", "Modified"],
+        analysis.topFiles.slice(0, 10).map((item) => [
+          item.path,
+          formatBytes(item.bytes),
+          item.category,
+          new Date(item.modifiedAt).toLocaleString(),
+        ]),
+      );
+      appendAnalyzerCommands(
+        container,
+        "uv-cache",
+        "Supported uv cache commands",
+        "Use uv's cache commands instead of modifying cache files. Pruning is the preferred periodic cleanup; clear the cache only when you need to reclaim all cache space.",
+        analysis.cleanupCommands,
+      );
+    }
+
     function renderCustomAnalyzer() {
       const container = $("customAnalyzerContent");
       const analysis = state.customAnalyses[state.analyzerId];
@@ -961,6 +1312,10 @@ export function renderHtml(token) {
         renderScoutAnalyzer(container, analysis);
       } else if (state.analyzerId === "docker-images") {
         renderDockerAnalyzer(container, analysis);
+      } else if (state.analyzerId === "npm-cache") {
+        renderNpmCacheAnalyzer(container, analysis);
+      } else if (state.analyzerId === "uv-cache") {
+        renderUvCacheAnalyzer(container, analysis);
       }
     }
 
@@ -970,6 +1325,8 @@ export function renderHtml(token) {
       if (segments.includes("microsoft vs code insiders")) return "vscode-insiders";
       if (segments.includes(".scout") || segments.includes("microsoft scout")) return "microsoft-scout";
       if (segments.includes("docker") || segments.includes("dockerdesktop") || segments.includes("windowsfilter")) return "docker-images";
+      if (segments.includes("npm-cache")) return "npm-cache";
+      if (normalized.includes("\\appdata\\local\\uv\\")) return "uv-cache";
       return undefined;
     }
 
@@ -1062,12 +1419,17 @@ export function renderHtml(token) {
         group.setAttribute("class", "treemap-cell");
         group.setAttribute("tabindex", "0");
         group.setAttribute("role", "button");
-        group.setAttribute("aria-label", item.child.name + ", " + formatBytes(item.child.bytes));
+        const protectedPrefix = item.child.protection ? "Protected folder, " : "";
+        const displayName = (item.child.protection ? "🔒 " : "") + item.child.name;
+        group.setAttribute("aria-label", protectedPrefix + item.child.name + ", " + formatBytes(item.child.bytes));
         const tooltip = document.createElementNS("http://www.w3.org/2000/svg", "title");
         tooltip.textContent = "Folder: " + item.child.name
           + "\nSpace used: " + formatBytes(item.child.bytes)
           + "\nFiles: " + item.child.files.toLocaleString()
           + "\nPath: " + (item.child.path || "Scanned storage");
+        if (item.child.protection) {
+          tooltip.textContent += "\nProtected: use the " + item.child.protection.analyzerId + " custom analyzer for cleanup.";
+        }
         group.appendChild(tooltip);
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("x", item.x + 1);
@@ -1082,7 +1444,7 @@ export function renderHtml(token) {
           label.setAttribute("x", item.x + 8);
           label.setAttribute("y", item.y + 20);
           label.setAttribute("class", "treemap-label");
-          label.textContent = item.child.name.length > 30 ? item.child.name.slice(0, 27) + "…" : item.child.name;
+          label.textContent = displayName.length > 30 ? displayName.slice(0, 27) + "…" : displayName;
           group.appendChild(label);
           const size = document.createElementNS("http://www.w3.org/2000/svg", "text");
           size.setAttribute("x", item.x + 8);
@@ -1114,7 +1476,7 @@ export function renderHtml(token) {
       state.treeStack.forEach((node, index) => {
         if (index) crumbs.appendChild(document.createTextNode("›"));
         const button = document.createElement("button");
-        button.textContent = node.name + " (" + formatBytes(node.bytes) + ")";
+        button.textContent = (node.protection ? "🔒 " : "") + node.name + " (" + formatBytes(node.bytes) + ")";
         button.addEventListener("click", () => {
           state.selectedFolder = node;
           renderSelectedFolderAction();
@@ -1141,13 +1503,49 @@ export function renderHtml(token) {
       const folder = state.selectedFolder;
       panel.hidden = !folder;
       if (!folder) return;
-      $("selectedFolderName").textContent = folder.name || "Selected folder";
-      $("selectedFolderDetails").textContent = [
-        folder.path || "Scanned storage",
-        formatBytes(folder.bytes),
-        folder.files.toLocaleString() + " files",
-      ].join(" · ");
+      $("selectedFolderName").textContent = (folder.protection ? "🔒 " : "") + (folder.name || "Selected folder");
+      const details = $("selectedFolderDetails");
+      details.replaceChildren();
+      const folderPath = document.createElement("span");
+      folderPath.className = "folder-path";
+      folderPath.textContent = folder.path || "Scanned storage";
+      const summary = document.createElement("span");
+      summary.textContent = formatBytes(folder.bytes) + " · " + folder.files.toLocaleString() + " files";
+      details.append(folderPath, summary);
+      renderProtectedFolderGuidance(folder);
       renderFolderExplanation();
+    }
+
+    function renderProtectedFolderGuidance(folder) {
+      const guidance = $("protectedFolderGuidance");
+      guidance.replaceChildren();
+      guidance.hidden = !folder.protection;
+      if (!folder.protection) return;
+      const analyzer = state.customAnalyzers.find((item) => item.id === folder.protection.analyzerId);
+      const label = analyzer?.name || folder.protection.name || "custom";
+      guidance.append(document.createTextNode("This folder is protected from direct cleanup. Use the "));
+      const link = document.createElement("a");
+      link.className = "analyzer-link";
+      link.href = "#custom-storage-analyzers";
+      link.textContent = label + " analyzer";
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        openProtectedAnalyzer(folder.protection.analyzerId);
+      });
+      guidance.append(link, document.createTextNode(" for supported cleanup operations."));
+    }
+
+    function openProtectedAnalyzer(analyzerId) {
+      const analyzer = state.customAnalyzers.find((item) => item.id === analyzerId);
+      if (!analyzer) return;
+      const analyzersPanel = document.querySelector("details.analyzers");
+      state.analyzerId = analyzer.id;
+      state.analyzerSelected.clear();
+      $("customAnalyzer").value = analyzer.id;
+      analyzersPanel.open = true;
+      updateAnalyzerDescription();
+      if (state.customAnalyses[analyzer.id]) renderCustomAnalyzer(); else runSelectedAnalyzer();
+      analyzersPanel.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function appendExplanationList(container, title, items) {
@@ -1171,40 +1569,29 @@ export function renderHtml(token) {
       container.append(heading, paragraph);
     }
 
-    function renderFolderExplanation() {
-      const container = $("folderExplanation");
-      const folder = state.selectedFolder;
-      container.replaceChildren();
-      if (!folder) {
-        container.hidden = true;
-        return;
-      }
-      if (state.explainingPath === folder.path) {
-        container.hidden = false;
-        container.appendChild(emptyMessage("Copilot is inspecting the folder and researching supported cleanup guidance..."));
-        return;
-      }
-      const error = state.folderExplanationErrors.get(folder.path);
-      if (error) {
-        container.hidden = false;
-        const message = document.createElement("div");
-        message.className = "warning";
-        message.textContent = "The analysis could not be displayed: " + error;
-        container.appendChild(message);
-        return;
-      }
-      const explanation = state.folderExplanations.get(folder.path);
-      container.hidden = !explanation;
-      if (!explanation) return;
+    function createCopyIcon() {
+      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      icon.setAttribute("viewBox", "0 0 16 16");
+      icon.setAttribute("aria-hidden", "true");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M0 6.75C0 5.784.784 5 1.75 5h6.5C9.216 5 10 5.784 10 6.75v6.5A1.75 1.75 0 0 1 8.25 15h-6.5A1.75 1.75 0 0 1 0 13.25ZM1.75 6.5a.25.25 0 0 0-.25.25v6.5c0 .138.112.25.25.25h6.5a.25.25 0 0 0 .25-.25v-6.5a.25.25 0 0 0-.25-.25Zm9.5-5a.25.25 0 0 0-.25.25V3h1.25A1.75 1.75 0 0 1 14 4.75v6.5h.25c.138 0 .25-.112.25-.25v-9.25a.25.25 0 0 0-.25-.25Z");
+      icon.appendChild(path);
+      return icon;
+    }
 
+    function renderExplanationContent(container, explanation) {
+      container.replaceChildren();
       const title = document.createElement("h2");
       title.textContent = explanation.title;
+      const application = document.createElement("p");
+      application.className = "muted";
+      application.textContent = "Likely created by: " + explanation.application;
       const summary = document.createElement("p");
       summary.textContent = explanation.summary;
       const recommendation = document.createElement("span");
       recommendation.className = "recommendation " + explanation.cleanup.recommendation;
       recommendation.textContent = "Cleanup: " + explanation.cleanup.recommendation.replace("-", " ");
-      container.append(title, summary, recommendation);
+      container.append(title, application, summary, recommendation);
 
       if (explanation.contents.length) {
         const heading = document.createElement("h3");
@@ -1220,6 +1607,7 @@ export function renderHtml(token) {
         container.append(heading, list);
       }
       appendExplanationList(container, "Typical uses", explanation.typicalUses);
+      appendExplanationList(container, "Best practices", explanation.bestPractices);
       appendExplanationText(container, "Cleanup guidance", explanation.cleanup.summary);
       appendExplanationText(container, "Risk", explanation.cleanup.risk);
       appendExplanationText(container, "Impact", explanation.cleanup.impact);
@@ -1241,20 +1629,30 @@ export function renderHtml(token) {
           label.textContent = command.label + " · " + command.shell + (command.requiresElevation ? " · Administrator" : "");
           const copy = document.createElement("button");
           copy.type = "button";
-          copy.textContent = "Copy";
+          copy.className = "icon-button";
+          copy.title = "Copy command";
+          copy.setAttribute("aria-label", "Copy command");
+          copy.appendChild(createCopyIcon());
           copy.addEventListener("click", async () => {
             try {
               await navigator.clipboard.writeText(command.command);
-              copy.textContent = "Copied";
-              setTimeout(() => { copy.textContent = "Copy"; }, 1500);
+              copy.title = "Copied";
+              copy.setAttribute("aria-label", "Copied");
+              setTimeout(() => {
+                copy.title = "Copy command";
+                copy.setAttribute("aria-label", "Copy command");
+              }, 1500);
             } catch {
               alert("The command could not be copied. Select it manually instead.");
             }
           });
-          header.append(label, copy);
+          header.appendChild(label);
           const code = document.createElement("code");
           code.textContent = command.command;
-          card.append(header, code);
+          const commandLine = document.createElement("div");
+          commandLine.className = "command-line";
+          commandLine.append(code, copy);
+          card.append(header, commandLine);
           if (command.description) {
             const description = document.createElement("p");
             description.className = "muted";
@@ -1294,6 +1692,33 @@ export function renderHtml(token) {
         });
         container.append(heading, list);
       }
+    }
+
+    function renderFolderExplanation() {
+      const container = $("folderExplanation");
+      const folder = state.selectedFolder;
+      container.replaceChildren();
+      if (!folder) {
+        container.hidden = true;
+        return;
+      }
+      if (state.explainingPath === folder.path) {
+        container.hidden = false;
+        container.appendChild(emptyMessage("Copilot is inspecting the folder and researching supported cleanup guidance..."));
+        return;
+      }
+      const error = state.folderExplanationErrors.get(folder.path);
+      if (error) {
+        container.hidden = false;
+        const message = document.createElement("div");
+        message.className = "warning";
+        message.textContent = "The analysis could not be displayed: " + error;
+        container.appendChild(message);
+        return;
+      }
+      const explanation = state.folderExplanations.get(folder.path);
+      container.hidden = !explanation;
+      if (explanation) renderExplanationContent(container, explanation);
     }
 
     function matchesFilters(item) {
@@ -1341,43 +1766,112 @@ export function renderHtml(token) {
       }
     }
 
-    async function askCopilotToInvestigate(item) {
+    function ensureCopilotInvestigationDialog() {
+      if (!$("copilotInvestigationDialog").open) $("copilotInvestigationDialog").showModal();
+    }
+
+    function renderCopilotInvestigation() {
+      const investigation = state.investigation;
+      const running = investigation.status === "running";
+      const finished = ["completed", "cancelled", "failed"].includes(investigation.status);
+      $("copilotInvestigationTitle").textContent = investigation.itemType === "directory"
+        ? "Ask Copilot about this folder"
+        : "Ask Copilot about this item";
+      $("copilotInvestigationStatus").textContent = running
+        ? investigation.cancellationRequested
+          ? "Cancelling the Copilot investigation..."
+          : "Copilot is inspecting the item and researching safe cleanup guidance. This may take a moment."
+        : investigation.status === "completed"
+          ? "Copilot investigation completed."
+          : investigation.status === "cancelled"
+            ? "Copilot investigation cancelled."
+            : investigation.status === "failed"
+              ? "Copilot investigation could not be completed."
+              : "";
+      $("copilotInvestigationPath").textContent = investigation.path || "";
+      $("copilotInvestigationProgress").hidden = !running;
+      $("copilotInvestigationError").hidden = investigation.status !== "cancelled" && investigation.status !== "failed";
+      $("copilotInvestigationError").textContent = investigation.error?.message || "";
+      const response = $("copilotInvestigationResponse");
+      response.hidden = investigation.status !== "completed";
+      if (investigation.status === "completed") renderExplanationContent(response, investigation.result.explanation);
+      $("cancelCopilotInvestigation").hidden = !running;
+      $("cancelCopilotInvestigation").disabled = investigation.cancellationRequested === true;
+      $("cancelCopilotInvestigation").textContent = investigation.cancellationRequested ? "Cancelling..." : "Cancel";
+      $("closeCopilotInvestigation").hidden = !finished;
+    }
+
+    async function investigateItem(item, { storeInline = false } = {}) {
+      if (state.investigation.status === "running") return;
+      state.folderExplanationErrors.delete(item.path);
+      state.explainingPath = storeInline ? item.path : null;
+      state.investigation = {
+        status: "running",
+        path: item.path,
+        itemType: item.entryType,
+        cancellationRequested: false,
+      };
+      ensureCopilotInvestigationDialog();
+      renderCopilotInvestigation();
+      if (storeInline) renderFolderExplanation();
       try {
         const result = await api("/api/investigate/request", {
           method: "POST",
           body: JSON.stringify({ path: item.path }),
         });
-        alert("Copilot has been asked to investigate " + result.itemType + " use and cleanup safety. Its findings will appear in chat.");
+        state.investigation = { ...state.investigation, status: "completed", result };
+        if (storeInline) {
+          state.folderExplanations.set(result.path, result.explanation);
+          state.folderExplanationErrors.delete(result.path);
+        }
       } catch (error) {
-        alert(error.message);
+        state.investigation = {
+          ...state.investigation,
+          status: error.code === "investigation_cancelled" ? "cancelled" : "failed",
+          error,
+        };
+        if (storeInline && error.code !== "investigation_cancelled") {
+          state.folderExplanationErrors.set(item.path, error.message);
+        }
+      } finally {
+        state.explainingPath = null;
+        renderCopilotInvestigation();
+        if (storeInline) renderFolderExplanation();
       }
     }
 
-    async function explainSelectedFolder() {
+    async function cancelCopilotInvestigation() {
+      const investigation = state.investigation;
+      if (investigation.status !== "running" || investigation.cancellationRequested) return;
+      state.investigation = { ...investigation, cancellationRequested: true };
+      renderCopilotInvestigation();
+      try {
+        await api("/api/investigate/cancel", {
+          method: "POST",
+          body: JSON.stringify({}),
+        });
+      } catch (error) {
+        if (state.investigation.status === "running") {
+          state.investigation = { ...state.investigation, cancellationRequested: false, error };
+          renderCopilotInvestigation();
+        }
+      }
+    }
+
+    function askCopilotToInvestigate(item) {
+      investigateItem(item);
+    }
+
+    function explainSelectedFolder() {
       const folder = state.selectedFolder;
       if (!folder) return;
       const button = $("explainFolder");
-      state.folderExplanationErrors.delete(folder.path);
-      state.explainingPath = folder.path;
-      renderFolderExplanation();
       button.disabled = true;
       button.textContent = "Analyzing folder...";
-      try {
-        const result = await api("/api/investigate/request", {
-          method: "POST",
-          body: JSON.stringify({ path: folder.path }),
-        });
-        state.folderExplanations.set(result.path, result.explanation);
-        state.folderExplanationErrors.delete(result.path);
-        button.title = "Copilot explanation received for " + result.path;
-      } catch (error) {
-        state.folderExplanationErrors.set(folder.path, error.message);
-      } finally {
-        state.explainingPath = null;
-        renderFolderExplanation();
+      investigateItem(folder, { storeInline: true }).finally(() => {
         button.disabled = false;
         button.textContent = "Analyze folder & cleanup options";
-      }
+      });
     }
 
     function appendItemActions(row, item) {
@@ -1450,6 +1944,7 @@ export function renderHtml(token) {
         const selectionCell = document.createElement("td");
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
+        checkbox.disabled = state.safety.directCleanupEnabled !== true;
         checkbox.checked = state.selected.has(item.id);
         checkbox.setAttribute("aria-label", "Select " + item.path);
         checkbox.addEventListener("change", () => {
@@ -1511,10 +2006,13 @@ export function renderHtml(token) {
     function renderSelection() {
       const candidates = new Map(state.result.candidates.map((item) => [item.id, item]));
       const bytes = [...state.selected].reduce((total, id) => total + (candidates.get(id)?.bytes || 0), 0);
-      $("selectionSummary").textContent = state.selected.size
+      const directCleanupEnabled = state.safety.directCleanupEnabled === true;
+      $("selectionSummary").textContent = !directCleanupEnabled
+        ? "🛡️ Allow delete is disabled. Enable it in Cleanup safety to move selected items to the Recycle Bin."
+        : state.selected.size
         ? state.selected.size.toLocaleString() + " selected · " + formatBytes(bytes)
         : "No files selected";
-      $("previewCleanup").disabled = state.selected.size === 0;
+      $("previewCleanup").disabled = !directCleanupEnabled || state.selected.size === 0;
     }
 
     function ensureCleanupDialog() {
@@ -1694,6 +2192,32 @@ export function renderHtml(token) {
       try { await api("/api/cancel", { method: "POST", body: "{}" }); }
       catch (error) { alert(error.message); }
     });
+    $("directCleanupEnabled").addEventListener("change", () => {
+      const enabled = $("directCleanupEnabled").checked;
+      if (enabled && !window.confirm(
+        "Enable direct cleanup?\n\nThis permits the extension to move selected files and folders to the Windows Recycle Bin. Incorrect selections can damage applications or your system. Analyzer commands are not affected.",
+      )) {
+        renderSafety(state.safety);
+        return;
+      }
+      updateSafety(
+        { directCleanupEnabled: enabled, acknowledged: enabled },
+        () => renderSafety(state.safety),
+      );
+    });
+    $("analyzerProtectionEnabled").addEventListener("change", () => {
+      const enabled = $("analyzerProtectionEnabled").checked;
+      if (!enabled && !window.confirm(
+        "Disable analyzer-folder protection?\n\nThis allows direct cleanup candidates inside folders managed by a custom analyzer after a rescan. Use the analyzer's supported commands whenever possible.",
+      )) {
+        renderSafety(state.safety);
+        return;
+      }
+      updateSafety(
+        { analyzerProtectionEnabled: enabled },
+        () => renderSafety(state.safety),
+      );
+    });
     document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => { state.tab = tab.dataset.tab; renderTable(); }));
     ["search", "appFilter", "categoryFilter"].forEach((id) => $(id).addEventListener("input", renderTable));
     $("previewCleanup").addEventListener("click", () => previewCleanup({
@@ -1709,6 +2233,22 @@ export function renderHtml(token) {
     });
     $("confirmCleanup").addEventListener("change", () => { $("executeCleanup").disabled = !$("confirmCleanup").checked; });
     $("executeCleanup").addEventListener("click", executeCleanup);
+    $("cancelAnalyzerCommand").addEventListener("click", cancelAnalyzerCommand);
+    $("confirmAnalyzerCommand").addEventListener("click", executeAnalyzerCommand);
+    $("closeAnalyzerCommand").addEventListener("click", () => {
+      if (!["awaiting-confirmation", "running"].includes(state.analyzerCommand.status)) $("analyzerCommandDialog").close();
+    });
+    $("analyzerCommandDialog").addEventListener("cancel", (event) => {
+      if (["awaiting-confirmation", "running"].includes(state.analyzerCommand.status)) event.preventDefault();
+    });
+    $("cancelCopilotInvestigation").addEventListener("click", cancelCopilotInvestigation);
+    $("closeCopilotInvestigation").addEventListener("click", () => {
+      if (["running"].includes(state.investigation.status)) return;
+      $("copilotInvestigationDialog").close();
+    });
+    $("copilotInvestigationDialog").addEventListener("cancel", (event) => {
+      if (state.investigation.status === "running") event.preventDefault();
+    });
     $("explainFolder").addEventListener("click", explainSelectedFolder);
     $("runCustomAnalyzer").addEventListener("click", runSelectedAnalyzer);
     document.querySelector("details.analyzers").addEventListener("toggle", () => {
