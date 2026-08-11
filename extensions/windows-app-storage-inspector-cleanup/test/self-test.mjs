@@ -388,18 +388,13 @@ try {
         approvedRoots: [{ id: "test", label: "Test root", path: root }],
     });
     assert.equal(preview.entries.length, 1);
-    const cleanupEntryStats = await stat(preview.entries[0].path);
-    preview.entries[0] = {
-        ...preview.entries[0],
-        bytes: cleanupEntryStats.size,
-        modifiedAt: cleanupEntryStats.mtime.toISOString(),
-    };
     const cleanupProgress = [];
     const cleanup = await executeCleanupPreview({
         preview,
         confirmed: true,
         onProgress: (progress) => cleanupProgress.push(progress),
         recycleBin: recycleTestFiles,
+        revalidateEntry: async (entry) => entry,
     });
     assert.equal(cleanup.succeeded.length, 1);
     assert.ok(cleanupProgress.some((progress) => progress.phase === "validating"));
@@ -444,6 +439,7 @@ try {
                 interruption: { code: "cleanup_timeout", message: "Recycle Bin operation timed out" },
             };
         },
+        revalidateEntry: async (entry) => entry,
     });
     assert.deepEqual(partialCleanup.succeeded.map((item) => item.path), [partialFirstFile]);
     assert.equal(partialCleanup.failed.length, 0);

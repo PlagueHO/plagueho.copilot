@@ -490,7 +490,13 @@ export async function createCleanupPreview({ itemIds, candidates, approvedRoots,
     };
 }
 
-export async function executeCleanupPreview({ preview, confirmed, onProgress, recycleBin = runRecycleBin }) {
+export async function executeCleanupPreview({
+    preview,
+    confirmed,
+    onProgress,
+    recycleBin = runRecycleBin,
+    revalidateEntry = revalidateCandidate,
+}) {
     if (confirmed !== true) {
         throw serviceError("cleanup_confirmation_required", "Explicit cleanup confirmation is required");
     }
@@ -509,7 +515,7 @@ export async function executeCleanupPreview({ preview, confirmed, onProgress, re
             total: preview.entries.length,
         });
         try {
-            ready.push(await revalidateCandidate(entry, validationContext));
+            ready.push(await revalidateEntry(entry, validationContext));
         } catch (error) {
             failed.push({
                 path: entry.path,
