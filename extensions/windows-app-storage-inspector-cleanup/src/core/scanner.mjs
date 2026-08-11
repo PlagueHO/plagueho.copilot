@@ -89,6 +89,23 @@ function normalizeWindowsPath(value) {
     return path.resolve(value).replaceAll("/", "\\").toLowerCase();
 }
 
+function isWithinPath(candidatePath, parentPath) {
+    const relative = path.relative(path.resolve(parentPath), path.resolve(candidatePath));
+    return relative === "" || (relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative));
+}
+
+function protectionForPath(directoryPath, categorizers) {
+    const categorizer = findCategorizer(directoryPath, categorizers);
+    if (!categorizer?.analyzerId) {
+        return undefined;
+    }
+    return {
+        analyzerId: categorizer.analyzerId,
+        name: categorizer.name,
+        description: categorizer.description,
+    };
+}
+
 function incrementAggregate(map, key, size) {
     const current = map.get(key) ?? { name: key, bytes: 0, files: 0 };
     current.bytes += size;
@@ -123,9 +140,12 @@ function classifyCategory(filePath, categorizer) {
     return CATEGORY_EXTENSIONS.get(extension) ?? (extension ? "Other files" : "Files without extension");
 }
 
-function cleanupCandidate(filePath, stats, app, categorizer) {
+function cleanupCandidate(filePath, stats, app, categorizer, protectAnalyzerManagedPaths) {
     const normalized = normalizeWindowsPath(filePath);
-    if (categorizer?.cleanupPolicy === "manual") {
+    if (
+        categorizer?.cleanupPolicy === "manual"
+        && (!categorizer.analyzerId || protectAnalyzerManagedPaths)
+    ) {
         return undefined;
     }
     if (normalized.includes("\\.git\\") || normalized.includes("\\windows\\installer\\")) {
@@ -181,7 +201,7 @@ function summarizeMap(map) {
     return [...map.values()].sort((left, right) => right.bytes - left.bytes);
 }
 
-function buildTree(nodes, nodePath, depth = 0) {
+function buildTree(nodes, nodePath, categorizers, protectAnalyzerManagedPaths, depth = 0) {
     const node = nodes.get(normalizeWindowsPath(nodePath));
     if (!node) {
         return undefined;
@@ -193,6 +213,9 @@ function buildTree(nodes, nodePath, depth = 0) {
         bytes: node.bytes,
         files: node.files,
         children: [],
+        protection: protectAnalyzerManagedPaths
+            ? protectionForPath(node.path, categorizers)
+            : undefined,
     };
 
     if (depth >= MAX_TREE_DEPTH) {
@@ -205,7 +228,13 @@ function buildTree(nodes, nodePath, depth = 0) {
         .sort((left, right) => right.bytes - left.bytes);
 
     for (const child of children.slice(0, MAX_TREE_CHILDREN)) {
-        const childTree = buildTree(nodes, child.path, depth + 1);
+        const childTree = buildTree(
+            nodes,
+            child.path,
+            categorizers,
+            protectAnalyzerManagedPaths,
+            depth + 1,
+        );
         if (childTree) {
             result.children.push(childTree);
         }
@@ -226,7 +255,7 @@ function buildTree(nodes, nodePath, depth = 0) {
     return result;
 }
 
-function aggregateDirectories(nodes, rootPaths) {
+function aggregateDirectories(nodes, rootPaths, categorizers, protectAnalyzerManagedPaths) {
     const byDepth = [...nodes.values()].sort(
         (left, right) => right.path.split(path.sep).length - left.path.split(path.sep).length,
     );
@@ -245,7 +274,7 @@ function aggregateDirectories(nodes, rootPaths) {
     }
 
     return rootPaths
-        .map((rootPath) => buildTree(nodes, rootPath))
+        .map((rootPath) => buildTree(nodes, rootPath, categorizers, protectAnalyzerManagedPaths))
         .filter(Boolean);
 }
 
@@ -264,7 +293,13 @@ export function getDefaultRoots(scopes = ["profile", "programData"]) {
     return roots;
 }
 
-export async function scanStorage({ roots, categorizers = [], signal, onProgress = () => {} }) {
+export async function scanStorage({
+    roots,
+    categorizers = [],
+    protectAnalyzerManagedPaths = true,
+    signal,
+    onProgress = () => {},
+}) {
     if (!Array.isArray(roots) || roots.length === 0) {
         const error = new Error("At least one scan root is required");
         error.code = "scan_roots_required";
@@ -413,7 +448,13 @@ export async function scanStorage({ roots, categorizers = [], signal, onProgress
         });
         pruneLargest(largestFiles, MAX_LARGEST_FILES);
 
-        const candidate = cleanupCandidate(fullPath, stats, app, categorizer);
+        const candidate = cleanupCandidate(
+            fullPath,
+            stats,
+            app,
+            categorizer,
+            protectAnalyzerManagedPaths,
+        );
         if (candidate) {
             candidates.push(candidate);
             pruneLargest(candidates, MAX_CANDIDATES);
@@ -468,21 +509,37 @@ export async function scanStorage({ roots, categorizers = [], signal, onProgress
         skippedReparsePoints,
     });
 
-    const trees = aggregateDirectories(nodes, rootPaths);
+    const trees = aggregateDirectories(nodes, rootPaths, categorizers, protectAnalyzerManagedPaths);
     largestFiles.sort((left, right) => right.bytes - left.bytes);
     largestFiles.length = Math.min(largestFiles.length, MAX_LARGEST_FILES);
     candidates.sort((left, right) => right.bytes - left.bytes);
     candidates.length = Math.min(candidates.length, MAX_CANDIDATES);
 
-    const directories = [...nodes.values()]
-        .map((node) => ({
-            name: node.name,
-            path: node.path,
-            rootId: node.rootId,
-            bytes: node.bytes,
-            files: node.files,
-            categorizer: findCategorizer(node.path, categorizers)?.name,
-        }))
+    const directoryDetails = [...nodes.values()]
+        .map((node) => {
+            const categorizer = findCategorizer(node.path, categorizers);
+            const analyzerManagement = protectionForPath(node.path, categorizers);
+            return {
+                name: node.name,
+                path: node.path,
+                rootId: node.rootId,
+                bytes: node.bytes,
+                files: node.files,
+                categorizer: categorizer?.name,
+                protection: protectAnalyzerManagedPaths ? analyzerManagement : undefined,
+                analyzerManagement,
+            };
+        });
+    const analyzerManagedPaths = directoryDetails
+        .filter((directory) => directory.analyzerManagement)
+        .sort((left, right) => left.path.length - right.path.length)
+        .filter((directory, index, items) => !items.slice(0, index).some((parent) => (
+            parent.analyzerManagement.analyzerId === directory.analyzerManagement.analyzerId
+            && isWithinPath(directory.path, parent.path)
+        )))
+        .map(({ path: directoryPath, analyzerManagement }) => ({ path: directoryPath, ...analyzerManagement }));
+    const protectedPaths = protectAnalyzerManagedPaths ? analyzerManagedPaths : [];
+    const directories = directoryDetails
         .sort((left, right) => right.bytes - left.bytes)
         .slice(0, MAX_DIRECTORY_ROWS);
 
@@ -520,6 +577,8 @@ export async function scanStorage({ roots, categorizers = [], signal, onProgress
         largestFiles,
         cloudOnlyFiles,
         candidates,
+        analyzerManagedPaths,
+        protectedPaths,
         warnings,
     };
 }

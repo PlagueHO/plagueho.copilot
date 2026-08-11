@@ -16,6 +16,7 @@ export const BUILT_IN_CATEGORIZERS = [
         match: "token",
         value: "\\appdata\\local\\docker\\",
         cleanupPolicy: "manual",
+        analyzerId: "docker-images",
         source: "built-in",
     },
     {
@@ -26,6 +27,7 @@ export const BUILT_IN_CATEGORIZERS = [
         match: "token",
         value: "\\programdata\\docker\\",
         cleanupPolicy: "manual",
+        analyzerId: "docker-images",
         source: "built-in",
     },
     {
@@ -46,6 +48,28 @@ export const BUILT_IN_CATEGORIZERS = [
         match: "token",
         value: "\\foundry local\\cache",
         cleanupPolicy: "manual",
+        source: "built-in",
+    },
+    {
+        id: "built-in-npm-cache",
+        name: "npm",
+        category: "Package manager cache",
+        description: "npm-managed package cache. Use `npm cache verify` before `npm cache clean --force`; do not delete _cacache contents directly.",
+        match: "token",
+        value: "\\appdata\\local\\npm-cache\\",
+        cleanupPolicy: "manual",
+        analyzerId: "npm-cache",
+        source: "built-in",
+    },
+    {
+        id: "built-in-uv-cache",
+        name: "uv",
+        category: "Python package manager data",
+        description: "uv-managed Python data. Use the uv cache analyzer and its supported commands; do not modify files directly.",
+        match: "token",
+        value: "\\appdata\\local\\uv\\",
+        cleanupPolicy: "manual",
+        analyzerId: "uv-cache",
         source: "built-in",
     },
 ];
@@ -95,7 +119,8 @@ export function findCategorizer(filePath, categorizers = []) {
     const normalizedPath = normalizePath(filePath);
     const matches = categorizers.filter((rule) => {
         if (rule.match === "token") {
-            return normalizedPath.includes(rule.value);
+            const tokenRoot = rule.value.endsWith("\\") ? rule.value.slice(0, -1) : rule.value;
+            return normalizedPath.includes(rule.value) || normalizedPath.endsWith(tokenRoot);
         }
         return normalizedPath === rule.path || normalizedPath.startsWith(`${rule.path}\\`);
     });
