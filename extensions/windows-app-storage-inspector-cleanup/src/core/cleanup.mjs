@@ -267,7 +267,10 @@ async function fingerprintDirectory(directoryPath) {
 }
 
 async function revalidateCandidate(candidate, validationContext) {
-    const lexicalRoot = validationContext.roots.find((root) => isWithinRoot(candidate.path, root.path));
+    const lexicalRoot = validationContext.roots.find((root) => (
+        isWithinRoot(candidate.path, root.path)
+        || isWithinRoot(candidate.path, root.canonicalPath)
+    ));
     if (!lexicalRoot) {
         throw serviceError("cleanup_path_not_allowed", `Path is outside approved scan roots: ${candidate.path}`);
     }
