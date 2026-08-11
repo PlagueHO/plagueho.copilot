@@ -375,9 +375,15 @@ try {
     assert.equal(refreshFailureService.getState().scan.status, "failed");
     assert.equal(refreshFailureService.getState().cleanup.status, "completed");
 
+    const cleanupFileStats = await stat(serviceCleanupFile);
+    const cleanupCandidate = {
+        ...serviceCleanupCandidate,
+        bytes: cleanupFileStats.size,
+        modifiedAt: cleanupFileStats.mtime.toISOString(),
+    };
     const preview = await createCleanupPreview({
-        itemIds: [result.candidates[0].id],
-        candidates: result.candidates,
+        itemIds: [cleanupCandidate.id],
+        candidates: [cleanupCandidate],
         source: { type: "scan" },
         approvedRoots: [{ id: "test", label: "Test root", path: root }],
     });
@@ -398,7 +404,7 @@ try {
     assert.equal(cleanup.succeeded.length, 1);
     assert.ok(cleanupProgress.some((progress) => progress.phase === "validating"));
     assert.ok(cleanupProgress.some((progress) => progress.phase === "recycling" && progress.completed === 1));
-    await assert.rejects(access(cacheFile));
+    await assert.rejects(access(serviceCleanupFile));
     await access(regularFile);
 
     const partialFirstFile = path.join(cacheDirectory, "partial-first.bin");
