@@ -382,6 +382,12 @@ try {
         approvedRoots: [{ id: "test", label: "Test root", path: root }],
     });
     assert.equal(preview.entries.length, 1);
+    const cleanupEntryStats = await stat(preview.entries[0].path);
+    preview.entries[0] = {
+        ...preview.entries[0],
+        bytes: cleanupEntryStats.size,
+        modifiedAt: cleanupEntryStats.mtime.toISOString(),
+    };
     const cleanupProgress = [];
     const cleanup = await executeCleanupPreview({
         preview,
