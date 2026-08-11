@@ -25,6 +25,7 @@ Canvas extensions are supported in the GitHub Copilot app only.
 5. After the scan completes:
    - Select treemap folders to drill down.
    - Use **Application ownership** and **File categories** to understand usage.
+   - Select a file or folder path in the result tabs to navigate the treemap to its deepest visible parent folder.
    - Use the result tabs to inspect folders, large files, cloud-only files, cleanup candidates, and warnings.
    - Select **Analyze folder & cleanup options** or **Ask Copilot** in a result row for a structured Copilot explanation of a selected item.
    - Open **Custom storage analyzers** for application-specific analysis.
