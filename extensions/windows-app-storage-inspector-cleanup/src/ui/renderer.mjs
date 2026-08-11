@@ -52,6 +52,55 @@ export function renderHtml(token) {
         var(--true-color-blue, #0969da);
       filter: brightness(.96);
     }
+    .github-menu { position: relative; }
+    .github-menu summary {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border-color-default, #d0d7de);
+      border-radius: 6px;
+      padding: 6px 8px;
+      color: inherit;
+      text-decoration: none;
+      background: var(--background-color-default, #fff);
+      cursor: pointer;
+      list-style: none;
+    }
+    .github-menu summary::-webkit-details-marker { display: none; }
+    .github-menu summary:focus-visible { outline: 2px solid var(--color-focus-outline, #0969da); outline-offset: 2px; }
+    .github-menu summary:hover, .github-menu summary:focus-visible, .github-menu[open] summary {
+      background: var(--background-color-muted, #f6f8fa);
+    }
+    .github-icon {
+      display: block;
+      width: 18px;
+      height: 18px;
+      background: currentColor;
+      -webkit-mask: url("/assets/github-mark-16.svg") center / contain no-repeat;
+      mask: url("/assets/github-mark-16.svg") center / contain no-repeat;
+    }
+    .github-menu-items {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      z-index: 5;
+      min-width: 180px;
+      padding: 4px;
+      border: 1px solid var(--border-color-default, #d0d7de);
+      border-radius: 6px;
+      background: var(--background-color-default, #fff);
+      box-shadow: 0 8px 24px rgba(31,35,40,.15);
+    }
+    .github-menu-items a {
+      display: block;
+      padding: 6px 8px;
+      border-radius: 4px;
+      color: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .github-menu-items a:hover, .github-menu-items a:focus-visible {
+      background: var(--background-color-muted, #f6f8fa);
+    }
     .danger {
       color: var(--color-white, #fff);
       background:
@@ -117,6 +166,7 @@ export function renderHtml(token) {
     @keyframes pulse { 50% { opacity: .35; } }
     .progress { height: 6px; margin: 10px 0; border-radius: 999px; overflow: hidden; background: var(--background-color-muted, #f6f8fa); }
     .progress > div { width: 35%; height: 100%; background: var(--true-color-blue, #0969da); animation: travel 1.4s infinite linear; }
+    .command-progress { margin: 12px 0; }
     @keyframes travel { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
     .scan-analysis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
     .scan-analysis .stat { text-align: left; }
@@ -140,8 +190,13 @@ export function renderHtml(token) {
     .treemap-label { pointer-events: none; fill: white; font-family: var(--font-sans, sans-serif); font-weight: 600; }
     .treemap-size { pointer-events: none; fill: rgba(255,255,255,.85); font-family: var(--font-sans, sans-serif); }
     .treemap-cell { cursor: pointer; }
-    .protected-folder-guidance { margin-top: 6px; }
-    .protected-folder-guidance button { padding: 0; border: 0; color: var(--true-color-blue, #0969da); background: transparent; cursor: pointer; text-decoration: underline; font: inherit; }
+    .protected-folder-guidance { width: 100%; margin: 0; }
+    .protected-folder-guidance .analyzer-link {
+      color: var(--true-color-blue, #0969da);
+      cursor: pointer;
+      text-decoration: underline;
+      font: inherit;
+    }
     .selected-folder-details .folder-path { display: block; overflow-wrap: anywhere; }
     .tab { border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
     .tab.active { border-bottom-color: var(--true-color-blue, #0969da); font-weight: 600; }
@@ -180,8 +235,9 @@ export function renderHtml(token) {
     .categorizer strong, .categorizer span { display: block; }
     .item-actions { display: flex; gap: 6px; flex-wrap: wrap; }
     .item-actions button { width: 120px; min-width: 120px; text-align: center; }
-    .selected-folder-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-top: 1px solid var(--border-color-default, #d0d7de); background: rgba(9,105,218,.055); }
+    .selected-folder-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px 12px; padding: 12px 14px; border-top: 1px solid var(--border-color-default, #d0d7de); background: rgba(9,105,218,.055); }
     .selected-folder-details { overflow-wrap: anywhere; }
+    .selected-folder-actions .protected-folder-guidance { grid-column: 1 / -1; }
     .folder-explanation { padding: 14px; border-top: 1px solid var(--border-color-default, #d0d7de); }
     .folder-explanation h2, .folder-explanation h3 { margin: 0 0 8px; }
     .folder-explanation h3 { margin-top: 16px; font-size: 14px; }
@@ -192,9 +248,9 @@ export function renderHtml(token) {
     .recommendation.not-recommended { color: var(--true-color-red, #cf222e); background: var(--true-color-red-muted, rgba(207,34,46,.1)); }
     .command-list { display: grid; gap: 10px; margin-top: 8px; }
     .command-card { padding: 10px; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; background: var(--background-color-default, #fff); }
-    .command-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-    .command-card code { display: block; padding: 8px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; font-family: var(--font-mono, Consolas, monospace); background: var(--background-color-muted, #f6f8fa); }
-    .command-actions { display: flex; align-items: center; gap: 6px; }
+    .command-header { margin-bottom: 6px; }
+    .command-line { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+    .command-card code { display: block; min-width: 0; padding: 8px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; font-family: var(--font-mono, Consolas, monospace); background: var(--background-color-muted, #f6f8fa); }
     .command-output { margin: 8px 0 0; padding: 8px; max-height: 180px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; font-family: var(--font-mono, Consolas, monospace); background: var(--background-color-muted, #f6f8fa); }
     .source-list a { overflow-wrap: anywhere; }
     dialog { width: min(760px, calc(100vw - 32px)); max-height: 80vh; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 10px; color: inherit; background: var(--background-color-default, #fff); }
@@ -202,6 +258,8 @@ export function renderHtml(token) {
     .modal-list { max-height: 320px; overflow: auto; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; padding: 8px; }
     .modal-entry { padding: 6px; border-bottom: 1px solid var(--border-color-default, #d0d7de); overflow-wrap: anywhere; }
     .modal-actions { justify-content: flex-end; margin-top: 14px; }
+    .investigation-path { margin: 8px 0; }
+    .investigation-response { max-height: 52vh; overflow: auto; margin-top: 14px; padding: 14px; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; }
     #cleanupProgress > div { width: 0; animation: none; transform: none; transition: width .2s ease; }
     #cleanupCurrentPath { min-height: 20px; overflow-wrap: anywhere; font-family: var(--font-mono, Consolas, monospace); font-size: var(--text-code-inline, 12px); }
     @media (max-width: 850px) {
@@ -216,7 +274,7 @@ export function renderHtml(token) {
 <body>
   <header>
     <div><h1>Windows App Storage Inspector &amp; Cleanup</h1><div class="subtitle">Windows-only · app storage in the local user profile and ProgramData</div></div>
-    <div class="header-actions"><button id="cancelScan" hidden>Cancel scan</button><button id="startScan" class="primary">Scan storage</button></div>
+  <div class="header-actions"><button id="cancelScan" hidden>Cancel scan</button><button id="startScan" class="primary">Scan storage</button><details class="github-menu"><summary aria-label="GitHub feedback and issues" title="Raise an issue or request a feature on GitHub"><span class="github-icon" aria-hidden="true"></span></summary><div class="github-menu-items"><a href="https://github.com/PlagueHO/plagueho.copilot/issues/new?template=bug_report.yml" target="_blank" rel="noopener noreferrer">Submit issue</a><a href="https://github.com/PlagueHO/plagueho.copilot/issues/new?template=feature_request.yml" target="_blank" rel="noopener noreferrer">Request feature</a></div></details></div>
   </header>
   <div class="layout">
     <aside>
@@ -286,8 +344,9 @@ export function renderHtml(token) {
           </div>
           <svg id="treemap" role="img" aria-label="Storage usage treemap"></svg>
           <div id="selectedFolderActions" class="selected-folder-actions" hidden>
-            <div class="selected-folder-details"><strong id="selectedFolderName"></strong><div id="selectedFolderDetails" class="muted"></div><div id="protectedFolderGuidance" class="warning protected-folder-guidance" hidden></div></div>
+            <div class="selected-folder-details"><strong id="selectedFolderName"></strong><div id="selectedFolderDetails" class="muted"></div></div>
             <button id="explainFolder" class="primary" type="button" title="Ask Copilot to explain this folder and recommend safe cleanup options">Analyze folder &amp; cleanup options</button>
+            <div id="protectedFolderGuidance" class="warning protected-folder-guidance" hidden></div>
           </div>
           <div id="folderExplanation" class="folder-explanation" aria-live="polite" hidden></div>
         </section>
@@ -306,7 +365,7 @@ export function renderHtml(token) {
           </div>
         </section>
         <section class="panel">
-          <details class="expander analyzers">
+          <details id="custom-storage-analyzers" class="expander analyzers">
             <summary>🧰 Custom storage analyzers</summary>
             <div class="panel-body">
               <div class="analyzer-toolbar">
@@ -360,12 +419,25 @@ export function renderHtml(token) {
     <h2 id="analyzerCommandTitle">Analyzer command</h2>
     <p id="analyzerCommandStatus" class="muted"></p>
     <code id="analyzerCommandText"></code>
+    <div id="analyzerCommandProgress" class="progress command-progress" role="progressbar" aria-label="Analyzer command in progress" hidden><div></div></div>
     <div id="analyzerCommandError" class="error" hidden></div>
     <pre id="analyzerCommandOutput" class="command-output" hidden></pre>
     <div class="modal-actions">
       <button id="cancelAnalyzerCommand">Cancel</button>
       <button id="confirmAnalyzerCommand" class="danger" hidden>Run cleanup command</button>
       <button id="closeAnalyzerCommand" hidden>Close</button>
+    </div>
+  </dialog>
+  <dialog id="copilotInvestigationDialog">
+    <h2 id="copilotInvestigationTitle">Ask Copilot</h2>
+    <p id="copilotInvestigationStatus" class="muted"></p>
+    <div id="copilotInvestigationPath" class="investigation-path scan-location"></div>
+    <div id="copilotInvestigationProgress" class="progress command-progress" role="progressbar" aria-label="Copilot investigation in progress" hidden><div></div></div>
+    <div id="copilotInvestigationError" class="error" hidden></div>
+    <div id="copilotInvestigationResponse" class="investigation-response" hidden></div>
+    <div class="modal-actions">
+      <button id="cancelCopilotInvestigation">Cancel</button>
+      <button id="closeCopilotInvestigation" hidden>Close</button>
     </div>
   </dialog>
   <script>
@@ -389,6 +461,7 @@ export function renderHtml(token) {
       folderExplanations: new Map(),
       folderExplanationErrors: new Map(),
       explainingPath: null,
+      investigation: { status: "idle" },
     };
     const $ = (id) => document.getElementById(id);
 
@@ -410,7 +483,11 @@ export function renderHtml(token) {
         headers: { "content-type": "application/json", "x-storage-inspector-token": token, ...(options && options.headers) },
       });
       const body = await response.json();
-      if (!response.ok) throw new Error(body.message || "Request failed");
+      if (!response.ok) {
+        const error = new Error(body.message || "Request failed");
+        error.code = body.code;
+        throw error;
+      }
       return body;
     }
 
@@ -685,12 +762,16 @@ export function renderHtml(token) {
       const active = state.analyzerCommand;
       const command = active.command;
       const isRunning = active.status === "running";
+      const isFinished = ["completed", "cancelled", "failed"].includes(active.status);
       $("analyzerCommandTitle").textContent = command?.label || "Analyzer command";
       $("analyzerCommandText").textContent = command?.command || "";
+      $("analyzerCommandProgress").hidden = !isRunning;
       $("analyzerCommandError").hidden = true;
       $("analyzerCommandOutput").hidden = true;
       $("confirmAnalyzerCommand").hidden = true;
-      $("cancelAnalyzerCommand").hidden = isRunning || active.status === "completed" || active.status === "failed";
+      $("cancelAnalyzerCommand").hidden = isFinished;
+      $("cancelAnalyzerCommand").disabled = active.cancellationRequested === true;
+      $("cancelAnalyzerCommand").textContent = active.cancellationRequested ? "Cancelling..." : "Cancel";
       $("closeAnalyzerCommand").hidden = active.status === "awaiting-confirmation" || isRunning;
 
       if (active.status === "awaiting-confirmation") {
@@ -699,7 +780,9 @@ export function renderHtml(token) {
         return;
       }
       if (isRunning) {
-        $("analyzerCommandStatus").textContent = "Running through the extension's centralized command runner. Other canvas actions are blocked until it completes.";
+        $("analyzerCommandStatus").textContent = active.cancellationRequested
+          ? "Cancelling the analyzer command..."
+          : "Running through the extension's centralized command runner. Other canvas actions are blocked until it completes.";
         return;
       }
       if (active.status === "completed") {
@@ -710,6 +793,12 @@ export function renderHtml(token) {
       }
       if (active.status === "failed") {
         $("analyzerCommandStatus").textContent = "Command did not complete.";
+        $("analyzerCommandError").hidden = false;
+        $("analyzerCommandError").textContent = active.error.message;
+        return;
+      }
+      if (active.status === "cancelled") {
+        $("analyzerCommandStatus").textContent = "Command cancelled.";
         $("analyzerCommandError").hidden = false;
         $("analyzerCommandError").textContent = active.error.message;
       }
@@ -731,9 +820,34 @@ export function renderHtml(token) {
         });
         state.analyzerCommand = { ...active, status: "completed", result };
       } catch (error) {
-        state.analyzerCommand = { ...active, status: "failed", error };
+        state.analyzerCommand = {
+          ...active,
+          status: error.code === "analyzer_command_cancelled" ? "cancelled" : "failed",
+          error,
+        };
       }
       renderAnalyzerCommandDialog();
+    }
+
+    async function cancelAnalyzerCommand() {
+      const active = state.analyzerCommand;
+      if (active.status === "awaiting-confirmation") {
+        $("analyzerCommandDialog").close();
+        return;
+      }
+      if (active.status !== "running" || active.cancellationRequested) return;
+      state.analyzerCommand = { ...active, cancellationRequested: true };
+      renderAnalyzerCommandDialog();
+      try {
+        await api("/api/analyzers/command/cancel", {
+          method: "POST",
+          body: JSON.stringify({}),
+        });
+      } catch (error) {
+        state.analyzerCommand = { ...active, cancellationRequested: false, error };
+        renderAnalyzerCommandDialog();
+        alert(error.message);
+      }
     }
 
     function runAnalyzerCommand(analyzerId, command) {
@@ -766,26 +880,23 @@ export function renderHtml(token) {
         header.className = "command-header";
         const label = document.createElement("strong");
         label.textContent = item.label;
-        const actions = document.createElement("div");
-        actions.className = "command-actions";
-        const shell = document.createElement("span");
-        shell.className = "muted";
-        shell.textContent = item.shell;
         const run = document.createElement("button");
         run.type = "button";
-        run.textContent = item.requiresConfirmation ? "Run cleanup" : "Run command";
+        run.textContent = "Run";
         run.title = item.requiresConfirmation
           ? "Run this cleanup command after confirmation"
           : "Run this read-only command";
         run.addEventListener("click", () => runAnalyzerCommand(analyzerId, item));
-        actions.append(shell, run);
-        header.append(label, actions);
+        header.append(label);
         const command = document.createElement("code");
         command.textContent = item.command;
+        const commandLine = document.createElement("div");
+        commandLine.className = "command-line";
+        commandLine.append(command, run);
         const description = document.createElement("div");
         description.className = "muted";
         description.textContent = item.description;
-        card.append(header, command, description);
+        card.append(header, commandLine, description);
         list.appendChild(card);
       });
       section.appendChild(list);
@@ -802,7 +913,7 @@ export function renderHtml(token) {
       bar.className = "analyzer-cleanup";
       const summary = document.createElement("span");
       summary.textContent = !directCleanupEnabled
-        ? "Direct cleanup is disabled in the header."
+        ? "🛡️ Allow delete is disabled. Enable it in Cleanup safety to move selected items to the Recycle Bin."
         : state.analyzerSelected.size
         ? state.analyzerSelected.size.toLocaleString() + " selected · " + formatBytes(selectedBytes)
         : eligible.length
@@ -1394,7 +1505,7 @@ export function renderHtml(token) {
       details.replaceChildren();
       const folderPath = document.createElement("span");
       folderPath.className = "folder-path";
-      folderPath.textContent = (folder.protection ? "🔒 " : "") + (folder.path || "Scanned storage");
+      folderPath.textContent = folder.path || "Scanned storage";
       const summary = document.createElement("span");
       summary.textContent = formatBytes(folder.bytes) + " · " + folder.files.toLocaleString() + " files";
       details.append(folderPath, summary);
@@ -1410,10 +1521,14 @@ export function renderHtml(token) {
       const analyzer = state.customAnalyzers.find((item) => item.id === folder.protection.analyzerId);
       const label = analyzer?.name || folder.protection.name || "custom";
       guidance.append(document.createTextNode("This folder is protected from direct cleanup. Use the "));
-      const link = document.createElement("button");
-      link.type = "button";
+      const link = document.createElement("a");
+      link.className = "analyzer-link";
+      link.href = "#custom-storage-analyzers";
       link.textContent = label + " analyzer";
-      link.addEventListener("click", () => openProtectedAnalyzer(folder.protection.analyzerId));
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        openProtectedAnalyzer(folder.protection.analyzerId);
+      });
       guidance.append(link, document.createTextNode(" for supported cleanup operations."));
     }
 
@@ -1451,40 +1566,19 @@ export function renderHtml(token) {
       container.append(heading, paragraph);
     }
 
-    function renderFolderExplanation() {
-      const container = $("folderExplanation");
-      const folder = state.selectedFolder;
+    function renderExplanationContent(container, explanation) {
       container.replaceChildren();
-      if (!folder) {
-        container.hidden = true;
-        return;
-      }
-      if (state.explainingPath === folder.path) {
-        container.hidden = false;
-        container.appendChild(emptyMessage("Copilot is inspecting the folder and researching supported cleanup guidance..."));
-        return;
-      }
-      const error = state.folderExplanationErrors.get(folder.path);
-      if (error) {
-        container.hidden = false;
-        const message = document.createElement("div");
-        message.className = "warning";
-        message.textContent = "The analysis could not be displayed: " + error;
-        container.appendChild(message);
-        return;
-      }
-      const explanation = state.folderExplanations.get(folder.path);
-      container.hidden = !explanation;
-      if (!explanation) return;
-
       const title = document.createElement("h2");
       title.textContent = explanation.title;
+      const application = document.createElement("p");
+      application.className = "muted";
+      application.textContent = "Likely created by: " + explanation.application;
       const summary = document.createElement("p");
       summary.textContent = explanation.summary;
       const recommendation = document.createElement("span");
       recommendation.className = "recommendation " + explanation.cleanup.recommendation;
       recommendation.textContent = "Cleanup: " + explanation.cleanup.recommendation.replace("-", " ");
-      container.append(title, summary, recommendation);
+      container.append(title, application, summary, recommendation);
 
       if (explanation.contents.length) {
         const heading = document.createElement("h3");
@@ -1500,6 +1594,7 @@ export function renderHtml(token) {
         container.append(heading, list);
       }
       appendExplanationList(container, "Typical uses", explanation.typicalUses);
+      appendExplanationList(container, "Best practices", explanation.bestPractices);
       appendExplanationText(container, "Cleanup guidance", explanation.cleanup.summary);
       appendExplanationText(container, "Risk", explanation.cleanup.risk);
       appendExplanationText(container, "Impact", explanation.cleanup.impact);
@@ -1576,6 +1671,33 @@ export function renderHtml(token) {
       }
     }
 
+    function renderFolderExplanation() {
+      const container = $("folderExplanation");
+      const folder = state.selectedFolder;
+      container.replaceChildren();
+      if (!folder) {
+        container.hidden = true;
+        return;
+      }
+      if (state.explainingPath === folder.path) {
+        container.hidden = false;
+        container.appendChild(emptyMessage("Copilot is inspecting the folder and researching supported cleanup guidance..."));
+        return;
+      }
+      const error = state.folderExplanationErrors.get(folder.path);
+      if (error) {
+        container.hidden = false;
+        const message = document.createElement("div");
+        message.className = "warning";
+        message.textContent = "The analysis could not be displayed: " + error;
+        container.appendChild(message);
+        return;
+      }
+      const explanation = state.folderExplanations.get(folder.path);
+      container.hidden = !explanation;
+      if (explanation) renderExplanationContent(container, explanation);
+    }
+
     function matchesFilters(item) {
       const search = $("search").value.trim().toLowerCase();
       const app = $("appFilter").value;
@@ -1621,43 +1743,112 @@ export function renderHtml(token) {
       }
     }
 
-    async function askCopilotToInvestigate(item) {
+    function ensureCopilotInvestigationDialog() {
+      if (!$("copilotInvestigationDialog").open) $("copilotInvestigationDialog").showModal();
+    }
+
+    function renderCopilotInvestigation() {
+      const investigation = state.investigation;
+      const running = investigation.status === "running";
+      const finished = ["completed", "cancelled", "failed"].includes(investigation.status);
+      $("copilotInvestigationTitle").textContent = investigation.itemType === "directory"
+        ? "Ask Copilot about this folder"
+        : "Ask Copilot about this item";
+      $("copilotInvestigationStatus").textContent = running
+        ? investigation.cancellationRequested
+          ? "Cancelling the Copilot investigation..."
+          : "Copilot is inspecting the item and researching safe cleanup guidance. This may take a moment."
+        : investigation.status === "completed"
+          ? "Copilot investigation completed."
+          : investigation.status === "cancelled"
+            ? "Copilot investigation cancelled."
+            : investigation.status === "failed"
+              ? "Copilot investigation could not be completed."
+              : "";
+      $("copilotInvestigationPath").textContent = investigation.path || "";
+      $("copilotInvestigationProgress").hidden = !running;
+      $("copilotInvestigationError").hidden = investigation.status !== "cancelled" && investigation.status !== "failed";
+      $("copilotInvestigationError").textContent = investigation.error?.message || "";
+      const response = $("copilotInvestigationResponse");
+      response.hidden = investigation.status !== "completed";
+      if (investigation.status === "completed") renderExplanationContent(response, investigation.result.explanation);
+      $("cancelCopilotInvestigation").hidden = !running;
+      $("cancelCopilotInvestigation").disabled = investigation.cancellationRequested === true;
+      $("cancelCopilotInvestigation").textContent = investigation.cancellationRequested ? "Cancelling..." : "Cancel";
+      $("closeCopilotInvestigation").hidden = !finished;
+    }
+
+    async function investigateItem(item, { storeInline = false } = {}) {
+      if (state.investigation.status === "running") return;
+      state.folderExplanationErrors.delete(item.path);
+      state.explainingPath = storeInline ? item.path : null;
+      state.investigation = {
+        status: "running",
+        path: item.path,
+        itemType: item.entryType,
+        cancellationRequested: false,
+      };
+      ensureCopilotInvestigationDialog();
+      renderCopilotInvestigation();
+      if (storeInline) renderFolderExplanation();
       try {
         const result = await api("/api/investigate/request", {
           method: "POST",
           body: JSON.stringify({ path: item.path }),
         });
-        alert("Copilot has been asked to investigate " + result.itemType + " use and cleanup safety. Its findings will appear in chat.");
+        state.investigation = { ...state.investigation, status: "completed", result };
+        if (storeInline) {
+          state.folderExplanations.set(result.path, result.explanation);
+          state.folderExplanationErrors.delete(result.path);
+        }
       } catch (error) {
-        alert(error.message);
+        state.investigation = {
+          ...state.investigation,
+          status: error.code === "investigation_cancelled" ? "cancelled" : "failed",
+          error,
+        };
+        if (storeInline && error.code !== "investigation_cancelled") {
+          state.folderExplanationErrors.set(item.path, error.message);
+        }
+      } finally {
+        state.explainingPath = null;
+        renderCopilotInvestigation();
+        if (storeInline) renderFolderExplanation();
       }
     }
 
-    async function explainSelectedFolder() {
+    async function cancelCopilotInvestigation() {
+      const investigation = state.investigation;
+      if (investigation.status !== "running" || investigation.cancellationRequested) return;
+      state.investigation = { ...investigation, cancellationRequested: true };
+      renderCopilotInvestigation();
+      try {
+        await api("/api/investigate/cancel", {
+          method: "POST",
+          body: JSON.stringify({}),
+        });
+      } catch (error) {
+        if (state.investigation.status === "running") {
+          state.investigation = { ...state.investigation, cancellationRequested: false, error };
+          renderCopilotInvestigation();
+        }
+      }
+    }
+
+    function askCopilotToInvestigate(item) {
+      investigateItem(item);
+    }
+
+    function explainSelectedFolder() {
       const folder = state.selectedFolder;
       if (!folder) return;
       const button = $("explainFolder");
-      state.folderExplanationErrors.delete(folder.path);
-      state.explainingPath = folder.path;
-      renderFolderExplanation();
       button.disabled = true;
       button.textContent = "Analyzing folder...";
-      try {
-        const result = await api("/api/investigate/request", {
-          method: "POST",
-          body: JSON.stringify({ path: folder.path }),
-        });
-        state.folderExplanations.set(result.path, result.explanation);
-        state.folderExplanationErrors.delete(result.path);
-        button.title = "Copilot explanation received for " + result.path;
-      } catch (error) {
-        state.folderExplanationErrors.set(folder.path, error.message);
-      } finally {
-        state.explainingPath = null;
-        renderFolderExplanation();
+      investigateItem(folder, { storeInline: true }).finally(() => {
         button.disabled = false;
         button.textContent = "Analyze folder & cleanup options";
-      }
+      });
     }
 
     function appendItemActions(row, item) {
@@ -1794,7 +1985,7 @@ export function renderHtml(token) {
       const bytes = [...state.selected].reduce((total, id) => total + (candidates.get(id)?.bytes || 0), 0);
       const directCleanupEnabled = state.safety.directCleanupEnabled === true;
       $("selectionSummary").textContent = !directCleanupEnabled
-        ? "Direct cleanup is disabled in the header."
+        ? "🛡️ Allow delete is disabled. Enable it in Cleanup safety to move selected items to the Recycle Bin."
         : state.selected.size
         ? state.selected.size.toLocaleString() + " selected · " + formatBytes(bytes)
         : "No files selected";
@@ -2019,15 +2210,21 @@ export function renderHtml(token) {
     });
     $("confirmCleanup").addEventListener("change", () => { $("executeCleanup").disabled = !$("confirmCleanup").checked; });
     $("executeCleanup").addEventListener("click", executeCleanup);
-    $("cancelAnalyzerCommand").addEventListener("click", () => {
-      if (state.analyzerCommand.status === "awaiting-confirmation") $("analyzerCommandDialog").close();
-    });
+    $("cancelAnalyzerCommand").addEventListener("click", cancelAnalyzerCommand);
     $("confirmAnalyzerCommand").addEventListener("click", executeAnalyzerCommand);
     $("closeAnalyzerCommand").addEventListener("click", () => {
       if (!["awaiting-confirmation", "running"].includes(state.analyzerCommand.status)) $("analyzerCommandDialog").close();
     });
     $("analyzerCommandDialog").addEventListener("cancel", (event) => {
       if (["awaiting-confirmation", "running"].includes(state.analyzerCommand.status)) event.preventDefault();
+    });
+    $("cancelCopilotInvestigation").addEventListener("click", cancelCopilotInvestigation);
+    $("closeCopilotInvestigation").addEventListener("click", () => {
+      if (["running"].includes(state.investigation.status)) return;
+      $("copilotInvestigationDialog").close();
+    });
+    $("copilotInvestigationDialog").addEventListener("cancel", (event) => {
+      if (state.investigation.status === "running") event.preventDefault();
     });
     $("explainFolder").addEventListener("click", explainSelectedFolder);
     $("runCustomAnalyzer").addEventListener("click", runSelectedAnalyzer);

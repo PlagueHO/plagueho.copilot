@@ -26,7 +26,7 @@ Canvas extensions are supported in the GitHub Copilot app only.
    - Select treemap folders to drill down.
    - Use **Application ownership** and **File categories** to understand usage.
    - Use the result tabs to inspect folders, large files, cloud-only files, cleanup candidates, and warnings.
-   - Select **Analyze folder & cleanup options** for a structured Copilot explanation of a selected folder.
+   - Select **Analyze folder & cleanup options** or **Ask Copilot** in a result row for a structured Copilot explanation of a selected item.
    - Open **Custom storage analyzers** for application-specific analysis.
 
 **Live scan analysis** stays visible after a scan completes or is cancelled so you can review its final or last-observed totals. Scans can take time on large profiles. Inaccessible folders are reported as warnings rather than silently ignored.
@@ -53,6 +53,10 @@ The canvas exposes these actions to GitHub Copilot:
 | `execute_cleanup` | Move confirmed, validated items to the Windows Recycle Bin. |
 
 The extension also provides the `storage_inspector_inspect_item` Copilot agent tool. Use it to inspect local storage metadata before researching what a folder does or whether cleanup is safe.
+
+## Ask Copilot investigations
+
+The **Ask Copilot** actions open a blocking modal while Copilot inspects the bounded local metadata and researches product-specific guidance. The modal shows an activity bar while the request is running, provides a **Cancel** button that aborts the active Copilot turn, and displays the returned explanation when it completes. Results explain the likely creating application, what the item contains and is used for, cleanup safety and impact, supported cleanup methods, best practices, warnings, and authoritative sources.
 
 ## Direct cleanup safety
 
@@ -186,7 +190,7 @@ Analyzer results are held in memory and are discarded on a new scan or extension
 
 Analyzer cleanup commands have a **Run command** or **Run cleanup** button. Each command runs through the extension's fixed command allowlist and a singleton command runner, so only one analyzer command can execute at a time across canvas instances.
 
-A blocking modal displays the command while it runs and then displays its result. Destructive commands require an explicit confirmation and use non-interactive, scoped CLI arguments. The canvas never executes arbitrary command text received from the browser.
+A blocking modal displays the command, an indeterminate progress bar, and a **Cancel** button while it runs, then displays its result. Cancellation terminates the centralized child process and reports the command as cancelled. Destructive commands require an explicit confirmation and use non-interactive, scoped CLI arguments. The canvas never executes arbitrary command text received from the browser.
 
 ### Create an analyzer
 

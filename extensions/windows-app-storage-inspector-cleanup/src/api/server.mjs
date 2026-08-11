@@ -1,9 +1,11 @@
 import { randomBytes } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { renderHtml } from "../ui/renderer.mjs";
 import { assertWindowsPlatform, createWindowsOnlyError, isWindowsPlatform } from "../core/platform.mjs";
 
 const MAX_BODY_BYTES = 1_048_576;
+const GITHUB_MARK = readFileSync(new URL("../../assets/github-mark-16.svg", import.meta.url));
 
 function sendJson(response, statusCode, value) {
     response.writeHead(statusCode, {
@@ -50,7 +52,7 @@ function authorized(request, url, token) {
     return request.headers["x-storage-inspector-token"] === token || url.searchParams.get("token") === token;
 }
 
-export async function startCanvasServer(service, requestAgentInvestigation) {
+export async function startCanvasServer(service, requestAgentInvestigation, cancelAgentInvestigation) {
     assertWindowsPlatform();
     const token = randomBytes(32).toString("hex");
     const clients = new Set();
@@ -67,7 +69,7 @@ export async function startCanvasServer(service, requestAgentInvestigation) {
             return;
         }
         const url = new URL(request.url ?? "/", "http://127.0.0.1");
-        response.setHeader("content-security-policy", "default-src 'self'; connect-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'");
+        response.setHeader("content-security-policy", "default-src 'self'; connect-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'");
         response.setHeader("referrer-policy", "no-referrer");
 
         if (request.method === "GET" && url.pathname === "/") {
@@ -77,6 +79,16 @@ export async function startCanvasServer(service, requestAgentInvestigation) {
                 "x-content-type-options": "nosniff",
             });
             response.end(renderHtml(token));
+            return;
+        }
+
+        if (request.method === "GET" && url.pathname === "/assets/github-mark-16.svg") {
+            response.writeHead(200, {
+                "content-type": "image/svg+xml",
+                "cache-control": "public, max-age=3600",
+                "x-content-type-options": "nosniff",
+            });
+            response.end(GITHUB_MARK);
             return;
         }
 
@@ -128,6 +140,11 @@ export async function startCanvasServer(service, requestAgentInvestigation) {
                 sendJson(response, 202, await requestAgentInvestigation(input.path));
                 return;
             }
+            if (request.method === "POST" && url.pathname === "/api/investigate/cancel") {
+                await readJson(request);
+                sendJson(response, 200, await cancelAgentInvestigation());
+                return;
+            }
             if (request.method === "GET" && url.pathname === "/api/analyzers") {
                 sendJson(response, 200, service.listCustomAnalyzers());
                 return;
@@ -144,6 +161,10 @@ export async function startCanvasServer(service, requestAgentInvestigation) {
                     input.commandId,
                     input.confirmed,
                 ));
+                return;
+            }
+            if (request.method === "POST" && url.pathname === "/api/analyzers/command/cancel") {
+                sendJson(response, 200, service.cancelAnalyzerCommand());
                 return;
             }
             if (request.method === "POST" && url.pathname === "/api/safety") {

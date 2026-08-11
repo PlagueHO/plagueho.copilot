@@ -8,7 +8,7 @@ import {
     executeCleanupPreview,
 } from "./cleanup.mjs";
 import { listCustomAnalyzers, runCustomAnalyzer } from "../analyzers/custom-analyzers.mjs";
-import { executeAnalyzerCommand } from "./analyzer-commands.mjs";
+import { cancelAnalyzerCommand, executeAnalyzerCommand } from "./analyzer-commands.mjs";
 import { inspectStorageItem } from "./item-inspector.mjs";
 import { getDefaultRoots, scanStorage } from "./scanner.mjs";
 import { assertWindowsPlatform } from "./platform.mjs";
@@ -155,6 +155,10 @@ export class StorageService {
             throw serviceError("analyzer_command_unknown", `Analyzer command is not available: ${commandId}`);
         }
         return executeAnalyzerCommand(analyzerId, command.id, confirmed);
+    }
+
+    cancelAnalyzerCommand() {
+        return cancelAnalyzerCommand();
     }
 
     async setCleanupSafety(input = {}) {

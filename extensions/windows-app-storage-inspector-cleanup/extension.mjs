@@ -7,6 +7,13 @@ import { buildFolderExplanationPrompt, parseFolderExplanationCandidates } from "
 const servers = new Map();
 const service = isWindowsPlatform() ? new StorageService() : undefined;
 let session;
+let activeInvestigation;
+
+function investigationError(code, message) {
+    const error = new Error(message);
+    error.code = code;
+    return error;
+}
 
 function handle(handler) {
     return async (context) => {
@@ -62,29 +69,64 @@ function collectResponseCandidates(events, response) {
 }
 
 async function requestAgentInvestigation(targetPath) {
-    const inspection = await service.inspectStorageItem(targetPath);
-    const eventCountBefore = (await session.getEvents()).length;
-    const observedMessages = [];
-    const unsubscribe = session.on("assistant.message", (event) => observedMessages.push(event));
+    if (activeInvestigation) {
+        throw investigationError("investigation_running", "Copilot is already investigating another storage item");
+    }
+    const investigation = {
+        cancellationRequested: false,
+        turnStarted: false,
+    };
+    activeInvestigation = investigation;
     let response;
+    let unsubscribe = () => {};
     try {
+        const inspection = await service.inspectStorageItem(targetPath);
+        if (investigation.cancellationRequested) {
+            throw investigationError("investigation_cancelled", "Copilot investigation cancelled");
+        }
+        const eventCountBefore = (await session.getEvents()).length;
+        const observedMessages = [];
+        unsubscribe = session.on("assistant.message", (event) => observedMessages.push(event));
+        investigation.turnStarted = true;
         response = await session.sendAndWait({
             prompt: buildFolderExplanationPrompt(inspection),
             displayPrompt: `Explain storage folder: ${inspection.path}`,
         }, 180_000);
+        if (investigation.cancellationRequested) {
+            throw investigationError("investigation_cancelled", "Copilot investigation cancelled");
+        }
+        const history = (await session.getEvents()).slice(eventCountBefore);
+        const explanation = parseFolderExplanationCandidates(
+            collectResponseCandidates([...observedMessages, ...history], response),
+        );
+        return {
+            path: inspection.path,
+            itemType: inspection.itemType,
+            category: inspection.category,
+            explanation,
+        };
+    } catch (error) {
+        if (investigation.cancellationRequested) {
+            throw investigationError("investigation_cancelled", "Copilot investigation cancelled");
+        }
+        throw error;
     } finally {
         unsubscribe();
+        if (activeInvestigation === investigation) {
+            activeInvestigation = undefined;
+        }
     }
-    const history = (await session.getEvents()).slice(eventCountBefore);
-    const explanation = parseFolderExplanationCandidates(
-        collectResponseCandidates([...observedMessages, ...history], response),
-    );
-    return {
-        path: inspection.path,
-        itemType: inspection.itemType,
-        category: inspection.category,
-        explanation,
-    };
+}
+
+async function cancelAgentInvestigation() {
+    if (!activeInvestigation) {
+        return { cancelling: false };
+    }
+    activeInvestigation.cancellationRequested = true;
+    if (activeInvestigation.turnStarted) {
+        await session.abort();
+    }
+    return { cancelling: true };
 }
 
 if (isWindowsPlatform()) {
@@ -262,7 +304,7 @@ session = await joinSession({
             open: handle(async (context) => {
                 let entry = servers.get(context.instanceId);
                 if (!entry) {
-                    entry = await startCanvasServer(service, requestAgentInvestigation);
+                    entry = await startCanvasServer(service, requestAgentInvestigation, cancelAgentInvestigation);
                     servers.set(context.instanceId, entry);
                 }
                 if (context.input?.autoStart && service.scan.status === "idle") {

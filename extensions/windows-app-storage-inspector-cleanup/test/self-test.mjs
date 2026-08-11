@@ -106,6 +106,29 @@ try {
     assert.equal((await firstCommand).output, "Cache verified.");
     assert.equal(commandRunner.getActiveCommand(), undefined);
 
+    let rejectCancellableCommand;
+    let cancellationRequested = false;
+    const cancellableRunner = createAnalyzerCommandRunner({
+        executeProcess: () => ({
+            promise: new Promise((resolve, reject) => {
+                rejectCancellableCommand = reject;
+            }),
+            cancel: () => {
+                cancellationRequested = true;
+                rejectCancellableCommand(new Error("terminated"));
+            },
+        }),
+    });
+    const cancellableCommand = cancellableRunner.execute("npm-cache", "npm-cache-verify");
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(cancellableRunner.cancel(), {
+        status: "cancelling",
+        commandId: "npm-cache-verify",
+    });
+    assert.equal(cancellationRequested, true);
+    await assert.rejects(cancellableCommand, { code: "analyzer_command_cancelled" });
+    assert.equal(cancellableRunner.getActiveCommand(), undefined);
+
     const cacheDirectory = path.join(root, "AppData", "Local", "GitHub Copilot", "Cache");
     const regularDirectory = path.join(root, "Documents");
     await mkdir(cacheDirectory, { recursive: true });
@@ -292,14 +315,18 @@ try {
     assert.equal(inspection.directContents.samples[0].name, "model.onnx");
     const explanationPrompt = buildFolderExplanationPrompt(inspection);
     assert.match(explanationPrompt, /Return ONLY one JSON object/);
+    assert.match(explanationPrompt, /application, service, package manager/);
+    assert.match(explanationPrompt, /bestPractices/);
     assert.match(explanationPrompt, /"recommendation": "safe \| conditional \| not-recommended \| unknown"/);
     const explanation = parseFolderExplanation(`\`\`\`json
 {
   "version": 1,
   "title": "Model cache",
+  "application": "Microsoft Foundry Local",
   "summary": "Downloaded model files.",
   "contents": [{ "name": "Models", "description": "Reusable model artifacts." }],
   "typicalUses": ["Offline inference"],
+  "bestPractices": ["Use the product's model management commands."],
   "cleanup": {
     "recommendation": "conditional",
     "summary": "Remove only models that are no longer needed.",
@@ -319,6 +346,8 @@ try {
 }
 \`\`\``);
     assert.equal(explanation.cleanup.recommendation, "conditional");
+    assert.equal(explanation.application, "Microsoft Foundry Local");
+    assert.deepEqual(explanation.bestPractices, ["Use the product's model management commands."]);
     assert.equal(explanation.cleanup.commands[0].command, "example cache list");
     assert.equal(explanation.sources[0].url, "https://example.com/docs");
     assert.equal(
