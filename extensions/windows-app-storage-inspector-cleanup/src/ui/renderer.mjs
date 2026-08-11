@@ -250,6 +250,8 @@ export function renderHtml(token) {
     .command-card { padding: 10px; border: 1px solid var(--border-color-default, #d0d7de); border-radius: 6px; background: var(--background-color-default, #fff); }
     .command-header { margin-bottom: 6px; }
     .command-line { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+    .icon-button { display: inline-grid; width: 32px; height: 32px; padding: 0; place-items: center; }
+    .icon-button svg { width: 16px; height: 16px; fill: currentColor; }
     .command-card code { display: block; min-width: 0; padding: 8px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; font-family: var(--font-mono, Consolas, monospace); background: var(--background-color-muted, #f6f8fa); }
     .command-output { margin: 8px 0 0; padding: 8px; max-height: 180px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; font-family: var(--font-mono, Consolas, monospace); background: var(--background-color-muted, #f6f8fa); }
     .source-list a { overflow-wrap: anywhere; }
@@ -1566,6 +1568,16 @@ export function renderHtml(token) {
       container.append(heading, paragraph);
     }
 
+    function createCopyIcon() {
+      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      icon.setAttribute("viewBox", "0 0 16 16");
+      icon.setAttribute("aria-hidden", "true");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M0 6.75C0 5.784.784 5 1.75 5h6.5C9.216 5 10 5.784 10 6.75v6.5A1.75 1.75 0 0 1 8.25 15h-6.5A1.75 1.75 0 0 1 0 13.25ZM1.75 6.5a.25.25 0 0 0-.25.25v6.5c0 .138.112.25.25.25h6.5a.25.25 0 0 0 .25-.25v-6.5a.25.25 0 0 0-.25-.25Zm9.5-5a.25.25 0 0 0-.25.25V3h1.25A1.75 1.75 0 0 1 14 4.75v6.5h.25c.138 0 .25-.112.25-.25v-9.25a.25.25 0 0 0-.25-.25Z");
+      icon.appendChild(path);
+      return icon;
+    }
+
     function renderExplanationContent(container, explanation) {
       container.replaceChildren();
       const title = document.createElement("h2");
@@ -1616,20 +1628,30 @@ export function renderHtml(token) {
           label.textContent = command.label + " · " + command.shell + (command.requiresElevation ? " · Administrator" : "");
           const copy = document.createElement("button");
           copy.type = "button";
-          copy.textContent = "Copy";
+          copy.className = "icon-button";
+          copy.title = "Copy command";
+          copy.setAttribute("aria-label", "Copy command");
+          copy.appendChild(createCopyIcon());
           copy.addEventListener("click", async () => {
             try {
               await navigator.clipboard.writeText(command.command);
-              copy.textContent = "Copied";
-              setTimeout(() => { copy.textContent = "Copy"; }, 1500);
+              copy.title = "Copied";
+              copy.setAttribute("aria-label", "Copied");
+              setTimeout(() => {
+                copy.title = "Copy command";
+                copy.setAttribute("aria-label", "Copy command");
+              }, 1500);
             } catch {
               alert("The command could not be copied. Select it manually instead.");
             }
           });
-          header.append(label, copy);
+          header.appendChild(label);
           const code = document.createElement("code");
           code.textContent = command.command;
-          card.append(header, code);
+          const commandLine = document.createElement("div");
+          commandLine.className = "command-line";
+          commandLine.append(code, copy);
+          card.append(header, commandLine);
           if (command.description) {
             const description = document.createElement("p");
             description.className = "muted";
