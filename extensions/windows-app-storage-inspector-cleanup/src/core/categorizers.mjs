@@ -5,9 +5,20 @@ import path from "node:path";
 
 const FILE_VERSION = 1;
 const MAX_CATEGORIZERS = 200;
+const MAX_PATH_LENGTH = 4096;
 const MAX_TEXT_LENGTH = 120;
 
 export const BUILT_IN_CATEGORIZERS = [
+    {
+        id: "built-in-github-copilot-cache",
+        name: "GitHub Copilot",
+        category: "Application cache",
+        description: "Regenerable GitHub Copilot application cache data.",
+        match: "token",
+        value: "\\appdata\\local\\github copilot\\",
+        cleanupPolicy: "automatic",
+        source: "built-in",
+    },
     {
         id: "built-in-docker-desktop",
         name: "Docker Desktop",
@@ -100,6 +111,17 @@ function normalizeText(value, field) {
     return normalized;
 }
 
+function normalizeStoragePath(value) {
+    if (typeof value !== "string" || !value.trim()) {
+        throw serviceError("categorizer_input_invalid", "Path is required");
+    }
+    const normalized = value.trim();
+    if (normalized.length > MAX_PATH_LENGTH) {
+        throw serviceError("categorizer_input_invalid", `Path must be ${MAX_PATH_LENGTH} characters or fewer`);
+    }
+    return normalized;
+}
+
 function defaultStoragePath() {
     const copilotHome = process.env.COPILOT_HOME ?? path.join(os.homedir(), ".copilot");
     return path.join(copilotHome, "extensions", "windows-app-storage-inspector-cleanup", "artifacts", "categorizers.json");
@@ -151,7 +173,7 @@ export class CategorizerStore {
 
     async add({ path: targetPath, name, category, description, approvedRoots }) {
         await this.#load();
-        const inputPath = normalizeText(targetPath, "Path");
+        const inputPath = normalizeStoragePath(targetPath);
         if (!path.isAbsolute(inputPath)) {
             throw serviceError("categorizer_path_invalid", "Categorizer path must be absolute");
         }
