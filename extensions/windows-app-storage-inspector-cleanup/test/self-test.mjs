@@ -30,6 +30,18 @@ import { findTreeStackForPath, getParentPath } from "../src/ui/tree-navigation.m
 const root = await mkdtemp(path.join(os.tmpdir(), "storage-inspector-test-"));
 const outsideRoot = await mkdtemp(path.join(os.tmpdir(), "storage-inspector-outside-"));
 const stateRoot = await mkdtemp(path.join(os.tmpdir(), "storage-inspector-state-"));
+
+async function recycleTestFiles(paths, onResult) {
+    const results = [];
+    for (const [index, filePath] of paths.entries()) {
+        await rm(filePath);
+        const result = { path: filePath, success: true };
+        results.push(result);
+        onResult?.(result, index + 1);
+    }
+    return { results, interruption: undefined };
+}
+
 try {
     const navigationTree = {
         name: "Scanned storage",
@@ -375,6 +387,7 @@ try {
         preview,
         confirmed: true,
         onProgress: (progress) => cleanupProgress.push(progress),
+        recycleBin: recycleTestFiles,
     });
     assert.equal(cleanup.succeeded.length, 1);
     assert.ok(cleanupProgress.some((progress) => progress.phase === "validating"));
