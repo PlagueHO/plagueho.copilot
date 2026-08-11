@@ -452,9 +452,9 @@ try {
         },
         revalidateEntry: async (entry) => entry,
     });
-    assert.deepEqual(partialCleanup.succeeded.map((item) => item.path), [partialFirstFile]);
+    assert.deepEqual(partialCleanup.succeeded.map((item) => item.path), [partialPreview.entries[0].path]);
     assert.equal(partialCleanup.failed.length, 0);
-    assert.deepEqual(partialCleanup.unknown.map((item) => item.path), [partialSecondFile]);
+    assert.deepEqual(partialCleanup.unknown.map((item) => item.path), [partialPreview.entries[1].path]);
     assert.equal(partialCleanup.reclaimedBytes, 32);
 
     const originalUserProfile = process.env.USERPROFILE;
