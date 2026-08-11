@@ -56,7 +56,9 @@ The extension also provides the `storage_inspector_inspect_item` Copilot agent t
 
 ## Ask Copilot investigations
 
-The **Ask Copilot** actions open a blocking modal while Copilot inspects the bounded local metadata and researches product-specific guidance. The modal shows an activity bar while the request is running, provides a **Cancel** button that aborts the active Copilot turn, and displays the returned explanation when it completes. Results explain the likely creating application, what the item contains and is used for, cleanup safety and impact, supported cleanup methods, best practices, warnings, and authoritative sources.
+The **Ask Copilot** actions open a blocking modal while Copilot inspects the bounded local metadata and researches product-specific guidance. The modal shows an activity bar while the request is running, provides a **Cancel** button that aborts the active Copilot turn, and displays the returned explanation when it completes.
+
+Results explain the likely creating application, what the item contains and is used for, cleanup safety and impact, supported cleanup methods, best practices, warnings, and authoritative sources.
 
 ## Direct cleanup safety
 
