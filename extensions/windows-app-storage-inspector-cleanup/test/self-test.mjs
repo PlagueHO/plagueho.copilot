@@ -30,6 +30,15 @@ import { findTreeStackForPath, getParentPath } from "../src/ui/tree-navigation.m
 const root = await mkdtemp(path.join(os.tmpdir(), "storage-inspector-test-"));
 const outsideRoot = await mkdtemp(path.join(os.tmpdir(), "storage-inspector-outside-"));
 const stateRoot = await mkdtemp(path.join(os.tmpdir(), "storage-inspector-state-"));
+const testKnownFolderPaths = [];
+
+function createTestCleanupPreview(options) {
+    return createCleanupPreview({ ...options, knownFolderPaths: testKnownFolderPaths });
+}
+
+function executeTestCleanupPreview(options) {
+    return executeCleanupPreview({ ...options, knownFolderPaths: testKnownFolderPaths });
+}
 
 async function recycleTestFiles(paths, onResult) {
     const results = [];
@@ -312,6 +321,7 @@ try {
     let completeServiceCleanup;
     const cleanupConcurrencyService = new StorageService({
         categorizerStore: testCategorizerStore,
+        createCleanupPreview: createTestCleanupPreview,
         discoverAnalyzerManagedPaths: async () => [],
         scanStorage: async () => serviceScanResult,
         executeCleanupPreview: async () => new Promise((resolve) => {
@@ -352,6 +362,7 @@ try {
     let refreshScanCount = 0;
     const refreshFailureService = new StorageService({
         categorizerStore: testCategorizerStore,
+        createCleanupPreview: createTestCleanupPreview,
         discoverAnalyzerManagedPaths: async () => [],
         scanStorage: async () => {
             refreshScanCount += 1;
@@ -381,7 +392,7 @@ try {
         bytes: cleanupFileStats.size,
         modifiedAt: cleanupFileStats.mtime.toISOString(),
     };
-    const preview = await createCleanupPreview({
+    const preview = await createTestCleanupPreview({
         itemIds: [cleanupCandidate.id],
         candidates: [cleanupCandidate],
         source: { type: "scan" },
@@ -389,7 +400,7 @@ try {
     });
     assert.equal(preview.entries.length, 1);
     const cleanupProgress = [];
-    const cleanup = await executeCleanupPreview({
+    const cleanup = await executeTestCleanupPreview({
         preview,
         confirmed: true,
         onProgress: (progress) => cleanupProgress.push(progress),
@@ -422,13 +433,13 @@ try {
             risk: "low",
         };
     }));
-    const partialPreview = await createCleanupPreview({
+    const partialPreview = await createTestCleanupPreview({
         itemIds: partialCandidates.map((candidate) => candidate.id),
         candidates: partialCandidates,
         source: { type: "scan" },
         approvedRoots: [{ id: "test", label: "Test root", path: root }],
     });
-    const partialCleanup = await executeCleanupPreview({
+    const partialCleanup = await executeTestCleanupPreview({
         preview: partialPreview,
         confirmed: true,
         recycleBin: async (paths, onResult) => {
@@ -454,7 +465,7 @@ try {
         await mkdir(path.dirname(allowedCleanupFile), { recursive: true });
         await writeFile(allowedCleanupFile, Buffer.alloc(64, 1));
         const allowedCleanupFileStats = await stat(allowedCleanupFile);
-        const protectedLocationPreview = await createCleanupPreview({
+        const protectedLocationPreview = await createTestCleanupPreview({
             itemIds: ["protected-documents-file", "allowed-cleanup-file"],
             candidates: [{
                 id: "protected-documents-file",
@@ -507,7 +518,7 @@ try {
     await mkdir(analyzerDirectory);
     await writeFile(path.join(analyzerDirectory, "cache.bin"), Buffer.alloc(128, 1));
     const analyzerStats = await stat(analyzerDirectory);
-    const analyzerPreview = await createCleanupPreview({
+    const analyzerPreview = await createTestCleanupPreview({
         itemIds: ["analyzer-cache"],
         candidates: [{
             id: "analyzer-cache",
@@ -531,7 +542,7 @@ try {
     await mkdir(path.dirname(mutableFile), { recursive: true });
     await writeFile(mutableFile, Buffer.alloc(32, 1));
     const mutableDirectoryStats = await stat(mutableDirectory);
-    const mutablePreview = await createCleanupPreview({
+    const mutablePreview = await createTestCleanupPreview({
         itemIds: ["mutable-directory"],
         candidates: [{
             id: "mutable-directory",
@@ -548,7 +559,7 @@ try {
     });
     await writeFile(mutableFile, Buffer.alloc(32, 2));
     await utimes(mutableDirectory, mutableDirectoryStats.atime, mutableDirectoryStats.mtime);
-    const mutableCleanup = await executeCleanupPreview({ preview: mutablePreview, confirmed: true });
+    const mutableCleanup = await executeTestCleanupPreview({ preview: mutablePreview, confirmed: true });
     assert.equal(mutableCleanup.succeeded.length, 0);
     assert.equal(mutableCleanup.failed[0].code, "cleanup_candidate_changed");
     await access(mutableDirectory);
@@ -560,7 +571,7 @@ try {
     const escapedPath = path.join(junctionPath, path.basename(outsideFile));
     const outsideStats = await stat(outsideFile);
     await assert.rejects(
-        createCleanupPreview({
+        createTestCleanupPreview({
             itemIds: ["junction-escape"],
             candidates: [{
                 id: "junction-escape",
@@ -655,7 +666,7 @@ try {
     await mkdir(path.dirname(unprotectedCache), { recursive: true });
     await writeFile(unprotectedCache, Buffer.alloc(64, 1));
     const unprotectedCacheStats = await stat(unprotectedCache);
-    const protectedPreview = await createCleanupPreview({
+    const protectedPreview = await createTestCleanupPreview({
         itemIds: ["uv-managed-cache", "unprotected-cache"],
         candidates: [
             {
