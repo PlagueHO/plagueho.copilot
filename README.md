@@ -28,22 +28,39 @@ Browse the shareable catalog at [plagueho.github.io/plagueho.copilot](https://pl
 
 ### VS Code
 
-[![Open in VS Code](https://img.shields.io/static/v1?label=Open&message=VS%20Code&logo=visualstudiocode&logoColor=white&labelColor=007ACC&color=007ACC)](vscode://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot)
-[![Open in VS Code Insiders](https://img.shields.io/static/v1?label=Open&message=VS%20Code%20Insiders&logo=visualstudiocode&logoColor=white&labelColor=6B3B9E&color=6B3B9E)](vscode-insiders://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot)
+[![Open in VS Code](https://img.shields.io/static/v1?label=Open&message=VS%20Code&logo=visualstudiocode&logoColor=white&labelColor=007ACC&color=007ACC)](vscode://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot%23marketplace)
+[![Open in VS Code Insiders](https://img.shields.io/static/v1?label=Open&message=VS%20Code%20Insiders&logo=visualstudiocode&logoColor=white&labelColor=6B3B9E&color=6B3B9E)](vscode-insiders://settings/chat.plugins.marketplaces?install-extension=PlagueHO/plagueho.copilot%23marketplace)
 
 Or add the repository to `settings.json`:
 
 ```jsonc
 {
   "chat.plugins.enabled": true,
-  "chat.plugins.marketplaces": ["PlagueHO/plagueho.copilot"]
+  "chat.plugins.marketplaces": ["PlagueHO/plagueho.copilot#marketplace"]
 }
 ```
+
+The `#marketplace` suffix tells VS Code to use the generated distribution
+branch rather than `main`, which is source-only. The installable plugin folders
+are generated on the `marketplace` branch by the publish workflow. For a local
+checkout, materialize the plugins before adding the folder as a local
+marketplace:
+
+```powershell
+pnpm install
+pnpm plugin:validate
+pnpm plugin:materialize
+```
+
+After materialization, each plugin's `skills/` folder contains the referenced
+skill directory and its `SKILL.md` file. Materialization updates the local
+`plugins/` folders in place, so use a disposable checkout or restore the
+source-only checkout from `main` before making source changes.
 
 ### GitHub Copilot CLI
 
 ```text
-/plugin marketplace add PlagueHO/plagueho.copilot
+/plugin marketplace add PlagueHO/plagueho.copilot#marketplace
 /plugin install <plugin>@plagueho-copilot
 ```
 
