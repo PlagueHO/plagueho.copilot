@@ -8,7 +8,7 @@ This directory contains the generated marketplace index and schemas for `PlagueH
 {
   "chat.plugins.enabled": true,
   "chat.plugins.marketplaces": [
-    "PlagueHO/plagueho.copilot"
+    "PlagueHO/plagueho.copilot#marketplace"
   ]
 }
 ```
@@ -16,7 +16,7 @@ This directory contains the generated marketplace index and schemas for `PlagueH
 For GitHub Copilot CLI:
 
 ```text
-/plugin marketplace add PlagueHO/plagueho.copilot
+/plugin marketplace add PlagueHO/plagueho.copilot#marketplace
 ```
 
 ## Source Model

@@ -24,6 +24,8 @@ tests/<skill>/trigger_tests.yaml
 
 Reusable resources live once at the repository root. Plugins compose them through `extensions["com.github.plagueho"]`; do not copy reusable source into plugin directories on `main`.
 
+The `main` branch is not directly installable as a plugin marketplace because its plugin folders contain source manifests only. The publish workflow creates the installable form on the `marketplace` branch by materializing each referenced skill, agent, or extension into its plugin folder and removing the private composition metadata from the served manifest.
+
 ## Add a Skill
 
 1. Create `skills/<skill-name>/SKILL.md` with valid frontmatter.
@@ -75,6 +77,8 @@ npm --prefix website install
 node website/build.mjs
 npm --prefix website run build
 ```
+
+To test a local install, run `pnpm plugin:materialize` after validation and point VS Code at the resulting `plugins/` folder. This command changes plugin folders in place; use a disposable checkout because the source-only manifests are replaced by served manifests.
 
 ## Security and Licensing
 
