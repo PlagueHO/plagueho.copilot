@@ -81,11 +81,10 @@ structured gap report identifying updates needed.
 | 5 | `microsoft_code_sample_search` | search | Find service-specific code samples |
 | 6 | `fetch` | fetch | Retrieve Azure Updates page as fallback |
 
-**Update-source fallback (if Release Communications MCP unavailable):**
-Use the Microsoft Learn MCP tools and Azure Updates page described in the
-later steps. Treat an unavailable server or unavailable tool as the fallback
-condition; do not treat an empty result as unavailable without trying a
-broader product or date query first.
+**Update-source fallback:** Use Microsoft Learn and Azure Updates when the
+Release Communications MCP or tool is unavailable, or when broader MCP
+queries cannot establish a complete result set. Do not treat an empty result
+as unavailable before trying broader service terms.
 
 **CLI Fallback (if all MCP tools are unavailable):**
 Browse Microsoft Learn directly at
@@ -123,14 +122,21 @@ example, use a product filter such as
 `modified ge 2025-01-01T00:00:00Z`. Use the `search` parameter for service
 names that are not represented exactly in the product taxonomy.
 
-Review the returned titles, descriptions, status, availability dates, tags,
+Start with `skip=0`. While `HasMore` is `true`, request the next page using
+`skip = Offset + Limit`. Deduplicate results by `id`. Do not consider this
+source exhausted until all pages have been retrieved.
+
+Review each result's titles, descriptions, status, availability dates, tags,
 and product categories. Use `get_azure_update_by_id` for every promising
 result so the complete description and official references are available
 before evaluating multitenant relevance.
 
-If the server or its Azure update tool is unavailable, record that fact in the
-report and continue with Step 3 as the fallback. Do not silently substitute a
-partial or successful-looking result.
+If the server or its Azure update tool is unavailable, record that fact and
+continue with Step 3. If the initial query returns no relevant results or the
+product taxonomy is unclear, repeat the fully paginated query with alternate
+product names and the service name in `search`. Record the filters, searches,
+and outcome. If those queries still cannot establish complete coverage,
+continue with Step 4 to corroborate the result.
 
 ### Step 3 — Search Microsoft Learn for Updates
 
@@ -147,17 +153,20 @@ Azure service:
    results, especially "What's New" pages covering the period since the last
    review date.
 
-### Step 4 — Search Azure Updates as a Fallback
+### Step 4 — Search Azure Updates When Needed
 
-If Microsoft Release Communications MCP was unavailable, use the fetch tool to
-retrieve the Azure Updates page for the service:
+Use the fetch tool to retrieve the Azure Updates page when Release
+Communications MCP is unavailable or its fully paginated, broader queries
+return no relevant results or cannot establish complete coverage:
 
 ```text
 https://azure.microsoft.com/updates/?searchterms=<Name+of+Azure+Service>
 ```
 
-Scan results for updates published after the last review date. Focus on
-features, not bug fixes or minor improvements.
+Scan results for updates published after the last review date. If necessary,
+repeat using alternate service names. Record the search terms and outcome.
+Focus on features, not bug fixes or minor improvements. Only conclude that no
+changes are needed after the applicable corroboration searches are complete.
 
 ### Step 5 — Continue Searching Until Exhausted
 
