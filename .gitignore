@@ -73,6 +73,7 @@ website/node_modules/
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+!.vscode/mcp.json
 
 # Local History
 .history/
