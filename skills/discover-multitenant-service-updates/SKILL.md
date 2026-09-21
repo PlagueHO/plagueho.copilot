@@ -81,10 +81,9 @@ structured gap report identifying updates needed.
 | 5 | `microsoft_code_sample_search` | search | Find service-specific code samples |
 | 6 | `fetch` | fetch | Retrieve Azure Updates page as fallback |
 
-**Update-source fallback:** Use Microsoft Learn and Azure Updates when the
-Release Communications MCP or tool is unavailable, or when broader MCP
-queries cannot establish a complete result set. Do not treat an empty result
-as unavailable before trying broader service terms.
+**Update-source fallback:** Use Microsoft Learn and Azure Updates when broader
+MCP queries cannot establish a complete result set. Do not treat an empty
+result as unavailable before trying broader service terms.
 
 **CLI Fallback (if all MCP tools are unavailable):**
 Browse Microsoft Learn directly at
@@ -131,12 +130,25 @@ and product categories. Use `get_azure_update_by_id` for every promising
 result so the complete description and official references are available
 before evaluating multitenant relevance.
 
-If the server or its Azure update tool is unavailable, record that fact and
-continue with Step 3. If the initial query returns no relevant results or the
-product taxonomy is unclear, repeat the fully paginated query with alternate
-product names and the service name in `search`. Record the filters, searches,
-and outcome. If those queries still cannot establish complete coverage,
-continue with Step 4 to corroborate the result.
+If the server or its Azure update tool is unavailable, tell the user it is the
+preferred source, then offer to enable it or proceed without it:
+
+- **VS Code:** Confirm that the workspace contains `.vscode/mcp.json` with
+  the `microsoft-release-communications` server, then use the MCP Servers
+  view to start or enable that server.
+- **Copilot CLI:** Confirm that the repository contains `.github/mcp.json`,
+  restart the CLI from the repository, and use `/mcp` to verify that the
+  server is available.
+
+Ask the user whether to enable the server or proceed without it. Do not
+continue until they choose. If they proceed without it, record the decision
+and continue with Step 3 and Step 4.
+
+If the initial query returns no relevant results or the product taxonomy is
+unclear, repeat the fully paginated query with alternate product names and the
+service name in `search`. Record the filters, searches, and outcome. If those
+queries still cannot establish complete coverage, continue with Step 4 to
+corroborate the result.
 
 ### Step 3 — Search Microsoft Learn for Updates
 
@@ -155,9 +167,10 @@ Azure service:
 
 ### Step 4 — Search Azure Updates When Needed
 
-Use the fetch tool to retrieve the Azure Updates page when Release
-Communications MCP is unavailable or its fully paginated, broader queries
-return no relevant results or cannot establish complete coverage:
+Use the fetch tool to retrieve the Azure Updates page after the user chooses
+to proceed without unavailable Release Communications MCP, or when its fully
+paginated, broader queries return no relevant results or cannot establish
+complete coverage:
 
 ```text
 https://azure.microsoft.com/updates/?searchterms=<Name+of+Azure+Service>
