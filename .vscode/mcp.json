@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "microsoft-release-communications": {
+      "type": "http",
+      "url": "https://www.microsoft.com/releasecommunications/mcp"
+    }
+  }
+}

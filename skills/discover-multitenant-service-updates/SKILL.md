@@ -12,8 +12,10 @@ description: >-
   multitenant doc", "find new Azure features for multitenant doc",
   "audit multitenant currency", "what changed since last review",
   "multitenant gap analysis", "scan service doc for updates".
-  INVOKES: microsoft-learn MCP, fetch, think tools. FOR SINGLE
-  OPERATIONS: Use Microsoft Learn MCP directly.
+  INVOKES: microsoft-release-communications MCP, microsoft-learn MCP,
+  fetch, think tools. FOR SINGLE OPERATIONS: Use Microsoft Release
+  Communications MCP for Azure update discovery, or Microsoft Learn MCP
+  directly for documentation lookups.
 
 metadata:
   author: PlagueHO
@@ -23,6 +25,7 @@ metadata:
 compatibility:
   - GitHub Copilot
   - VS Code
+  - Uses microsoft-release-communications MCP when available for preferred Azure update discovery
   - Requires microsoft-learn MCP tools
   - Requires fetch tool for Azure Updates page
 
@@ -55,6 +58,11 @@ structured gap report identifying updates needed.
 
 ## Prerequisites
 
+- **Microsoft Release Communications MCP tools (preferred, optional)** —
+  `get_recent_azure_updates`
+  and `get_azure_update_by_id` for the preferred source of Azure product
+  updates. This server is configured in `.vscode/mcp.json` for VS Code and
+  `.github/mcp.json` for Copilot CLI in this repository.
 - **Microsoft Learn MCP tools** — `microsoft_docs_search`,
   `microsoft_docs_fetch`, and `microsoft_code_sample_search` for querying
   official documentation.
@@ -66,12 +74,18 @@ structured gap report identifying updates needed.
 
 | Step | Tool | Command | Purpose |
 |------|------|---------|----------|
-| 1 | `microsoft_docs_search` | search | Find What's New and multitenant docs |
-| 2 | `microsoft_docs_fetch` | fetch | Retrieve full documentation pages |
-| 3 | `microsoft_code_sample_search` | search | Find service-specific code samples |
-| 4 | `fetch` | fetch | Retrieve Azure Updates page |
+| 1 | `get_recent_azure_updates` | query | Find recent Azure product updates |
+| 2 | `get_azure_update_by_id` | fetch | Retrieve complete update details |
+| 3 | `microsoft_docs_search` | search | Find What's New and multitenant docs |
+| 4 | `microsoft_docs_fetch` | fetch | Retrieve full documentation pages |
+| 5 | `microsoft_code_sample_search` | search | Find service-specific code samples |
+| 6 | `fetch` | fetch | Retrieve Azure Updates page as fallback |
 
-**CLI Fallback (if MCP unavailable):**
+**Update-source fallback:** Use Microsoft Learn and Azure Updates when broader
+MCP queries cannot establish a complete result set. Do not treat an empty
+result as unavailable before trying broader service terms.
+
+**CLI Fallback (if all MCP tools are unavailable):**
 Browse Microsoft Learn directly at
 `https://learn.microsoft.com/en-us/azure/<service>/` and the Azure
 Updates page at `https://azure.microsoft.com/updates/`.
@@ -96,9 +110,50 @@ Read the target document file provided by the user.
 3. Extract the Azure service name from the document title.
 4. Record the review date and service name in `report.md`.
 
-### Step 2 — Search Microsoft Learn for Updates
+### Step 2 — Search Microsoft Release Communications for Azure Updates
 
-Use `microsoft_docs_search` to find updates for the identified Azure service:
+When the Microsoft Release Communications MCP is available, use
+`get_recent_azure_updates` as the primary source for Azure product updates.
+Query the service using its product name and restrict results to updates
+published or modified on or after the document's last review date. For
+example, use a product filter such as
+`products/any(p: p eq 'Azure Storage')` together with a date filter such as
+`modified ge 2025-01-01T00:00:00Z`. Use the `search` parameter for service
+names that are not represented exactly in the product taxonomy.
+
+Start with `skip=0`. While `HasMore` is `true`, request the next page using
+`skip = Offset + Limit`. Deduplicate results by `id`. Do not consider this
+source exhausted until all pages have been retrieved.
+
+Review each result's titles, descriptions, status, availability dates, tags,
+and product categories. Use `get_azure_update_by_id` for every promising
+result so the complete description and official references are available
+before evaluating multitenant relevance.
+
+If the server or its Azure update tool is unavailable, tell the user it is the
+preferred source, then offer to enable it or proceed without it:
+
+- **VS Code:** Confirm that the workspace contains `.vscode/mcp.json` with
+  the `microsoft-release-communications` server, then use the MCP Servers
+  view to start or enable that server.
+- **Copilot CLI:** Confirm that the repository contains `.github/mcp.json`,
+  restart the CLI from the repository, and use `/mcp` to verify that the
+  server is available.
+
+Ask the user whether to enable the server or proceed without it. Do not
+continue until they choose. If they proceed without it, record the decision
+and continue with Step 3 and Step 4.
+
+If the initial query returns no relevant results or the product taxonomy is
+unclear, repeat the fully paginated query with alternate product names and the
+service name in `search`. Record the filters, searches, and outcome. If those
+queries still cannot establish complete coverage, continue with Step 4 to
+corroborate the result.
+
+### Step 3 — Search Microsoft Learn for Updates
+
+Use `microsoft_docs_search` to find documentation updates for the identified
+Azure service:
 
 1. Search for the service "What's New" page:
    `"<service-name> what's new"`.
@@ -110,18 +165,23 @@ Use `microsoft_docs_search` to find updates for the identified Azure service:
    results, especially "What's New" pages covering the period since the last
    review date.
 
-### Step 3 — Search Azure Updates
+### Step 4 — Search Azure Updates When Needed
 
-Use the fetch tool to retrieve the Azure Updates page for the service:
+Use the fetch tool to retrieve the Azure Updates page after the user chooses
+to proceed without unavailable Release Communications MCP, or when its fully
+paginated, broader queries return no relevant results or cannot establish
+complete coverage:
 
 ```text
 https://azure.microsoft.com/updates/?searchterms=<Name+of+Azure+Service>
 ```
 
-Scan results for updates published after the last review date. Focus on
-features, not bug fixes or minor improvements.
+Scan results for updates published after the last review date. If necessary,
+repeat using alternate service names. Record the search terms and outcome.
+Focus on features, not bug fixes or minor improvements. Only conclude that no
+changes are needed after the applicable corroboration searches are complete.
 
-### Step 4 — Continue Searching Until Exhausted
+### Step 5 — Continue Searching Until Exhausted
 
 Do not stop after the first round of searches. Continue with additional
 queries to cover all angles:
@@ -133,7 +193,7 @@ queries to cover all angles:
 
 Only move to the next step when confident all relevant sources are exhausted.
 
-### Step 5 — Evaluate Multitenant Relevance
+### Step 6 — Evaluate Multitenant Relevance
 
 For each discovered update or new feature, use the think tool to determine
 whether it is relevant in a multitenant context.
@@ -163,7 +223,7 @@ uniquely benefits solutions serving multiple tenant groups. Examples:
 - The benefit applies equally to single-tenant and multitenant architectures
   with no distinguishing multitenant advantage.
 
-### Step 6 — Build the Discovered Updates Table
+### Step 7 — Build the Discovered Updates Table
 
 For each relevant discovered update, add a row to the report table in `report.md`:
 
@@ -185,7 +245,7 @@ For each relevant discovered update, add a row to the report table in `report.md
 | ❓ | Documentation status unclear |
 | ⛔ | Feature not applicable after analysis |
 
-### Step 7 — Finalize Report
+### Step 8 — Finalize Report
 
 Complete the `report.md` file:
 
