@@ -15,7 +15,7 @@
     "website:build": "npm --prefix website run build"
   },
   "devDependencies": {
-    "markdownlint-cli2": "^0.23.2"
+    "markdownlint-cli2": "^0.23.3"
   },
   "description": "Copilot plugins, skills, agents, and canvas extensions",
   "repository": {
