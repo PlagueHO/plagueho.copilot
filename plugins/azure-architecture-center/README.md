@@ -16,7 +16,7 @@ copilot plugin install azure-architecture-center@plagueho-copilot
 
 | Command | Description |
 |---------|-------------|
-| `/azure-architecture-center:discover-multitenant-service-updates` | Discover new or changed Azure service features that may need to be added to an AAC multitenant service-specific guidance document. Use BEFORE updating a doc. |
+| `/azure-architecture-center:discover-multitenant-service-updates` | Discover new or changed Azure service features, optionally checking path-filtered commits in private Azure docs repositories. Use BEFORE updating a doc. |
 | `/azure-architecture-center:review-multitenant-service-specific-doc` | Review AAC multitenant service-specific documentation for accuracy, structure, and product correctness. |
 | `/azure-architecture-center:review-multitenant-approaches-doc` | Review AAC multitenant approaches documentation for accuracy, structure, and product correctness. |
 | `/azure-architecture-center:review-multitenant-considerations-doc` | Review AAC multitenant considerations documentation for accuracy, structure, and product correctness. |

@@ -11,7 +11,7 @@
     "marketplace:generate": "node eng/generate-marketplace.mjs",
     "plugin:materialize": "node eng/materialize-plugins.mjs",
     "plugin:validate": "node eng/validate-plugins.mjs",
-    "test": "node --test eng/*.test.mjs",
+    "test": "node --test eng/*.test.mjs && node eng/run-python-tests.mjs",
     "website:build": "npm --prefix website run build"
   },
   "devDependencies": {

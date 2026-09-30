@@ -22,7 +22,18 @@ multitenant-relevant features for this service. -->
 | Microsoft Learn (docs search) | <!-- search query --> | <!-- count --> |
 | Microsoft Learn (docs fetch) | <!-- URLs fetched --> | <!-- count --> |
 | Azure Updates | <!-- URL with search terms --> | <!-- count --> |
+| Azure documentation commits | <!-- repository, exact section paths, and ms.date cutoff; or skipped/failed --> | <!-- count --> |
 | <!-- additional sources --> | <!-- terms --> | <!-- count --> |
+
+## Commit Evidence
+
+| Repository | Section | Commit Date | Commit | Changed Documentation Files |
+|------------|---------|-------------|--------|------------------------------|
+| <!-- owner/repo --> | <!-- articles/product-section --> | <!-- yyyy-mm-dd --> | <!-- [short SHA](commit URL) and subject --> | <!-- relevant paths only --> |
+
+<!-- If the optional source was queried successfully but no commits qualified,
+write: No qualifying commits for the selected sections since the last review date.
+If skipped, say so in Sources Searched and remove this table. -->
 
 ## Findings
 

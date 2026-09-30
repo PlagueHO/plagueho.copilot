@@ -15,7 +15,7 @@
       "name": "azure-architecture-center",
       "source": "azure-architecture-center",
       "description": "Skills for Azure Architecture Center documentation maintainers: discover needed updates and review multitenant docs for currency, accuracy, and completeness.",
-      "version": "2.0.1"
+      "version": "2.1.0"
     },
     {
       "name": "azure-infrastructure-deployment",
