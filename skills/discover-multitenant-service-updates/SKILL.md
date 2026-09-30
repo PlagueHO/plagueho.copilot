@@ -6,19 +6,16 @@ description: >-
   that may need to be added to an AAC multitenant service-specific
   guidance document. Searches Azure Updates, What's New pages, and
   Microsoft Learn to produce a gap report of multitenant-relevant
-  changes since the document's last review date. Can optionally inspect
-  path-filtered commits in private Azure documentation repositories for
-  thorough checks. Use this BEFORE
-  updating a doc; use the review-multitenant-*-doc skills AFTER.
+  changes since the document's last review date. Optionally inspects
+  path-filtered private docs commits. Use this BEFORE updating a doc; use the review-multitenant-*-doc skills AFTER.
   WHEN: "discover multitenant updates", "what needs updating in
   multitenant doc", "find new Azure features for multitenant doc",
   "audit multitenant currency", "what changed since last review",
   "multitenant gap analysis", "scan service doc for updates",
   "check private Azure docs commits".
   INVOKES: microsoft-release-communications MCP, microsoft-learn MCP,
-  fetch, think tools, and the bundled Python helper with GitHub CLI
-  for optional private-doc commit history. FOR SINGLE OPERATIONS: Use Microsoft Release
-  Communications MCP for Azure update discovery, or Microsoft Learn MCP
+  fetch, think tools, bundled Python helper with GitHub CLI.
+  FOR SINGLE OPERATIONS: Use Microsoft Release Communications MCP for Azure update discovery, or Microsoft Learn MCP
   directly for documentation lookups.
 
 metadata:
