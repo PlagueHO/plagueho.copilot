@@ -14,6 +14,7 @@ shouldTriggerPrompts:
   - "discover multitenant updates for App Service guidance"
   - "what new features need adding to this AAC multitenant doc"
   - "scan this multitenant guidance for Azure API Management updates"
+  - "check private Azure docs commits for new features in this multitenant guide"
 
 # Prompts that should NOT activate this skill
 # Generated from competing-skill scenarios and unrelated topics

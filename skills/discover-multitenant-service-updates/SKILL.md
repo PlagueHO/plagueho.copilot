@@ -6,20 +6,21 @@ description: >-
   that may need to be added to an AAC multitenant service-specific
   guidance document. Searches Azure Updates, What's New pages, and
   Microsoft Learn to produce a gap report of multitenant-relevant
-  changes since the document's last review date. Use this BEFORE
-  updating a doc; use the review-multitenant-*-doc skills AFTER.
+  changes since the document's last review date. Optionally inspects
+  path-filtered private docs commits. Use this BEFORE updating a doc; use the review-multitenant-*-doc skills AFTER.
   WHEN: "discover multitenant updates", "what needs updating in
   multitenant doc", "find new Azure features for multitenant doc",
   "audit multitenant currency", "what changed since last review",
-  "multitenant gap analysis", "scan service doc for updates".
+  "multitenant gap analysis", "scan service doc for updates",
+  "check private Azure docs commits".
   INVOKES: microsoft-release-communications MCP, microsoft-learn MCP,
-  fetch, think tools. FOR SINGLE OPERATIONS: Use Microsoft Release
-  Communications MCP for Azure update discovery, or Microsoft Learn MCP
+  fetch, think tools, bundled Python helper with GitHub CLI.
+  FOR SINGLE OPERATIONS: Use Microsoft Release Communications MCP for Azure update discovery, or Microsoft Learn MCP
   directly for documentation lookups.
 
 metadata:
   author: PlagueHO
-  version: "2.0"
+  version: "2.1"
   reference: https://learn.microsoft.com/en-us/azure/architecture/guide/multitenant/overview
 
 compatibility:
@@ -69,6 +70,9 @@ structured gap report identifying updates needed.
 - **Fetch tool** — for retrieving Azure Updates pages.
 - **Think tool** — for deep reasoning about multitenant relevance.
 - **Todo tool** — for tracking review progress.
+- **GitHub CLI (`gh`) and Python 3 (optional)** — required only when the
+  user chooses the private Azure documentation commit check. The CLI must
+  already be authenticated to an account with SSO access to the private repos.
 
 ## MCP Tools Used
 
@@ -80,6 +84,7 @@ structured gap report identifying updates needed.
 | 4 | `microsoft_docs_fetch` | fetch | Retrieve full documentation pages |
 | 5 | `microsoft_code_sample_search` | search | Find service-specific code samples |
 | 6 | `fetch` | fetch | Retrieve Azure Updates page as fallback |
+| Optional | `check-private-azure-docs-commits.py` | Python + `gh api` | Find commits changing selected product sections |
 
 **Update-source fallback:** Use Microsoft Learn and Azure Updates when broader
 MCP queries cannot establish a complete result set. Do not treat an empty
@@ -109,6 +114,8 @@ Read the target document file provided by the user.
    the same directory (e.g., `app-service.yml` for `app-service-content.md`).
 3. Extract the Azure service name from the document title.
 4. Record the review date and service name in `report.md`.
+5. Keep the identified product names for the optional commit check. Resolve
+   repository section paths only if the user chooses that source.
 
 ### Step 2 — Search Microsoft Release Communications for Azure Updates
 
@@ -164,6 +171,54 @@ Azure service:
 4. Use `microsoft_docs_fetch` to retrieve full content from any promising
    results, especially "What's New" pages covering the period since the last
    review date.
+
+### Optional Step — Search Private Azure Documentation Commits
+
+Recommend this source when the user asks for a thorough check of new
+features. Ask whether to include it; keep the existing discovery workflow
+available when the user declines.
+
+Use the bundled PowerShell or Bash wrapper to query GitHub's REST commits API
+through the authenticated `gh` CLI. Do not clone, fetch, pull, or otherwise
+download either large documentation repository. Run the helper once per
+repository that contains mapped product sections, passing the exact section
+paths and the target document's `ms.date`:
+
+```powershell
+& skills\discover-multitenant-service-updates\scripts\check-private-azure-docs-commits.ps1 -Repository MicrosoftDocs/azure-docs-pr -Section articles/app-service -Since 2026-01-15
+```
+
+Use `MicrosoftDocs/azure-docs-pr` for Azure service documentation and
+`MicrosoftDocs/azure-ai-docs-pr` for Azure AI documentation. The repositories
+organize product content under `articles/`; examples verified in the
+repositories include `articles/app-service` and `articles/api-management` in
+`azure-docs-pr`, plus `articles/ai-services`, `articles/search`, and
+`articles/machine-learning` in `azure-ai-docs-pr`. Map each product in the
+guidance page to its exact section using the official product documentation
+source path. A page may map to multiple sections or repositories. Pass each
+section as a separate `--section` argument to the helper. It validates that
+the repository is supported and every section exists beneath `articles/`,
+then queries the commits endpoint with the exact `path` and `since` filters.
+It paginates results and inspects commit details. Include only commits
+strictly newer than `ms.date`, and only changed Markdown or documentation TOC
+files whose paths are inside the selected section(s). A cross-section commit
+may be returned by GitHub when it changes one selected section; exclude its
+other files from the report. If a product cannot be mapped confidently to an
+exact section, ask the user; do not query the whole repository or guess a
+broad section.
+
+Record the repository, selected section paths, cutoff date, commit SHA,
+commit date, subject, and relevant changed paths in the report's **Commit
+Evidence** table. Use these commits as discovery leads; verify feature
+claims against the changed documentation and official sources before
+adding findings.
+
+If Python 3 or the CLI is missing, the repository/section cannot be accessed,
+or an API request fails, stop this source check and tell the user the check
+did not complete. For authentication or SSO errors, ask them to authenticate
+with an authorized account; for rate limits, wait until access is available
+again. Do not treat an error as an empty result. A successful query with no
+qualifying commits is a valid empty result and must be recorded as such.
 
 ### Step 4 — Search Azure Updates When Needed
 
