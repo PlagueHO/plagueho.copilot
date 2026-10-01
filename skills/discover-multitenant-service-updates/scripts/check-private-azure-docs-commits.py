@@ -27,9 +27,9 @@ SUPPORTED_REPOSITORIES = {
     "MicrosoftDocs/azure-ai-docs-pr",
     "MicrosoftDocs/azure-docs-pr",
 }
-DOCUMENTATION_EXTENSIONS = {".md", ".yml", ".yaml"}
 PAGE_SIZE = 100
-MAX_COMMIT_FILES = 300
+MAX_COMMIT_FILES = 3000
+TOC_FILENAMES = {"toc.yml", "toc.yaml"}
 
 
 class ApiError(RuntimeError):
@@ -103,8 +103,15 @@ def utc_commit_date(value: str) -> datetime:
 
 def is_documentation_file(path: str, sections: list[str]) -> bool:
     in_selected_section = any(path.startswith(section + "/") for section in sections)
+    if not in_selected_section:
+        return False
+
+    basename = path.rsplit("/", maxsplit=1)[-1].lower()
+    if basename in TOC_FILENAMES:
+        return True
+
     extension = "." + path.rsplit(".", maxsplit=1)[-1].lower() if "." in path else ""
-    return in_selected_section and extension in DOCUMENTATION_EXTENSIONS
+    return extension == ".md"
 
 
 def section_endpoint(repository: str, section: str) -> str:
@@ -125,6 +132,16 @@ def commits_endpoint(
     return f"repos/{repository}/commits?{query}"
 
 
+def commit_details_endpoint(repository: str, sha: str, page: int) -> str:
+    query = urlencode(
+        {
+            "per_page": str(PAGE_SIZE),
+            "page": str(page),
+        }
+    )
+    return f"repos/{repository}/commits/{quote(sha, safe='')}?{query}"
+
+
 def fetch_section_commits(
     repository: str, section: str, cutoff: date
 ) -> list[dict[str, Any]]:
@@ -141,6 +158,30 @@ def fetch_section_commits(
         commits.extend(result)
         if len(result) < PAGE_SIZE:
             return commits
+        page += 1
+
+
+def fetch_commit_files(repository: str, sha: str) -> list[dict[str, Any]]:
+    files: list[dict[str, Any]] = []
+    page = 1
+
+    while True:
+        details = api_get(commit_details_endpoint(repository, sha, page))
+        if not isinstance(details, dict):
+            raise ApiError(f"GitHub returned an invalid detail response for commit {sha}.")
+
+        page_files = details.get("files")
+        if not isinstance(page_files, list):
+            raise ApiError(f"GitHub returned no changed-file list for commit {sha}.")
+
+        files.extend(page_files)
+        if len(files) >= MAX_COMMIT_FILES:
+            raise ApiError(
+                f"Commit {sha} reached GitHub's retrievable limit of {MAX_COMMIT_FILES} "
+                "changed files; the section filter cannot be verified safely."
+            )
+        if len(page_files) < PAGE_SIZE:
+            return files
         page += 1
 
 
@@ -177,19 +218,7 @@ def collect_changes(
 
     results = []
     for sha, metadata in commits_by_sha.items():
-        details = api_get(f"repos/{repository}/commits/{quote(sha, safe='')}")
-        if not isinstance(details, dict):
-            raise ApiError(f"GitHub returned an invalid detail response for commit {sha}.")
-        files = details.get("files")
-        if not isinstance(files, list):
-            raise ApiError(f"GitHub returned no changed-file list for commit {sha}.")
-        if len(files) >= MAX_COMMIT_FILES:
-            raise ApiError(
-                f"Commit {sha} has {MAX_COMMIT_FILES} or more changed files; "
-                "GitHub may have truncated the file list, so the section filter "
-                "cannot be verified safely."
-            )
-
+        files = fetch_commit_files(repository, sha)
         relevant_files = []
         for changed_file in files:
             path = changed_file.get("filename")
