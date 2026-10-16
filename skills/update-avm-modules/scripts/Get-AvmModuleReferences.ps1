@@ -1,80 +1,22 @@
 <#
 .SYNOPSIS
-    Extracts Azure Verified Module (AVM) references from Bicep files.
-
-.DESCRIPTION
-    Scans one or more Bicep files for AVM module references matching
-    br/public:avm/{type}/{service}/{resource}:{version} and outputs
-    structured JSON with module path, current version, file path, and
-    line number for each reference.
-
+Extract active AVM declarations as a JSON array using the shared Node.js implementation.
 .PARAMETER BicepFile
-    Path to a single Bicep file to scan.
-
-.PARAMETER Directory
-    Path to a directory to recursively scan for *.bicep files.
-
+A Bicep file. Alternatively, supply Directory or Files.
 .EXAMPLE
-    .\Get-AvmModuleReferences.ps1 -BicepFile "infra/main.bicep"
-
-.EXAMPLE
-    .\Get-AvmModuleReferences.ps1 -Directory "infra/"
+./Get-AvmModuleReferences.ps1 -Directory infra
 #>
-
 [CmdletBinding(DefaultParameterSetName = 'File')]
 param(
-    [Parameter(Mandatory, ParameterSetName = 'File')]
-    [ValidateScript({ Test-Path $_ -PathType Leaf })]
-    [string]$BicepFile,
-
-    [Parameter(Mandatory, ParameterSetName = 'Directory')]
-    [ValidateScript({ Test-Path $_ -PathType Container })]
-    [string]$Directory
+    [Parameter(Mandatory, ParameterSetName = 'File')][string]$BicepFile,
+    [Parameter(Mandatory, ParameterSetName = 'Directory')][string]$Directory,
+    [Parameter(Mandatory, ParameterSetName = 'List')][string[]]$Files
 )
-
-Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-
-$pattern = "br/public:(avm/(?:res|ptn|utl)/[^:]+):(\d+\.\d+(?:\.\d+)?)"
-
-# Determine files to scan
-if ($PSCmdlet.ParameterSetName -eq 'Directory') {
-    $files = Get-ChildItem -Path $Directory -Recurse -Filter '*.bicep' -File |
-        Select-Object -ExpandProperty FullName
-} else {
-    $files = @((Resolve-Path $BicepFile).Path)
+$arguments = switch ($PSCmdlet.ParameterSetName) {
+    'File' { @('--file', $BicepFile) }
+    'Directory' { @('--directory', $Directory) }
+    'List' { @('--files') + $Files }
 }
-
-if ($files.Count -eq 0) {
-    Write-Host "No Bicep files found."
-    Write-Output "[]"
-    exit 0
-}
-
-$results = @()
-
-foreach ($file in $files) {
-    $lines = Get-Content -Path $file
-    for ($i = 0; $i -lt $lines.Count; $i++) {
-        $line = $lines[$i]
-        $lineMatches = [regex]::Matches($line, $pattern)
-
-        foreach ($match in $lineMatches) {
-            $results += [PSCustomObject]@{
-                Module      = $match.Groups[1].Value
-                Version     = $match.Groups[2].Value
-                FilePath    = $file
-                LineNumber  = $i + 1
-            }
-        }
-    }
-}
-
-if ($results.Count -eq 0) {
-    Write-Host "No AVM module references found."
-    Write-Output "[]"
-    exit 0
-}
-
-Write-Host "Found $($results.Count) AVM module reference(s) in $($files.Count) file(s)."
-$results | ConvertTo-Json -Depth 3
+& node (Join-Path $PSScriptRoot 'avm.mjs') references @arguments
+exit $LASTEXITCODE

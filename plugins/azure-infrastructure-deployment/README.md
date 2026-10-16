@@ -23,6 +23,16 @@ copilot plugin install azure-infrastructure-deployment@plagueho-os
 | Agent | Description |
 |-------|-------------|
 
+## AVM runtime and safety
+
+The AVM skill requires Node.js 22+ and network access to MCR and GitHub.
+Build validation also requires Azure CLI with Bicep installed; version checks do not.
+PowerShell 7+ and Bash wrappers share one `.mjs` implementation; curl and jq are not required.
+Updates require a discovery hash and a new rollback snapshot.
+Version and approved parameter edits are restored together if validation fails.
+Snapshots contain source code; keep them in a private session directory outside the repository.
+Build validation does not deploy resources or prove deployment compatibility.
+
 ## Source
 
 This plugin is part of [plagueho.os](https://github.com/PlagueHO/plagueho.os), organizational assets for Daniel Scott-Raynsford.
