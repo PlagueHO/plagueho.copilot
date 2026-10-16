@@ -1,0 +1,18 @@
+name: github-create-issue-triggers
+skill: github-create-issue
+
+# Derived from WHEN: phrases in the skill description
+shouldTriggerPrompts:
+  - "create a GitHub issue for this bug"
+  - "file a new issue in my repository"
+  - "help me choose an issue template"
+  - "check whether this GitHub issue already exists"
+  - "create an issue and set its labels and assignee"
+  - "prepare an issue with the right milestone"
+
+shouldNotTriggerPrompts:
+  - "create a GitHub pull request"
+  - "review this pull request"
+  - "merge my Dependabot PRs"
+  - "convert this prompt into a skill"
+  - "set up GitHub Actions for my repository"
