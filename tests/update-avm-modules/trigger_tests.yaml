@@ -1,0 +1,14 @@
+name: update-avm-modules-triggers
+skill: update-avm-modules
+shouldTriggerPrompts:
+  - "Update AVM in infra/main.bicep."
+  - "Update Bicep modules to the latest AVM versions."
+  - "Update Azure Verified Modules in this directory."
+  - "Upgrade Bicep dependencies."
+  - "Check AVM versions without changing files."
+  - "Update module versions for these AVM references."
+shouldNotTriggerPrompts:
+  - "Compile this Bicep file without changing dependencies."
+  - "Deploy this ARM template."
+  - "Update Terraform provider versions."
+  - "Create a local Bicep module."
