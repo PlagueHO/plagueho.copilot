@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "skill-lifecycle",
   "description": "Create, convert, and generate agent skills from prompts and pull requests.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "Daniel Scott-Raynsford",
     "url": "https://github.com/PlagueHO"

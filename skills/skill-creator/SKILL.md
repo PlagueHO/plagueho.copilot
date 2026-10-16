@@ -84,7 +84,7 @@ characters, no leading/trailing/consecutive hyphens. Confirm with the user.
 Before writing, gather context:
 
 1. **Check for similar existing skills** on
-   [skillsdirectory.org](https://www.skillsdirectory.org/) using `fetch_webpage`.
+   [skilldirectory.com](https://skilldirectory.com/) using `fetch_webpage`.
    If a relevant skill already exists, **STOP** and ask the user whether to
    adopt it, adapt it, or proceed with a new one.
 2. **Search the codebase** for patterns, conventions, or prior art that the
