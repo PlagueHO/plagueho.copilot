@@ -7,8 +7,9 @@ description: >-
   Generates non-overlapping guidance so agents and code review produce
   compliant code. WHEN: "create AGENTS.md", "add copilot instructions",
   "onboard repo for Copilot", "generate copilot-instructions.md", "scaffold
-  repo AI instructions", "add agent instructions to my repo". INVOKES: file
-  read, semantic_search, fetch_webpage. FOR SINGLE OPERATIONS: Edit
+  repo AI instructions", "add agent instructions to my repo", "write repo
+  guidance in Simplified Technical English", "apply ASD-STE100". INVOKES:
+  file read, semantic_search, fetch_webpage. FOR SINGLE OPERATIONS: Edit
   .github/copilot-instructions.md directly.
 
 metadata:
@@ -129,6 +130,12 @@ follow while writing both files:
 - No secrets, tokens, or internal URLs.
 - Treat as living documentation — grow from observed mistakes, not up-front
   design.
+- Apply ASD-STE100 (Simplified Technical English) principles: use simple,
+  precise words; active voice; short sentences; one instruction per bullet;
+  consistent terms; and no idioms or unnecessary words.
+- Treat these principles as a writing guide, not proof of full ASD-STE100
+  compliance. Do not invent approved vocabulary or claim compliance unless the
+  current standard's rules and dictionary have been checked.
 
 ## Step 4 — Plan the Content Split
 
@@ -165,6 +172,7 @@ Writing rules:
 - Use tables for conventions — they are fast to scan
 - Bold any rule whose violation will fail CI
 - Omit boilerplate advice ("handle errors") — only include repo-specific rules
+- Write direct, concise sentences. Put one action or rule in each bullet.
 
 ## Step 6 — Write .github/copilot-instructions.md
 
@@ -185,6 +193,8 @@ Writing rules:
 - Keep under 100 lines; hard limit 150
 - Omit generic advice ("write clean code") — only include repo-specific rules
   that are clearly visible in the source inspection
+- Write direct, concise sentences. Put one rule in each bullet and use the same
+  term for the same concept throughout.
 
 ## Step 7 — Validate
 
@@ -202,6 +212,7 @@ Check both generated files:
 - No content duplicated across the two files
 - Newline at end of file; no trailing whitespace
 - Each file under 150 lines
+- Use short, direct sentences and consistent terms; remove unnecessary words
 - No secrets, tokens, or internal URLs
 
 ## Step 8 — Present Results

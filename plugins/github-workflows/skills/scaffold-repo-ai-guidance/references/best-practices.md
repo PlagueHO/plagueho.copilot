@@ -100,6 +100,26 @@ official agents.md spec, and Cursor — sourced April 2026.
 - Don't write a 500-line file on day one — add instructions one at a time.
 - Review all instruction sources together to catch contradictions.
 
+## Writing Style — ASD-STE100
+
+Use ASD-STE100 Simplified Technical English principles to make both files
+short, clear, and easy to translate:
+
+- Use simple, precise words and active voice.
+- Keep sentences short. Put one instruction or rule in each sentence or bullet.
+- Use one term for each concept. Do not switch between synonyms.
+- State the actor, action, and condition. Avoid vague pronouns, idioms, and
+  unnecessary words.
+- Use lists and tables to group related rules. Keep each item focused.
+- Preserve technical accuracy. Do not remove conditions, exceptions, or
+  safety-critical detail just to shorten the text.
+
+ASD-STE100 is a controlled language standard with specific grammar rules and a
+controlled dictionary. Apply these principles as a style guide when the current
+standard is not available. Do not invent approved words or claim full
+ASD-STE100 compliance unless the relevant rules and vocabulary have been
+checked.
+
 ## Content Split — Decision Table
 
 | Guideline type | File |
@@ -128,6 +148,7 @@ official agents.md spec, and Cursor — sourced April 2026.
 
 ## Sources
 
+- [ASD-STE100 Simplified Technical English](https://www.asd-europe.org/standards-specifications/simplified-technical-english/)
 - [GitHub: Adding repository custom instructions](https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions)
 - [GitHub: Response customization](https://docs.github.com/en/copilot/concepts/prompting/response-customization)
 - [GitHub: Custom instructions support reference](https://docs.github.com/en/copilot/reference/custom-instructions-support)

@@ -2,6 +2,7 @@
 
 <!-- AGENTS.md — Operational guide for AI agents executing tasks in this repo.
      Loaded automatically by agentic runtimes. Keep under 150 lines.
+     Use direct, concise technical English and one instruction per bullet.
      For code style and patterns, see .github/copilot-instructions.md. -->
 
 ## Layout
