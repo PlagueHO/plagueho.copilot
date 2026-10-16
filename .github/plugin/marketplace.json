@@ -44,8 +44,8 @@
     {
       "name": "github-workflows",
       "source": "github-workflows",
-      "description": "GitHub workflow skills for PR review evaluation, Dependabot PR management, Copilot resource optimization, and AI guidance scaffolding.",
-      "version": "1.4.1"
+      "description": "GitHub workflow skills for issue creation, PR review evaluation, Dependabot PR management, Copilot resource optimization, and AI guidance scaffolding.",
+      "version": "1.4.2"
     },
     {
       "name": "microsoft-technical-research",
