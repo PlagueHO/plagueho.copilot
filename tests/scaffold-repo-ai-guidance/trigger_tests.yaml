@@ -13,6 +13,8 @@ shouldTriggerPrompts:
   - "set up AI guidance files for this codebase"
   - "create copilot instructions for this project"
   - "scaffold AGENTS.md and copilot-instructions"
+  - "write AGENTS.md and Copilot instructions in Simplified Technical English"
+  - "apply ASD-STE100 when creating repo guidance"
 
 # Competing skills and unrelated topics
 shouldNotTriggerPrompts:

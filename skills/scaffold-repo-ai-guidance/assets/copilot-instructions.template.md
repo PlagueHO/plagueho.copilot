@@ -3,6 +3,7 @@
 <!-- .github/copilot-instructions.md — Project-specific conventions for
      GitHub Copilot chat and code review. Loaded automatically for all
      requests in this repo's context. Keep under 150 lines.
+     Use direct, concise technical English and one rule per bullet.
      See AGENTS.md for layout, commands, and CI pipeline. -->
 
 ## Purpose
