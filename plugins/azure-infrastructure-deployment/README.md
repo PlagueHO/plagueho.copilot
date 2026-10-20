@@ -6,7 +6,7 @@ Infrastructure management plugin that provisions Azure identities for GitHub and
 
 ```bash
 # Using Copilot CLI
-copilot plugin install azure-infrastructure-deployment@plagueho-os
+copilot plugin install azure-infrastructure-deployment@plagueho-copilot
 ```
 
 ## What's Included

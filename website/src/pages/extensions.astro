@@ -66,7 +66,7 @@ const base = import.meta.env.BASE_URL;
             <section>
               <h3>1. Register the marketplace, then install</h3>
               <p>
-                Register <code>{siteData.extensions[0]?.marketplaceSource ?? 'PlagueHO/plagueho.copilot'}</code> once before using the Copilot app, CLI, VS Code, or VS Code Insiders install links.
+                Register <code>{siteData.extensions[0]?.marketplaceSource ?? 'PlagueHO/plagueho.copilot#marketplace'}</code> once before using the Copilot app, CLI, VS Code, or VS Code Insiders install links.
               </p>
               {siteData.extensions[0] && (
                 <div class="install__buttons">
@@ -89,7 +89,7 @@ const base = import.meta.env.BASE_URL;
                 </div>
               )}
               <p>
-                In VS Code or VS Code Insiders, add <code>PlagueHO/plagueho.copilot</code> to the <code>chat.plugins.marketplaces</code> setting.
+                In VS Code or VS Code Insiders, add <code>PlagueHO/plagueho.copilot#marketplace</code> to the <code>chat.plugins.marketplaces</code> setting.
               </p>
               <p>
                 Use the card’s Copilot app button, or open an extension for VS Code, VS Code Insiders, and CLI installation options.
