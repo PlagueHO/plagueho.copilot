@@ -6,7 +6,7 @@ GitHub workflow skills for issue creation, PR review evaluation, Dependabot PR m
 
 ```bash
 # Using Copilot CLI
-copilot plugin install github-workflows@plagueho-os
+copilot plugin install github-workflows@plagueho-copilot
 ```
 
 ## What's Included

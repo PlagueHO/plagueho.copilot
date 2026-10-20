@@ -6,7 +6,7 @@ Developer environment plugin that scaffolds dotfiles repositories and synchroniz
 
 ```bash
 # Using Copilot CLI
-copilot plugin install developer-environment@plagueho-os
+copilot plugin install developer-environment@plagueho-copilot
 ```
 
 ## What's Included

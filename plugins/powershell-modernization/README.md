@@ -8,7 +8,7 @@ conventions.
 
 ```bash
 # Using Copilot CLI
-copilot plugin install powershell-modernization@plagueho-os
+copilot plugin install powershell-modernization@plagueho-copilot
 ```
 
 ## What's Included

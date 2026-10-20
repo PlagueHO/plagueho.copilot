@@ -6,7 +6,7 @@ Discovery plugin that suggests and installs GitHub Copilot assets from the [awes
 
 ```bash
 # Using Copilot CLI
-copilot plugin install suggest-awesome-github-copilot@plagueho-os
+copilot plugin install suggest-awesome-github-copilot@plagueho-copilot
 ```
 
 ## What's Included

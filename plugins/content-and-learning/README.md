@@ -6,7 +6,7 @@ Content quality and learning plugin that reviews documents for AI readiness and 
 
 ```bash
 # Using Copilot CLI
-copilot plugin install content-and-learning@plagueho-os
+copilot plugin install content-and-learning@plagueho-copilot
 ```
 
 ## What's Included
