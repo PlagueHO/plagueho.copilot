@@ -6,7 +6,7 @@ Modernization plugin that converts legacy .NET project files to the modern SDK-s
 
 ```bash
 # Using Copilot CLI
-copilot plugin install dotnet-modernization@plagueho-os
+copilot plugin install dotnet-modernization@plagueho-copilot
 ```
 
 ## What's Included

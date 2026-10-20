@@ -6,7 +6,7 @@ Skill authoring plugin that creates, converts, and generates GitHub Copilot Agen
 
 ```bash
 # Using Copilot CLI
-copilot plugin install skill-lifecycle@plagueho-os
+copilot plugin install skill-lifecycle@plagueho-copilot
 ```
 
 ## What's Included
