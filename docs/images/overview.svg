@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 240" role="img" aria-labelledby="title description">
   <title id="title">PlagueHO Copilot Catalog</title>
-  <desc id="description">Eleven plugins compose twenty-nine skills, five agents, and one canvas extension.</desc>
+  <desc id="description">Eleven plugins compose thirty skills, five agents, and one canvas extension.</desc>
   <defs>
     <linearGradient id="background" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0d1117"/>
@@ -21,7 +21,7 @@
   <g transform="translate(36 98)">
     <text class="count" x="0" y="28">11</text>
     <text class="label" x="0" y="50">plugins</text>
-    <text class="count" x="118" y="28">29</text>
+    <text class="count" x="118" y="28">30</text>
     <text class="label" x="118" y="50">skills</text>
     <text class="count" x="236" y="28">5</text>
     <text class="label" x="236" y="50">agents</text>

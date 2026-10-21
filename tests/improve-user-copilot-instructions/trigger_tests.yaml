@@ -1,0 +1,25 @@
+name: improve-user-copilot-instructions-triggers
+skill: improve-user-copilot-instructions
+
+# Derived from WHEN: phrases in the skill description.
+shouldTriggerPrompts:
+  - "improve my personal Copilot instructions from last week's sessions"
+  - "Run a weekly instruction review across my recent projects"
+  - "review session feedback and suggest changes to my user-level instructions"
+  - "reduce repeated Copilot corrections with better personal instructions"
+  - "improve my personal Copilot instructions without changing them yet"
+  - "Run a weekly instruction review using these selected session exports"
+  - "review session feedback for portable machine-level Copilot guidance"
+  - "reduce repeated Copilot corrections and let me approve each instruction change"
+
+shouldNotTriggerPrompts:
+  - "Scaffold AGENTS.md and repository Copilot instructions for this project"
+  - "Optimize tokens in this prompt without changing its meaning"
+  - "Generate a standup report from my recent sessions"
+  - "Resume my last Copilot session"
+  - "Search session history for the deployment issue"
+  - "Sync my VS Code profiles"
+  - "Create a dotfiles repository"
+  - "Create a new agent skill from this prompt"
+  - "Review this pull request"
+  - "Schedule an automatic weekly report"

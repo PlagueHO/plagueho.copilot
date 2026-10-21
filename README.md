@@ -15,7 +15,7 @@ This repository contains Daniel Scott-Raynsford's curated GitHub Copilot plugins
 | [content-and-learning](plugins/content-and-learning/) | Review AI content readiness and create learning pathways. |
 | [developer-environment](plugins/developer-environment/) | Scaffold dotfiles repositories and synchronize VS Code profiles. |
 | [dotnet-modernization](plugins/dotnet-modernization/) | Convert legacy .NET projects to SDK style. |
-| [github-workflows](plugins/github-workflows/) | Create GitHub issues, evaluate reviews, manage Dependabot PRs, optimize Copilot resources, and generate release content. |
+| [github-workflows](plugins/github-workflows/) | Create GitHub issues, evaluate reviews, manage Dependabot PRs, optimize Copilot resources, review personal instructions, and generate release content. |
 | [microsoft-technical-research](plugins/microsoft-technical-research/) | Orchestrate structured Microsoft technical research with custom agents. |
 | [powershell-modernization](plugins/powershell-modernization/) | Migrate Pester v4 tests to Pester v5. |
 | [skill-lifecycle](plugins/skill-lifecycle/) | Create and convert agent skills. |

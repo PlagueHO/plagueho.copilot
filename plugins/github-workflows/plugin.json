@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "github-workflows",
-  "description": "GitHub workflow skills for issue creation, PR review evaluation, Dependabot PR management, Copilot resource optimization, and AI guidance scaffolding.",
-  "version": "1.4.2",
+  "description": "GitHub workflow skills for issue creation, PR review evaluation, Dependabot PR management, Copilot resource optimization, personal instruction review, and AI guidance scaffolding.",
+  "version": "1.5.0",
   "author": {
     "name": "Daniel Scott-Raynsford",
     "url": "https://github.com/PlagueHO"
@@ -25,6 +25,7 @@
       "skills": [
         "./skills/evaluate-pr-review-comments/",
         "./skills/github-create-issue/",
+        "./skills/improve-user-copilot-instructions/",
         "./skills/merge-dependabot-prs/",
         "./skills/optimize-github-copilot-resources/",
         "./skills/release-changelog/",
