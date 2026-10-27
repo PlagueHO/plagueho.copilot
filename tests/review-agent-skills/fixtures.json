@@ -1,0 +1,126 @@
+[
+  {
+    "label": "minimal",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: Review a supplied input.\n",
+    "failed": []
+  },
+  {
+    "label": "folded and literal strings",
+    "name": "example",
+    "frontmatter": "name: 'example'\ndescription: >-\n  Review inputs\n  when requested.\ncompatibility: |-\n  Requires local file access.\nmetadata:\n  version: \"1.0\"\n",
+    "failed": []
+  },
+  {
+    "label": "empty description",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: '  '\n",
+    "failed": ["FM-002"]
+  },
+  {
+    "label": "missing name",
+    "name": "example",
+    "frontmatter": "description: Review inputs.\n",
+    "failed": ["FM-002"]
+  },
+  {
+    "label": "numeric name and description",
+    "name": "123",
+    "frontmatter": "name: 123\ndescription: 42\n",
+    "failed": ["FM-002"]
+  },
+  {
+    "label": "wrong directory",
+    "name": "example",
+    "frontmatter": "name: another\ndescription: Review inputs.\n",
+    "failed": ["FM-003"]
+  },
+  {
+    "label": "repeated hyphen",
+    "name": "ex--ample",
+    "frontmatter": "name: ex--ample\ndescription: Review inputs.\n",
+    "failed": ["FM-003"]
+  },
+  {
+    "label": "unknown extension",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: Review inputs.\ncustom-secret-field: REDACTED_VALUE\n",
+    "failed": ["FM-006"]
+  },
+  {
+    "label": "catalog extensions remain standard differences",
+    "name": "example",
+    "profile": "catalog",
+    "frontmatter": "name: example\ndescription: Review inputs.\nargument-hint: Provide a path.\nuser-invocable: true\ncompatibility:\n  - An example environment\n",
+    "failed": ["FM-005", "FM-006"]
+  },
+  {
+    "label": "catalog forbids experimental allowed-tools",
+    "name": "example",
+    "profile": "catalog",
+    "frontmatter": "name: example\ndescription: Review inputs.\nallowed-tools: Read\n",
+    "failed": ["LC-002"]
+  },
+  {
+    "label": "catalog extension types",
+    "name": "example",
+    "profile": "catalog",
+    "frontmatter": "name: example\ndescription: Review inputs.\nargument-hint: true\nuser-invocable: yes\n",
+    "failed": ["FM-006", "LC-003"]
+  },
+  {
+    "label": "standard Unicode versus local ASCII",
+    "name": "café",
+    "profile": "catalog",
+    "frontmatter": "name: café\ndescription: Review inputs.\n",
+    "failed": ["LC-001"]
+  },
+  {
+    "label": "metadata string mapping",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: Review inputs.\nmetadata:\n  version: 1.0\nlicense: false\nallowed-tools: []\n",
+    "failed": ["FM-005"]
+  },
+  {
+    "label": "duplicate key",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: Review inputs.\nname: duplicate\n",
+    "failed": ["FM-001", "FM-007"]
+  },
+  {
+    "label": "malformed YAML",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: [not closed\n",
+    "failed": ["FM-001"]
+  },
+  {
+    "label": "non-mapping",
+    "name": "example",
+    "frontmatter": "- not\n- a mapping\n",
+    "failed": ["FM-001"]
+  },
+  {
+    "label": "custom tag",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: !untrusted REDACTED_VALUE\n",
+    "failed": ["FM-001", "FM-007"]
+  },
+  {
+    "label": "anchor and alias",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: &value Review inputs.\nlicense: *value\n",
+    "failed": ["FM-007"]
+  },
+  {
+    "label": "explicit standard tag",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: !!str Review inputs.\n",
+    "failed": ["FM-007"]
+  },
+  {
+    "label": "merge key",
+    "name": "example",
+    "frontmatter": "name: example\ndescription: Review inputs.\nmetadata:\n  <<: {version: \"1.0\"}\n",
+    "failed": ["FM-007"]
+  }
+]
