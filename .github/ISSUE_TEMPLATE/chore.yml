@@ -1,0 +1,47 @@
+name: Chore
+description: Track maintenance work that does not add a user-facing feature.
+title: "[CHORE] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to track maintenance work, quality checks, and other internal tasks.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the maintenance task and its intended result.
+      placeholder: Review all skills with ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Why is this work needed?
+      description: Explain the reason for this task.
+    validations:
+      required: true
+
+  - type: textarea
+    id: work-items
+    attributes:
+      label: Work items
+      description: List the steps needed to complete the task.
+      placeholder: |
+        - [ ] ...
+
+  - type: textarea
+    id: completion-criteria
+    attributes:
+      label: Completion criteria
+      description: State how to confirm that the task is complete.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add related links or other useful information.
