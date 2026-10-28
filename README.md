@@ -18,7 +18,7 @@ This repository contains Daniel Scott-Raynsford's curated GitHub Copilot plugins
 | [github-workflows](plugins/github-workflows/) | Create GitHub issues, evaluate reviews, manage Dependabot PRs, optimize Copilot resources, review personal instructions, and generate release content. |
 | [microsoft-technical-research](plugins/microsoft-technical-research/) | Orchestrate structured Microsoft technical research with custom agents. |
 | [powershell-modernization](plugins/powershell-modernization/) | Migrate Pester v4 tests to Pester v5. |
-| [skill-lifecycle](plugins/skill-lifecycle/) | Create and convert agent skills. |
+| [skill-lifecycle](plugins/skill-lifecycle/) | Create, convert, and review agent skills for quality, portability, and consistency. |
 | [suggest-awesome-github-copilot](plugins/suggest-awesome-github-copilot/) | Discover resources from the awesome-copilot catalog. |
 | [windows-app-storage-inspector-cleanup](plugins/windows-app-storage-inspector-cleanup/) | Inspect Windows application storage and safely recycle approved cleanup items. |
 

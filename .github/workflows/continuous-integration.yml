@@ -82,6 +82,32 @@ jobs:
           test -f plugins/windows-app-storage-inspector-cleanup/extensions/windows-app-storage-inspector-cleanup/extension.mjs
           test -f plugins/windows-app-storage-inspector-cleanup/assets/preview.png
 
+  validate-review-checker:
+    name: Validate Review Checker (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@10.18.3
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test checker and both launchers
+        env:
+          REQUIRE_REVIEW_LAUNCHERS: '1'
+        run: node --test eng/review-agent-skills.test.mjs eng/review-agent-skills-casing.test.mjs
+
   validate-windows-extension:
     name: Validate Windows Extension
     runs-on: windows-latest

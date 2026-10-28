@@ -1,0 +1,18 @@
+name: review-agent-skills-triggers
+skill: review-agent-skills
+
+shouldTriggerPrompts:
+  - "Review agent skills in skills/example before I publish them."
+  - "Check skill quality for skills/example/SKILL.md."
+  - "Audit skill portability for these two skill paths."
+  - "Compare skills for overlap in the supplied collection folder."
+  - "Review a skill folder for reliability and repeated rules."
+  - "Check this skill with the skill checker at skills/example/SKILL.md."
+  - "Check this skill source at examples/reference-context.SKILL.md."
+
+shouldNotTriggerPrompts:
+  - "Create a new skill for release notes."
+  - "Convert this prompt into a skill."
+  - "Review the code changes in this pull request."
+  - "Reduce tokens in my prompt without changing its behavior."
+  - "Find a skill that manages my calendar."
