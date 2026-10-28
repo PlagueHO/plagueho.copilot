@@ -3,7 +3,7 @@
 // Parameters: [--profile standard|catalog] -- PATH [PATH...]
 // Usage: node check-frontmatter.mjs --profile catalog -- ./skills/example
 // Requires Node.js 20+ and the yaml dependency from this directory's package.json.
-import { lstat, open, realpath } from "node:fs/promises";
+import { lstat, open, readdir, realpath } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -76,12 +76,24 @@ async function readTarget(input) {
   const path = resolve(input);
   await assertUnlinked(path);
   const stat = await lstat(path);
-  const directory = stat.isDirectory() ? path : dirname(path);
-  const file = stat.isDirectory() ? join(path, "SKILL.md") : path;
-  if (basename(file) !== "SKILL.md") throw new Error("Supply a skill directory or a file named SKILL.md.");
+  if (stat.isDirectory()) {
+    const directory = await realpath(path);
+    if (!(await readdir(directory)).includes("SKILL.md")) {
+      throw new Error("Skill directory must contain a file named exactly SKILL.md.");
+    }
+    const file = join(directory, "SKILL.md");
+    await assertUnlinked(file);
+    if (!(await lstat(file)).isFile()) throw new Error("SKILL.md must be a regular file.");
+    return { directory, file, canonical: await realpath(file) };
+  }
+  const file = await realpath(path);
+  if (basename(file) !== "SKILL.md") {
+    throw new Error("Supply a skill directory or a file named exactly SKILL.md.");
+  }
+  const directory = dirname(file);
   await assertUnlinked(file);
   if (!(await lstat(file)).isFile()) throw new Error("SKILL.md must be a regular file.");
-  return { directory, file, canonical: await realpath(file) };
+  return { directory, file, canonical: file };
 }
 
 async function readBounded(file) {

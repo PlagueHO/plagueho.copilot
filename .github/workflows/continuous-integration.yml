@@ -106,7 +106,7 @@ jobs:
       - name: Test checker and both launchers
         env:
           REQUIRE_REVIEW_LAUNCHERS: '1'
-        run: node --test eng/review-agent-skills.test.mjs
+        run: node --test eng/review-agent-skills.test.mjs eng/review-agent-skills-casing.test.mjs
 
   validate-windows-extension:
     name: Validate Windows Extension
